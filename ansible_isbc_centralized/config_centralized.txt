@@ -1,0 +1,65 @@
+conf
+set addressContext default ipInterfaceGroup LIG1 ipInterface LIF1 ceName vsbc1 ipVarV4 IF2.IPV4 prefixVarV4 IF2.PrefixV4 vlanTagVar IF2.VlanId state enabled mode inService portName pkt0
+commit
+set addressContext default ipInterfaceGroup LIG2 ipInterface LIF2 ceName vsbc1 ipVarV4 IF3.IPV4 prefixVarV4 IF3.PrefixV4 vlanTagVar IF3.VlanId state enabled mode inService portName pkt1
+commit
+
+set addressContext default zone ZONE1 id 2 sipSigPort 1 ipInterfaceGroupName LIG1 portNumber 5060 transportProtocolsAllowed sip-udp ipVarV4 IF2.IPV4 state enabled
+commit
+set addressContext default zone ZONE2 id 3 sipSigPort 2 ipInterfaceGroupName LIG2 portNumber 5060 transportProtocolsAllowed sip-udp state enabled ipVarV4 IF3.IPV4
+commit
+set addressContext default staticRoute 0.0.0.0 0 10.34.227.1 LIG1 LIF1 preference 100
+commit
+set addressContext default staticRoute 0.0.0.0 0 10.34.228.1 LIG2 LIF2 preference 100
+commit
+set addressContext default zone ZONE1 id 2 sipTrunkGroup TG1 media mediaIpInterfaceGroupName LIG1
+commit
+set addressContext default zone ZONE2 id 3 sipTrunkGroup TG2 media mediaIpInterfaceGroupName LIG2
+commit
+set addressContext default zone ZONE2 id 3 sipTrunkGroup TG2 state enabled mode inService
+commit
+set addressContext default zone ZONE1 id 2 sipTrunkGroup TG1 state enabled mode inService
+commit
+set addressContext default zone ZONE1 id 2 sipTrunkGroup TG1 ingressIpPrefix 10.0.0.0 8
+commit
+set addressContext default zone ZONE2 id 3 sipTrunkGroup TG2 ingressIpPrefix 10.0.0.0 8
+commit
+set addressContext default zone ZONE2 sipTrunkGroup TG2 signaling timers sessionKeepalive 0
+commit
+       
+set addressContext default zone ZONE1 sipTrunkGroup TG1 signaling timers sessionKeepalive 0
+commit
+       
+set addressContext default zone ZONE2 ipPeer PEER_OUT_1 ipAddress 10.54.81.11 ipPort 14055
+commit       
+set global callRouting routingLabel OUT_RL1 routingLabelRoute 0 ipPeer PEER_OUT_1 trunkGroup TG2 inService inService
+commit       
+set global callRouting route trunkGroup TG1 VSBCSYSTEM standard Sonus_NULL 1 all all ALL none Sonus_NULL routingLabel OUT_RL1
+commit       
+set addressContext default linkDetectionGroup LDG1 ceName vsbc1 threshold 2 state enabled
+commit       
+set addressContext default linkDetectionGroup LDG1 ceName vsbc1 linkMonitor LM1_P physicalPort pkt0P interfaceGroup LIG1 interface LIF1 destination 10.34.227.1 state enabled probeOnStandby enabled
+commit	
+set addressContext default linkDetectionGroup LDG1 ceName vsbc1 linkMonitor LM1_S physicalPort pkt0S interfaceGroup LIG1 interface LIF1 destination 10.34.227.1 state enabled probeOnStandby enabled
+commit	
+set addressContext default linkDetectionGroup LDG2 ceName vsbc1 threshold 2 state enabled
+commit	
+set addressContext default linkDetectionGroup LDG2 ceName vsbc1 linkMonitor LM1_P physicalPort pkt1P interfaceGroup LIG2 interface LIF2 destination 10.34.228.1 state enabled probeOnStandby enabled
+commit	
+set addressContext default linkDetectionGroup LDG2 ceName vsbc1 linkMonitor LM1_S physicalPort pkt1S interfaceGroup LIG2 interface LIF2 destination 10.34.228.1 state enabled probeOnStandby enabled
+commit
+set addressContext default linkDetectionGroup LDG3 ceName vsbc2 threshold 2 state enabled
+commit
+set addressContext default linkDetectionGroup LDG3 ceName vsbc2 linkMonitor LM2_P physicalPort pkt0P interfaceGroup LIG1 interface LIF1 destination 10.34.227.1 state enabled probeOnStandby enabled
+commit
+set addressContext default linkDetectionGroup LDG3 ceName vsbc2 linkMonitor LM2_S physicalPort pkt0S interfaceGroup LIG1 interface LIF1 destination 10.34.227.1 state enabled probeOnStandby enabled
+commit
+set addressContext default linkDetectionGroup LDG4 ceName vsbc2 threshold 2 state enabled
+commit
+set addressContext default linkDetectionGroup LDG4 ceName vsbc2 linkMonitor LM2_P physicalPort pkt1P interfaceGroup LIG2 interface LIF2 destination 10.34.228.1 state enabled probeOnStandby enabled
+commit
+set addressContext default linkDetectionGroup LDG4 ceName vsbc2 linkMonitor LM2_S physicalPort pkt1S interfaceGroup LIG2 interface LIF2 destination 10.34.228.1 state enabled probeOnStandby enabled
+commit
+set system admin vsbcSystem linkDetection allowArpBroadcastProbeReply enabled
+commit
+exit

@@ -1,0 +1,37 @@
+---
+  - name: remove  the invalid key
+    shell: ssh-keygen -R "mgt0IPAddress_STANDBY"
+  - name: remove  the invalid key
+    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+  - block:
+      - name: pushing license in active node  as well as standby node as it is distributed ISBC .
+        script: /home/ansible/license_push_cloud1.sh {{ mgt0IPAddress_ACTIVE }} {{ mgt0IPAddress_STANDBY }}
+        register: result
+        failed_when: result.rc == 1 or "license bundle b1 already exists"  in result.stderr
+#        register: command_result
+#  #      failed_when: command_result.rc == 0 or command_result.rc >= 99
+    rescue:
+      - name: License not pushed successfully.
+        debug: msg="There was an error in the block."
+  - name: License pushed on active box 
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/system/licenseInfo | grep -wE '(usageLimit|inUse)' | head -2
+    register: b
+  - debug: var=b.stdout_lines
+  - name: License pushed on standby box
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_STANDBY}}/api/operational/system/licenseInfo | grep -wE '(usageLimit|inUse)' | head -2
+    register: b
+  - debug: var=b.stdout_lines
+#  - name: 
+#    shell: curl -kisu 'admin:admin' -X GET https://{{ mgt0IPAddress_ACTIVE }}/api/operational/system/coredumpList/| grep  "No Content"
+#    register: b
+#  - debug: var=b.stdout_lines
+  - name:
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_STANDBY}}/api/operational/system/coredumpSummary/vsbc1 | grep "coredumpAndTraceCount"
+    register: b
+  - debug: var=b.stdout_lines
+
+  
+
+  
+
+

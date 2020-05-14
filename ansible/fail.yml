@@ -1,0 +1,9 @@
+---
+- name: checking fail module and when condition 
+  hosts: localhost
+  vars:
+    test1: "SBC service is now running"
+- fail:
+    msg: SBC is try to run, please wait ......
+  when: test1=="SBC service is now running" or test1==a
+

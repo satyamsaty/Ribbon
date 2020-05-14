@@ -1,0 +1,56 @@
+---
+- name: create stack for ISBC active and standby 
+  hosts: localhost
+  ignore_errors: True
+  tasks:
+  - name: ISBC
+    os_stack:
+       name: ISBC_active
+       tag: stack
+       state: present
+       validate_certs: false
+       template: Test_active_ISBC_SRIOV.yaml
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+  - shell: "{{ item }}"
+    with_items:  
+    - ping 192.168.2.111
+    - ssh -p 2024 linuxadmin@192.168.2.111
+    - yes
+    - sonus
+    - su -
+    - sonus1
+    - tail -f /var/log/sonus/lca/lca.log | grep "SBC service is now running"
+    - echo "SBC service is now runnng"
+    - tail -f /var/log/sonus/lca/lca.log | grep "Node is running in active role"
+    - echo "node service is now running"
+    register: a
+  - debug: var=a.stdout_lines
+
+  - name: ISBC_standby
+    os_stack:
+       name: ISBC_standby
+       tag: stack
+       state: present
+       validate_certs: false
+       template: Test_standby_ISBC_SRIOV.yaml
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS 
+  - shell: "{{ item }}"
+    with_items:
+    - ping 192.168.2.112
+    - ssh -p 2024 linuxadmin@192.168.2.112
+    - yes
+    - sonus
+    - su -
+    - sonus1
+    - tail -f /var/log/sonus/lca/lca.log | grep "SBC service is now running"
+    - echo "SBC service is now runnng"
+    - tail -f /var/log/sonus/lca/lca.log | grep "Node is running in standby role"
+    - echo "node service is now running"
+    register: s
+  - debug: var=s.stdout_lines

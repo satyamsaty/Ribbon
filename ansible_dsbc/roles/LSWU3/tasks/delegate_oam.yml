@@ -1,0 +1,12 @@
+---
+  - name:
+    debug:
+      msg: "{{ item }}"
+    loop: "{{ oam_nodes }}"
+    register: stack
+
+  - set_fact:
+      oam_ssbc_mgt0ipaddress: "{{ stack.results[0].item.mgt0ipaddress_active }}"
+      oam_msbc_mgt0ipaddress: "{{ stack.results[1].item.mgt0ipaddress_active }}"
+      oam_tsbc_mgt0ipaddress: "{{ stack.results[2].item.mgt0ipaddress_active }}"
+

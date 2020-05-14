@@ -1,0 +1,27 @@
+---
+  - include: inventory_ssbc.yml
+  - name: SaveAndActivate from OAM .
+    ignore_errors: yes
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+       expect ">"
+       send "show table system rgStatus\n"
+
+       expect ">"
+       send "\n"
+
+       exit 0
+    args:
+        executable: /usr/bin/expect
+    delegate_to: "{{ item }}"
+    loop: "{{groups['ssbc']}}"
+    register: oam
+  - debug:
+      var: oam
+
+

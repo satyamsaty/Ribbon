@@ -1,0 +1,9 @@
+  - name: to push license in active node after upgrade
+    shell: sh /home/ansible/license_push_cloud.sh {{mgt0IPAddress_ACTIVE}} null
+    delegate_to: localhost
+    register: command_result
+  - name: License pushed on active box
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/system/licenseInfo | grep -wE '(usageLimit|inUse)' | head -2
+    register: b
+  - debug: var=b.stdout_lines
+

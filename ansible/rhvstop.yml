@@ -1,0 +1,13 @@
+---
+- name: RHV
+  hosts: localhost
+  gather_facts: true
+  ignore_errors: true
+  tasks:
+  - name: Stopping an existing instance
+    RHV:
+    instance_name: MSBCSTANDBY
+    state: stopped
+    user: admin
+    password: sonus1
+    url: https://rhevh01.in.sonusnet.com

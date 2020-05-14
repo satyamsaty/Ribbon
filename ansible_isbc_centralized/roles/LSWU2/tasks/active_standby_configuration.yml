@@ -1,0 +1,52 @@
+---
+
+
+  - include_tasks: delegate.yml
+  - include_tasks: inventory.yml
+
+#  - name: 
+#    command: "echo {{ item.name }}"
+#    register: res
+#    loop: "{{ isbc_centralized_nodes }}"
+#    loop_control:
+#       label: "{{ item.name }}"
+#  - debug:
+#      var: res
+#    no_log: True
+#
+  - name: 
+    run_once: True
+    copy:
+     src: "{{ Configuration_File_Path }}"
+     dest: /root/config_centralized.txt
+     mode: '0777'
+     force: yes
+    delegate_to: "{{ res.results[0].stdout }}"
+#    loop: "{{ isbc_centralized_nodes }}"
+#    when: item.role =='ACTIVE'
+
+#    loop: "{{groups['isbc']}}"
+#    loop_control:
+#          label: "{{ item }}"
+
+  - name: To run configuration in active box
+    ignore_errors: yes
+    shell: cat /root/config_centralized.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    register: configuration
+    delegate_to: "{{ res.results[0].stdout }}"
+#  - debug:
+#      var: configuration
+
+  - name: Configuration is not pushed properly
+    fail:
+      msg: "Configuration is not pushed successfully"
+    when: "'error' in configuration.stdout"
+
+
+#    loop: "{{groups['isbc']}}"
+#    loop_control:
+#          label: "{{ item }}"
+
+
+
+

@@ -1,0 +1,17 @@
+---
+- name: create stack
+  hosts: localhost
+  gather_facts: true
+  ignore_errors: true
+  tasks:
+  - name: Running the call(uas)
+    shell: ssh -p 22 -o  "stricthostkeychecking no" satykumar@10.54.81.66 "/ats/bin/sipp -sn uas -i 10.54.81.66 -p 14055 -bg "
+  - name: Running the call(uac)
+    shell: ssh -p 22 -o  "stricthostkeychecking no" satykumar@10.54.81.66 "/ats/bin/sipp -sn uac -i 10.54.81.66 -p 15823 10.34.226.111 -s 9966896446 -m 10 -d 2000 -bg"
+  - name: To copy the callcount script in remote box
+    shell: scp -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key -P 2024 /home/ansible/call.sh root@10.34.224.111:/root
+  - name: Call Count
+    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key root@10.34.224.111 "expect /root/call.sh"
+    register: v
+  - debug: var=v.stdout_lines
+

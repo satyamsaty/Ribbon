@@ -1,0 +1,17 @@
+---
+- name: Gather facts about a flavor
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: To get the info about flavor
+      os_flavor_facts:
+        cloud: clouds.yml
+        name: ansible_master
+        validate_certs: false
+      register: openstack_flavor.stdout
+
+    - name: Show openstack facts
+      debug:
+        msg: "{{ openstack_flavor }}"
+

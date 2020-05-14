@@ -1,0 +1,63 @@
+  - name: Adding  active OAM instances to oam_1 group.
+    add_host:
+      name: "{{ item.name }}-1"
+      groups: "oam_1"
+      ansible_host: "{{ item.mgt0ipaddress_active }}"
+    loop: "{{ oam_nodes }}"
+    no_log: True
+
+  - name: Adding standby OAM instances to oam_2 group.
+    add_host:
+      name: "{{ item.name }}-2"
+      groups: "oam_2"
+      ansible_host: "{{ item.mgt0ipaddress_standby }}"
+    loop: "{{ oam_nodes }}"
+    no_log: True
+
+
+#  - name: inventory_hostname for oam group
+#    debug:
+#      msg: "{{ item }}"
+#    with_items: "{{ groups['oam_1'][0] }}"
+#
+#  - name: inventory_hostname for oam group
+#    debug:
+#      msg: "{{ item }}"
+#    with_items: "{{ groups['oam_1'][1] }}"
+#
+#
+#  - name: inventory_hostname for oam group
+#    debug:
+#      msg: "{{ item }}"
+#    with_items: "{{ groups['oam_1'][2] }}"
+
+
+
+
+   
+#  - name: inventory_hostname for group oam-1
+#    debug:
+#      msg: "{{ item }}"
+#    loop: "{{ groups['oam_1'][0] }}"
+
+#  - name: inventory_hostname for group oam-2
+#    debug:
+#      msg: "{{ item }}"
+#    loop: "{{ groups['oam-2'] }}"
+#
+#
+## show all the hosts in the current play
+#  - debug:
+#     msg: "{{ item }}"
+#    loop: "{{ ansible_play_batch }}"
+#
+#
+#  - debug:
+#     msg: "{{ item }}"
+#    loop: "{{ query('inventory_hostnames', 'oam-1') }}"
+#
+## show all the hosts matching the pattern, ie all but the group www
+#  - debug:
+#      msg: "{{ item }}"
+#    loop: "{{ query('inventory_hostnames', 'all:!oam-1') }}"
+#

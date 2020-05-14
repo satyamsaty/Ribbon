@@ -1,0 +1,16 @@
+  - name: Adding MSBC  instances to msbc group.
+    add_host:
+      name: "{{ item.name }}"
+      groups: "msbc"
+      ansible_host: "{{ item.mgt0ipaddress }}"
+    loop: "{{ msbc_nodes }}"
+#    register: inventory_msbc
+#  - debug:
+#      var: inventory_msbc
+
+
+#  - name: inventory_hostname for msbc group 
+#    debug:
+#      msg: "{{ item }}"
+#    with_items: "{{ groups['msbc'][0] }}"
+

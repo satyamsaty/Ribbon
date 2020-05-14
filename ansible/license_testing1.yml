@@ -1,0 +1,9 @@
+---
+- name: create stack
+  hosts: localhost
+  gather_facts: false
+  ignore_errors: false
+  tasks:
+  - name: license push
+    shell: sh /home/ansible/license_push_cloud.sh
+     

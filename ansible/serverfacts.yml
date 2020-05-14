@@ -1,0 +1,15 @@
+---
+- name: Gather facts about a previously created image named image1
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: To get the facts about image
+      os_image_facts:
+        image: centos_qcow2 
+        validate_certs: false
+      register: openstack_image.stdout
+
+    - name: Show openstack facts
+      debug:
+        msg: "{{ openstack_image }}"

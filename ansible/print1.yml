@@ -1,0 +1,11 @@
+- name: print
+  hosts: localhost
+  tasks:
+     - name: simple print
+       shell: echo "hello mukul"
+       register: a
+     - debug: var=a.stdout_lines
+     - name: print name of employee
+       shell: echo "rahul"
+       register: out
+     - debug: var=out.stdout_lines

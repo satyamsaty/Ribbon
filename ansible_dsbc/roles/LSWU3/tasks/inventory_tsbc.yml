@@ -1,0 +1,16 @@
+ - name: Adding TSBC  instances to tsbc group.
+   add_host:
+      name: "{{ item.name }}"
+      groups: "tsbc"
+      ansible_host: "{{ item.mgt0ipaddress }}"
+   loop: "{{ tsbc_nodes }}"
+#   register: inventory_tsbc
+# - debug:
+#      var: inventory_tsbc
+
+
+# - name: inventory_hostname for tsbc group
+#   debug:
+#      msg: "{{ item }}"
+#   loop: "{{ groups['tsbc'] }}"
+

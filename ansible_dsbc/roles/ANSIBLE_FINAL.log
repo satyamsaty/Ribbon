@@ -1,0 +1,548 @@
+
+PLAY [localhost] ************************************************************************************************************************
+Tuesday 31 March 2020  21:29:07 +0530 (0:00:00.039)       0:00:00.039 ********* 
+
+TASK [include_vars] *********************************************************************************************************************
+ok: [localhost]
+
+PLAY [SPAWNING OAM INSTANCES] ***********************************************************************************************************
+Tuesday 31 March 2020  21:29:07 +0530 (0:00:00.059)       0:00:00.099 ********* 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/oam.yml for localhost
+Tuesday 31 March 2020  21:29:07 +0530 (0:00:00.160)       0:00:00.259 ********* 
+
+TASK [Spawning the OAM instances] *******************************************************************************************************
+changed: [localhost] => (item=OAM_SSBC_ANSIBLE)
+changed: [localhost] => (item=OAM_MSBC_ANSIBLE)
+changed: [localhost] => (item=OAM_TSBC_ANSIBLE)
+Tuesday 31 March 2020  21:31:38 +0530 (0:02:31.421)       0:02:31.681 ********* 
+Tuesday 31 March 2020  21:31:39 +0530 (0:00:00.288)       0:02:31.969 ********* 
+
+TASK [Wait until the active OAM  instances pings] ***************************************************************************************
+ok: [localhost] => (item=10.34.194.65)
+ok: [localhost] => (item=10.34.194.61)
+ok: [localhost] => (item=10.34.194.23)
+Tuesday 31 March 2020  21:34:40 +0530 (0:03:01.444)       0:05:33.414 ********* 
+
+TASK [Wait until the standby OAM   instance pings] **************************************************************************************
+ok: [localhost] => (item=10.34.194.66)
+ok: [localhost] => (item=10.34.194.62)
+ok: [localhost] => (item=10.34.194.25)
+Tuesday 31 March 2020  21:37:41 +0530 (0:03:01.090)       0:08:34.504 ********* 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/inventory_oam.yml for localhost
+Tuesday 31 March 2020  21:37:41 +0530 (0:00:00.097)       0:08:34.601 ********* 
+
+TASK [Add instances to inventory] *******************************************************************************************************
+changed: [localhost] => (item=None)
+changed: [localhost] => (item=None)
+changed: [localhost] => (item=None)
+changed: [localhost]
+Tuesday 31 March 2020  21:37:41 +0530 (0:00:00.141)       0:08:34.743 ********* 
+
+TASK [Add instances to inventory] *******************************************************************************************************
+changed: [localhost] => (item=None)
+changed: [localhost] => (item=None)
+changed: [localhost] => (item=None)
+changed: [localhost]
+Tuesday 31 March 2020  21:37:41 +0530 (0:00:00.109)       0:08:34.852 ********* 
+
+TASK [inventory_hostname for oam group] *************************************************************************************************
+ok: [localhost] => (item=OAM_SSBC_ANSIBLE-1) => 
+  msg: OAM_SSBC_ANSIBLE-1
+Tuesday 31 March 2020  21:37:42 +0530 (0:00:00.105)       0:08:34.958 ********* 
+
+TASK [inventory_hostname for oam group] *************************************************************************************************
+ok: [localhost] => (item=OAM_MSBC_ANSIBLE-1) => 
+  msg: OAM_MSBC_ANSIBLE-1
+Tuesday 31 March 2020  21:37:42 +0530 (0:00:00.088)       0:08:35.047 ********* 
+
+TASK [inventory_hostname for oam group] *************************************************************************************************
+ok: [localhost] => (item=OAM_TSBC_ANSIBLE-1) => 
+  msg: OAM_TSBC_ANSIBLE-1
+Tuesday 31 March 2020  21:37:42 +0530 (0:00:00.104)       0:08:35.152 ********* 
+
+TASK [Checking the Management  IP of Active OAM  is pingable or not] ********************************************************************
+changed: [localhost] => (item=10.34.194.65)
+changed: [localhost] => (item=10.34.194.61)
+changed: [localhost] => (item=10.34.194.23)
+Tuesday 31 March 2020  21:37:46 +0530 (0:00:04.049)       0:08:39.202 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.194.65 (10.34.194.65) 56(84) bytes of data.', u'64 bytes from 10.34.194.65: icmp_seq=1 ttl=61 time=3.82 ms', u'64 bytes from 10.34.194.65: icmp_seq=2 ttl=61 time=12.4 ms', u'', u'--- 10.34.194.65 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 999ms', u'rtt min/avg/max/mdev = 3.828/8.128/12.428/4.300 ms']) => 
+  msg:
+  - PING 10.34.194.65 (10.34.194.65) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.65: icmp_seq=1 ttl=61 time=3.82 ms'
+  - '64 bytes from 10.34.194.65: icmp_seq=2 ttl=61 time=12.4 ms'
+  - ''
+  - '--- 10.34.194.65 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 999ms
+  - rtt min/avg/max/mdev = 3.828/8.128/12.428/4.300 ms
+ok: [localhost] => (item=[u'PING 10.34.194.61 (10.34.194.61) 56(84) bytes of data.', u'64 bytes from 10.34.194.61: icmp_seq=1 ttl=61 time=5.65 ms', u'64 bytes from 10.34.194.61: icmp_seq=2 ttl=61 time=5.24 ms', u'', u'--- 10.34.194.61 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 5.241/5.450/5.659/0.209 ms']) => 
+  msg:
+  - PING 10.34.194.61 (10.34.194.61) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.61: icmp_seq=1 ttl=61 time=5.65 ms'
+  - '64 bytes from 10.34.194.61: icmp_seq=2 ttl=61 time=5.24 ms'
+  - ''
+  - '--- 10.34.194.61 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1000ms
+  - rtt min/avg/max/mdev = 5.241/5.450/5.659/0.209 ms
+ok: [localhost] => (item=[u'PING 10.34.194.23 (10.34.194.23) 56(84) bytes of data.', u'64 bytes from 10.34.194.23: icmp_seq=1 ttl=61 time=4.68 ms', u'64 bytes from 10.34.194.23: icmp_seq=2 ttl=61 time=4.31 ms', u'', u'--- 10.34.194.23 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 4.313/4.500/4.687/0.187 ms']) => 
+  msg:
+  - PING 10.34.194.23 (10.34.194.23) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.23: icmp_seq=1 ttl=61 time=4.68 ms'
+  - '64 bytes from 10.34.194.23: icmp_seq=2 ttl=61 time=4.31 ms'
+  - ''
+  - '--- 10.34.194.23 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1000ms
+  - rtt min/avg/max/mdev = 4.313/4.500/4.687/0.187 ms
+Tuesday 31 March 2020  21:37:46 +0530 (0:00:00.134)       0:08:39.336 ********* 
+
+TASK [Checking the Management  IP of Standby OAM  is pingable or not] *******************************************************************
+changed: [localhost] => (item=10.34.194.66)
+changed: [localhost] => (item=10.34.194.62)
+changed: [localhost] => (item=10.34.194.25)
+Tuesday 31 March 2020  21:37:51 +0530 (0:00:04.791)       0:08:44.128 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.194.66 (10.34.194.66) 56(84) bytes of data.', u'64 bytes from 10.34.194.66: icmp_seq=1 ttl=61 time=10.7 ms', u'64 bytes from 10.34.194.66: icmp_seq=2 ttl=61 time=1.44 ms', u'', u'--- 10.34.194.66 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1001ms', u'rtt min/avg/max/mdev = 1.443/6.080/10.717/4.637 ms']) => 
+  msg:
+  - PING 10.34.194.66 (10.34.194.66) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.66: icmp_seq=1 ttl=61 time=10.7 ms'
+  - '64 bytes from 10.34.194.66: icmp_seq=2 ttl=61 time=1.44 ms'
+  - ''
+  - '--- 10.34.194.66 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+  - rtt min/avg/max/mdev = 1.443/6.080/10.717/4.637 ms
+ok: [localhost] => (item=[u'PING 10.34.194.62 (10.34.194.62) 56(84) bytes of data.', u'64 bytes from 10.34.194.62: icmp_seq=1 ttl=61 time=4.27 ms', u'64 bytes from 10.34.194.62: icmp_seq=2 ttl=61 time=8.25 ms', u'', u'--- 10.34.194.62 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 4.276/6.267/8.258/1.991 ms']) => 
+  msg:
+  - PING 10.34.194.62 (10.34.194.62) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.62: icmp_seq=1 ttl=61 time=4.27 ms'
+  - '64 bytes from 10.34.194.62: icmp_seq=2 ttl=61 time=8.25 ms'
+  - ''
+  - '--- 10.34.194.62 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1000ms
+  - rtt min/avg/max/mdev = 4.276/6.267/8.258/1.991 ms
+ok: [localhost] => (item=[u'PING 10.34.194.25 (10.34.194.25) 56(84) bytes of data.', u'64 bytes from 10.34.194.25: icmp_seq=1 ttl=61 time=4.55 ms', u'64 bytes from 10.34.194.25: icmp_seq=2 ttl=61 time=3.43 ms', u'', u'--- 10.34.194.25 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1001ms', u'rtt min/avg/max/mdev = 3.436/3.996/4.556/0.560 ms']) => 
+  msg:
+  - PING 10.34.194.25 (10.34.194.25) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.25: icmp_seq=1 ttl=61 time=4.55 ms'
+  - '64 bytes from 10.34.194.25: icmp_seq=2 ttl=61 time=3.43 ms'
+  - ''
+  - '--- 10.34.194.25 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+  - rtt min/avg/max/mdev = 3.436/3.996/4.556/0.560 ms
+Tuesday 31 March 2020  21:37:51 +0530 (0:00:00.201)       0:08:44.329 ********* 
+
+TASK [Checking if any core file generated, fails task if generated] *********************************************************************
+changed: [localhost -> 10.34.194.65] => (item=OAM_SSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.61] => (item=OAM_MSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.23] => (item=OAM_TSBC_ANSIBLE-1)
+Tuesday 31 March 2020  21:37:59 +0530 (0:00:07.739)       0:08:52.069 ********* 
+
+TASK [Core dump files] ******************************************************************************************************************
+ok: [localhost] => (item=0) => 
+  msg: OAM_SSBC_ANSIBLE-1 has 0 core files
+ok: [localhost] => (item=0) => 
+  msg: OAM_MSBC_ANSIBLE-1 has 0 core files
+ok: [localhost] => (item=0) => 
+  msg: OAM_TSBC_ANSIBLE-1 has 0 core files
+Tuesday 31 March 2020  21:37:59 +0530 (0:00:00.097)       0:08:52.166 ********* 
+Tuesday 31 March 2020  21:37:59 +0530 (0:00:00.096)       0:08:52.262 ********* 
+
+TASK [checking if any core file is  generated on standby oam , fails task if generated .] ***********************************************
+changed: [localhost -> 10.34.194.66] => (item=OAM_SSBC_ANSIBLE-2)
+changed: [localhost -> 10.34.194.62] => (item=OAM_MSBC_ANSIBLE-2)
+changed: [localhost -> 10.34.194.25] => (item=OAM_TSBC_ANSIBLE-2)
+Tuesday 31 March 2020  21:38:05 +0530 (0:00:05.885)       0:08:58.148 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'0']) => 
+  msg: OAM_SSBC_ANSIBLE-2 has 0 core files
+ok: [localhost] => (item=[u'0']) => 
+  msg: OAM_MSBC_ANSIBLE-2 has 0 core files
+ok: [localhost] => (item=[u'0']) => 
+  msg: OAM_TSBC_ANSIBLE-2 has 0 core files
+Tuesday 31 March 2020  21:38:05 +0530 (0:00:00.100)       0:08:58.248 ********* 
+Tuesday 31 March 2020  21:38:05 +0530 (0:00:00.142)       0:08:58.391 ********* 
+
+TASK [Waiting for service] **************************************************************************************************************
+changed: [localhost -> 10.34.194.65] => (item=OAM_SSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.61] => (item=OAM_MSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.23] => (item=OAM_TSBC_ANSIBLE-1)
+Tuesday 31 March 2020  21:38:06 +0530 (0:00:01.193)       0:08:59.584 ********* 
+Tuesday 31 March 2020  21:38:06 +0530 (0:00:00.103)       0:08:59.688 ********* 
+
+TASK [Waiting for service] **************************************************************************************************************
+changed: [localhost -> 10.34.194.65] => (item=OAM_SSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.61] => (item=OAM_MSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.23] => (item=OAM_TSBC_ANSIBLE-1)
+Tuesday 31 March 2020  21:38:08 +0530 (0:00:01.321)       0:09:01.010 ********* 
+Tuesday 31 March 2020  21:38:08 +0530 (0:00:00.099)       0:09:01.109 ********* 
+
+TASK [checking sync status] *************************************************************************************************************
+changed: [localhost] => (item=10.34.194.65)
+changed: [localhost] => (item=10.34.194.61)
+changed: [localhost] => (item=10.34.194.23)
+Tuesday 31 March 2020  21:38:15 +0530 (0:00:07.355)       0:09:08.465 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item={'stderr_lines': [], 'ansible_loop_var': u'item', u'end': u'2020-03-31 21:38:09.937954', u'stderr': u'', u'stdout': u'    <status>syncCompleted</status>\n    <status>syncCompleted</status>', u'changed': True, 'failed': False, u'delta': u'0:00:01.549579', u'cmd': u"curl -kisu 'admin:admin' -X GET https://10.34.194.65/api/operational/system/syncStatus/ | grep status", 'item': {u'name': u'OAM_SSBC_ANSIBLE', u'mgt0ipaddress_active': u'10.34.194.65', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'present_or_absent': u'present', u'template': u'OAM_SSBC_PROVIDER.yml', u'security_group': u'sbccoresvt-sg', u'flavor': u'ANSIBLE', u'mgt0ipaddress_standby': u'10.34.194.66', u'OAM_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2'}, u'rc': 0, u'invocation': {u'module_args': {u'warn': False, u'executable': None, u'_uses_shell': True, u'strip_empty_ends': True, u'_raw_params': u"curl -kisu 'admin:admin' -X GET https://10.34.194.65/api/operational/system/syncStatus/ | grep status", u'removes': None, u'argv': None, u'creates': None, u'chdir': None, u'stdin_add_newline': True, u'stdin': None}}, 'stdout_lines': [u'    <status>syncCompleted</status>', u'    <status>syncCompleted</status>'], u'start': u'2020-03-31 21:38:08.388375'}) => 
+  msg:
+  - '    <status>syncCompleted</status>'
+  - '    <status>syncCompleted</status>'
+ok: [localhost] => (item={'stderr_lines': [], 'ansible_loop_var': u'item', u'end': u'2020-03-31 21:38:13.899431', u'stderr': u'', u'stdout': u'    <status>unprotected</status>\n    <status>unprotected</status>', u'changed': True, 'failed': False, u'delta': u'0:00:03.757933', u'cmd': u"curl -kisu 'admin:admin' -X GET https://10.34.194.61/api/operational/system/syncStatus/ | grep status", 'item': {u'name': u'OAM_MSBC_ANSIBLE', u'mgt0ipaddress_active': u'10.34.194.61', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'present_or_absent': u'present', u'template': u'OAM_MSBC_PROVIDER.yml', u'security_group': u'sbccoresvt-sg', u'flavor': u'ANSIBLE', u'mgt0ipaddress_standby': u'10.34.194.62', u'OAM_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2'}, u'rc': 0, u'invocation': {u'module_args': {u'warn': False, u'executable': None, u'_uses_shell': True, u'strip_empty_ends': True, u'_raw_params': u"curl -kisu 'admin:admin' -X GET https://10.34.194.61/api/operational/system/syncStatus/ | grep status", u'removes': None, u'argv': None, u'creates': None, u'chdir': None, u'stdin_add_newline': True, u'stdin': None}}, 'stdout_lines': [u'    <status>unprotected</status>', u'    <status>unprotected</status>'], u'start': u'2020-03-31 21:38:10.141498'}) => 
+  msg:
+  - '    <status>unprotected</status>'
+  - '    <status>unprotected</status>'
+ok: [localhost] => (item={'stderr_lines': [], 'ansible_loop_var': u'item', u'end': u'2020-03-31 21:38:15.474190', u'stderr': u'', u'stdout': u'    <status>unprotected</status>\n    <status>unprotected</status>', u'changed': True, 'failed': False, u'delta': u'0:00:01.356293', u'cmd': u"curl -kisu 'admin:admin' -X GET https://10.34.194.23/api/operational/system/syncStatus/ | grep status", 'item': {u'name': u'OAM_TSBC_ANSIBLE', u'mgt0ipaddress_active': u'10.34.194.23', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'present_or_absent': u'present', u'template': u'OAM_TSBC_PROVIDER.yml', u'security_group': u'sbccoresvt-sg', u'flavor': u'ANSIBLE', u'mgt0ipaddress_standby': u'10.34.194.25', u'OAM_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2'}, u'rc': 0, u'invocation': {u'module_args': {u'warn': False, u'executable': None, u'_uses_shell': True, u'strip_empty_ends': True, u'_raw_params': u"curl -kisu 'admin:admin' -X GET https://10.34.194.23/api/operational/system/syncStatus/ | grep status", u'removes': None, u'argv': None, u'creates': None, u'chdir': None, u'stdin_add_newline': True, u'stdin': None}}, 'stdout_lines': [u'    <status>unprotected</status>', u'    <status>unprotected</status>'], u'start': u'2020-03-31 21:38:14.117897'}) => 
+  msg:
+  - '    <status>unprotected</status>'
+  - '    <status>unprotected</status>'
+
+PLAY [SPAWNING SSBC Instances] **********************************************************************************************************
+Tuesday 31 March 2020  21:38:15 +0530 (0:00:00.105)       0:09:08.571 ********* 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/ssbc.yml for localhost
+Tuesday 31 March 2020  21:38:15 +0530 (0:00:00.097)       0:09:08.669 ********* 
+
+TASK [spawning the SSBC instances] ******************************************************************************************************
+changed: [localhost] => (item={u'name': u'SSBC_ACTIVE_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'ACTIVE', u'template': u'SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.120'})
+changed: [localhost] => (item={u'name': u'SSBC_STANDBY_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'STANDBY', u'template': u'SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.83'})
+Tuesday 31 March 2020  21:40:31 +0530 (0:02:15.584)       0:11:24.253 ********* 
+Tuesday 31 March 2020  21:40:31 +0530 (0:00:00.118)       0:11:24.372 ********* 
+
+TASK [Wait until the  SSBC  instances ping] *********************************************************************************************
+ok: [localhost] => (item=10.34.194.120)
+ok: [localhost] => (item=10.34.194.83)
+Tuesday 31 March 2020  21:42:32 +0530 (0:02:00.699)       0:13:25.071 ********* 
+
+TASK [Checking the Management IP of SSBC instances  is pingable or not] *****************************************************************
+changed: [localhost] => (item=10.34.194.120)
+changed: [localhost] => (item=10.34.194.83)
+Tuesday 31 March 2020  21:42:34 +0530 (0:00:02.568)       0:13:27.640 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.194.120 (10.34.194.120) 56(84) bytes of data.', u'64 bytes from 10.34.194.120: icmp_seq=1 ttl=61 time=1.21 ms', u'64 bytes from 10.34.194.120: icmp_seq=2 ttl=61 time=5.48 ms', u'', u'--- 10.34.194.120 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 999ms', u'rtt min/avg/max/mdev = 1.216/3.350/5.485/2.135 ms']) => 
+  msg:
+  - PING 10.34.194.120 (10.34.194.120) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.120: icmp_seq=1 ttl=61 time=1.21 ms'
+  - '64 bytes from 10.34.194.120: icmp_seq=2 ttl=61 time=5.48 ms'
+  - ''
+  - '--- 10.34.194.120 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 999ms
+  - rtt min/avg/max/mdev = 1.216/3.350/5.485/2.135 ms
+ok: [localhost] => (item=[u'PING 10.34.194.83 (10.34.194.83) 56(84) bytes of data.', u'64 bytes from 10.34.194.83: icmp_seq=1 ttl=61 time=5.73 ms', u'64 bytes from 10.34.194.83: icmp_seq=2 ttl=61 time=4.08 ms', u'', u'--- 10.34.194.83 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1001ms', u'rtt min/avg/max/mdev = 4.088/4.910/5.732/0.822 ms']) => 
+  msg:
+  - PING 10.34.194.83 (10.34.194.83) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.83: icmp_seq=1 ttl=61 time=5.73 ms'
+  - '64 bytes from 10.34.194.83: icmp_seq=2 ttl=61 time=4.08 ms'
+  - ''
+  - '--- 10.34.194.83 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+  - rtt min/avg/max/mdev = 4.088/4.910/5.732/0.822 ms
+Tuesday 31 March 2020  21:42:34 +0530 (0:00:00.092)       0:13:27.732 ********* 
+Tuesday 31 March 2020  21:42:34 +0530 (0:00:00.087)       0:13:27.820 ********* 
+
+TASK [wait for 30 seconds] **************************************************************************************************************
+ok: [localhost]
+Tuesday 31 March 2020  21:43:05 +0530 (0:00:30.304)       0:13:58.125 ********* 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/inventory_ssbc.yml for localhost
+Tuesday 31 March 2020  21:43:05 +0530 (0:00:00.105)       0:13:58.230 ********* 
+
+TASK [Add SSBC  instances to inventory] *************************************************************************************************
+changed: [localhost] => (item={u'name': u'SSBC_ACTIVE_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'ACTIVE', u'template': u'SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.120'})
+changed: [localhost] => (item={u'name': u'SSBC_STANDBY_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'STANDBY', u'template': u'SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.83'})
+Tuesday 31 March 2020  21:43:05 +0530 (0:00:00.093)       0:13:58.324 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => 
+  inventory_ssbc:
+    changed: true
+    msg: All items completed
+    results:
+    - add_host:
+        groups:
+        - ssbc
+        host_name: SSBC_ACTIVE_ANSIBLE
+        host_vars:
+          ansible_host: 10.34.194.120
+      ansible_loop_var: item
+      changed: true
+      failed: false
+      item:
+        SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+        base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+        flavor: ANSIBLE
+        mgt0ipaddress: 10.34.194.120
+        name: SSBC_ACTIVE_ANSIBLE
+        present_or_absent: present
+        role: ACTIVE
+        security_group: sbccoresvt-sg
+        template: SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+    - add_host:
+        groups:
+        - ssbc
+        host_name: SSBC_STANDBY_ANSIBLE
+        host_vars:
+          ansible_host: 10.34.194.83
+      ansible_loop_var: item
+      changed: true
+      failed: false
+      item:
+        SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+        base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+        flavor: ANSIBLE
+        mgt0ipaddress: 10.34.194.83
+        name: SSBC_STANDBY_ANSIBLE
+        present_or_absent: present
+        role: STANDBY
+        security_group: sbccoresvt-sg
+        template: SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml
+Tuesday 31 March 2020  21:43:05 +0530 (0:00:00.078)       0:13:58.402 ********* 
+
+TASK [inventory_hostname for group oam-1] ***********************************************************************************************
+ok: [localhost] => (item=SSBC_ACTIVE_ANSIBLE) => 
+  msg: SSBC_ACTIVE_ANSIBLE
+ok: [localhost] => (item=SSBC_STANDBY_ANSIBLE) => 
+  msg: SSBC_STANDBY_ANSIBLE
+Tuesday 31 March 2020  21:43:05 +0530 (0:00:00.097)       0:13:58.500 ********* 
+
+TASK [checking if any core file generated, fails task if generated .] *******************************************************************
+changed: [localhost -> 10.34.194.120] => (item=SSBC_ACTIVE_ANSIBLE)
+changed: [localhost -> 10.34.194.83] => (item=SSBC_STANDBY_ANSIBLE)
+Tuesday 31 March 2020  21:43:09 +0530 (0:00:04.317)       0:14:02.818 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'0']) => 
+  msg: SSBC_ACTIVE_ANSIBLE has 0 core files
+ok: [localhost] => (item=[u'0']) => 
+  msg: SSBC_STANDBY_ANSIBLE has 0 core files
+Tuesday 31 March 2020  21:43:09 +0530 (0:00:00.072)       0:14:02.890 ********* 
+Tuesday 31 March 2020  21:43:10 +0530 (0:00:00.096)       0:14:02.987 ********* 
+FAILED - RETRYING: Waiting for service (60 retries left).
+FAILED - RETRYING: Waiting for service (59 retries left).
+FAILED - RETRYING: Waiting for service (58 retries left).
+FAILED - RETRYING: Waiting for service (57 retries left).
+FAILED - RETRYING: Waiting for service (56 retries left).
+FAILED - RETRYING: Waiting for service (55 retries left).
+FAILED - RETRYING: Waiting for service (54 retries left).
+FAILED - RETRYING: Waiting for service (53 retries left).
+FAILED - RETRYING: Waiting for service (52 retries left).
+
+TASK [Waiting for service] **************************************************************************************************************
+changed: [localhost -> 10.34.194.120] => (item=SSBC_ACTIVE_ANSIBLE)
+FAILED - RETRYING: Waiting for service (60 retries left).
+FAILED - RETRYING: Waiting for service (59 retries left).
+FAILED - RETRYING: Waiting for service (58 retries left).
+FAILED - RETRYING: Waiting for service (57 retries left).
+FAILED - RETRYING: Waiting for service (56 retries left).
+FAILED - RETRYING: Waiting for service (55 retries left).
+FAILED - RETRYING: Waiting for service (54 retries left).
+FAILED - RETRYING: Waiting for service (53 retries left).
+FAILED - RETRYING: Waiting for service (52 retries left).
+FAILED - RETRYING: Waiting for service (51 retries left).
+FAILED - RETRYING: Waiting for service (50 retries left).
+changed: [localhost -> 10.34.194.83] => (item=SSBC_STANDBY_ANSIBLE)
+Tuesday 31 March 2020  21:45:22 +0530 (0:02:12.252)       0:16:15.239 ********* 
+Tuesday 31 March 2020  21:45:22 +0530 (0:00:00.094)       0:16:15.333 ********* 
+
+TASK [checking sync status] *************************************************************************************************************
+changed: [localhost] => (item={u'name': u'SSBC_ACTIVE_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'ACTIVE', u'template': u'SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.120'})
+changed: [localhost] => (item={u'name': u'SSBC_STANDBY_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'STANDBY', u'template': u'SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.83'})
+Tuesday 31 March 2020  21:45:31 +0530 (0:00:09.159)       0:16:24.492 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item={'stderr_lines': [], 'ansible_loop_var': u'item', u'end': u'2020-03-31 21:45:26.371051', u'stderr': u'', u'stdout': u'    <status>syncCompleted</status>\n    <status>syncCompleted</status>', u'changed': True, 'failed': False, u'delta': u'0:00:03.777087', u'cmd': u"curl -kisu 'admin:admin' -X GET https://10.34.194.120/api/operational/system/syncStatus/ | grep status", 'item': {u'name': u'SSBC_ACTIVE_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'present_or_absent': u'present', u'role': u'ACTIVE', u'template': u'SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'security_group': u'sbccoresvt-sg', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.120'}, u'rc': 0, u'invocation': {u'module_args': {u'warn': False, u'executable': None, u'_uses_shell': True, u'strip_empty_ends': True, u'_raw_params': u"curl -kisu 'admin:admin' -X GET https://10.34.194.120/api/operational/system/syncStatus/ | grep status", u'removes': None, u'argv': None, u'creates': None, u'chdir': None, u'stdin_add_newline': True, u'stdin': None}}, 'stdout_lines': [u'    <status>syncCompleted</status>', u'    <status>syncCompleted</status>'], u'start': u'2020-03-31 21:45:22.593964'}) => 
+  msg:
+  - '    <status>syncCompleted</status>'
+  - '    <status>syncCompleted</status>'
+ok: [localhost] => (item={'stderr_lines': [], 'ansible_loop_var': u'item', u'end': u'2020-03-31 21:45:31.468792', u'stderr': u'', u'stdout': u'    <status>unprotectedRunningStandby</status>\n    <status>unprotectedRunningStandby</status>', u'changed': True, 'failed': False, u'delta': u'0:00:04.881126', u'cmd': u"curl -kisu 'admin:admin' -X GET https://10.34.194.83/api/operational/system/syncStatus/ | grep status", 'item': {u'name': u'SSBC_STANDBY_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'present_or_absent': u'present', u'role': u'STANDBY', u'template': u'SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'security_group': u'sbccoresvt-sg', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.83'}, u'rc': 0, u'invocation': {u'module_args': {u'warn': False, u'executable': None, u'_uses_shell': True, u'strip_empty_ends': True, u'_raw_params': u"curl -kisu 'admin:admin' -X GET https://10.34.194.83/api/operational/system/syncStatus/ | grep status", u'removes': None, u'argv': None, u'creates': None, u'chdir': None, u'stdin_add_newline': True, u'stdin': None}}, 'stdout_lines': [u'    <status>unprotectedRunningStandby</status>', u'    <status>unprotectedRunningStandby</status>'], u'start': u'2020-03-31 21:45:26.587666'}) => 
+  msg:
+  - '    <status>unprotectedRunningStandby</status>'
+  - '    <status>unprotectedRunningStandby</status>'
+
+PLAY [SPAWNING MSBC Instances] **********************************************************************************************************
+Tuesday 31 March 2020  21:45:31 +0530 (0:00:00.130)       0:16:24.623 ********* 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/msbc.yml for localhost
+Tuesday 31 March 2020  21:45:31 +0530 (0:00:00.074)       0:16:24.698 ********* 
+
+TASK [spawning the MSBC  instances] *****************************************************************************************************
+changed: [localhost] => (item={u'name': u'MSBC_ACTIVE1_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'MSBC_UPGRADED_BUILD1': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'role': u'ACTIVE', u'template': u'MSBC_DISTRIBUTED_1TO1_ACTIVE1_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.84'})
+changed: [localhost] => (item={u'name': u'MSBC_ACTIVE2_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'MSBC_UPGRADED_BUILD1': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'role': u'ACTIVE', u'template': u'MSBC_DISTRIBUTED_1TO1_ACTIVE2_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.85'})
+changed: [localhost] => (item={u'name': u'MSBC_STANDBY_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'MSBC_UPGRADED_BUILD1': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'role': u'STANDBY', u'template': u'MSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.86'})
+Tuesday 31 March 2020  21:48:50 +0530 (0:03:19.106)       0:19:43.804 ********* 
+Tuesday 31 March 2020  21:48:50 +0530 (0:00:00.135)       0:19:43.939 ********* 
+
+TASK [Wait until the MSBC  instance pings] **********************************************************************************************
+ok: [localhost] => (item=10.34.194.84)
+ok: [localhost] => (item=10.34.194.85)
+ok: [localhost] => (item=10.34.194.86)
+Tuesday 31 March 2020  21:51:51 +0530 (0:03:00.916)       0:22:44.856 ********* 
+
+TASK [Checking the Management IP of MSBC instances  is pingable or not] *****************************************************************
+changed: [localhost] => (item=10.34.194.84)
+failed: [localhost] (item=10.34.194.85) => changed=true 
+  ansible_loop_var: item
+  cmd: ping -c2 10.34.194.85
+  delta: '0:00:11.020910'
+  end: '2020-03-31 21:52:04.397359'
+  item:
+    MSBC_UPGRADED_BUILD1: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    flavor: ANSIBLE
+    mgt0ipaddress: 10.34.194.85
+    name: MSBC_ACTIVE2_ANSIBLE
+    present_or_absent: present
+    role: ACTIVE
+    security_group: sbccoresvt-sg
+    template: MSBC_DISTRIBUTED_1TO1_ACTIVE2_PORT_RED.yml
+  msg: non-zero return code
+  rc: 1
+  start: '2020-03-31 21:51:53.376449'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.
+  
+    --- 10.34.194.85 ping statistics ---
+    2 packets transmitted, 0 received, 100% packet loss, time 1001ms
+  stdout_lines: <omitted>
+changed: [localhost] => (item=10.34.194.86)
+...ignoring
+Tuesday 31 March 2020  21:52:05 +0530 (0:00:13.825)       0:22:58.681 ********* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.194.84 (10.34.194.84) 56(84) bytes of data.', u'64 bytes from 10.34.194.84: icmp_seq=1 ttl=61 time=3.01 ms', u'64 bytes from 10.34.194.84: icmp_seq=2 ttl=61 time=10.8 ms', u'', u'--- 10.34.194.84 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 999ms', u'rtt min/avg/max/mdev = 3.014/6.950/10.886/3.936 ms']) => 
+  msg:
+  - PING 10.34.194.84 (10.34.194.84) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.84: icmp_seq=1 ttl=61 time=3.01 ms'
+  - '64 bytes from 10.34.194.84: icmp_seq=2 ttl=61 time=10.8 ms'
+  - ''
+  - '--- 10.34.194.84 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 999ms
+  - rtt min/avg/max/mdev = 3.014/6.950/10.886/3.936 ms
+ok: [localhost] => (item=[u'PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.', u'', u'--- 10.34.194.85 ping statistics ---', u'2 packets transmitted, 0 received, 100% packet loss, time 1001ms']) => 
+  msg:
+  - PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.
+  - ''
+  - '--- 10.34.194.85 ping statistics ---'
+  - 2 packets transmitted, 0 received, 100% packet loss, time 1001ms
+ok: [localhost] => (item=[u'PING 10.34.194.86 (10.34.194.86) 56(84) bytes of data.', u'64 bytes from 10.34.194.86: icmp_seq=1 ttl=61 time=3.19 ms', u'64 bytes from 10.34.194.86: icmp_seq=2 ttl=61 time=3.29 ms', u'', u'--- 10.34.194.86 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 3.193/3.242/3.292/0.075 ms']) => 
+  msg:
+  - PING 10.34.194.86 (10.34.194.86) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.86: icmp_seq=1 ttl=61 time=3.19 ms'
+  - '64 bytes from 10.34.194.86: icmp_seq=2 ttl=61 time=3.29 ms'
+  - ''
+  - '--- 10.34.194.86 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1000ms
+  - rtt min/avg/max/mdev = 3.193/3.242/3.292/0.075 ms
+Tuesday 31 March 2020  21:52:05 +0530 (0:00:00.115)       0:22:58.797 ********* 
+
+TASK [MSBC  INSTANCES DIDNOT PING] ******************************************************************************************************
+failed: [localhost] (item={'stderr_lines': [], 'ansible_loop_var': u'item', u'end': u'2020-03-31 21:52:04.397359', u'stderr': u'', u'stdout': u'PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.\n\n--- 10.34.194.85 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 1001ms', u'changed': True, u'failed': True, u'delta': u'0:00:11.020910', u'cmd': u'ping -c2 10.34.194.85', 'item': {u'name': u'MSBC_ACTIVE2_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'present_or_absent': u'present', u'MSBC_UPGRADED_BUILD1': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'role': u'ACTIVE', u'template': u'MSBC_DISTRIBUTED_1TO1_ACTIVE2_PORT_RED.yml', u'security_group': u'sbccoresvt-sg', u'flavor': u'ANSIBLE', u'mgt0ipaddress': u'10.34.194.85'}, u'rc': 1, u'invocation': {u'module_args': {u'warn': False, u'executable': None, u'_uses_shell': True, u'strip_empty_ends': True, u'_raw_params': u'ping -c2 10.34.194.85', u'removes': None, u'argv': None, u'creates': None, u'chdir': None, u'stdin_add_newline': True, u'stdin': None}}, 'stdout_lines': [u'PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.', u'', u'--- 10.34.194.85 ping statistics ---', u'2 packets transmitted, 0 received, 100% packet loss, time 1001ms'], u'start': u'2020-03-31 21:51:53.376449', u'msg': u'non-zero return code'}) => changed=false 
+  ansible_loop_var: item
+  item:
+    ansible_loop_var: item
+    changed: true
+    cmd: ping -c2 10.34.194.85
+    delta: '0:00:11.020910'
+    end: '2020-03-31 21:52:04.397359'
+    failed: true
+    invocation:
+      module_args:
+        _raw_params: ping -c2 10.34.194.85
+        _uses_shell: true
+        argv: null
+        chdir: null
+        creates: null
+        executable: null
+        removes: null
+        stdin: null
+        stdin_add_newline: true
+        strip_empty_ends: true
+        warn: false
+    item:
+      MSBC_UPGRADED_BUILD1: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+      base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+      flavor: ANSIBLE
+      mgt0ipaddress: 10.34.194.85
+      name: MSBC_ACTIVE2_ANSIBLE
+      present_or_absent: present
+      role: ACTIVE
+      security_group: sbccoresvt-sg
+      template: MSBC_DISTRIBUTED_1TO1_ACTIVE2_PORT_RED.yml
+    msg: non-zero return code
+    rc: 1
+    start: '2020-03-31 21:51:53.376449'
+    stderr: ''
+    stderr_lines: []
+    stdout: |-
+      PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.
+  
+      --- 10.34.194.85 ping statistics ---
+      2 packets transmitted, 0 received, 100% packet loss, time 1001ms
+    stdout_lines:
+    - PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.
+    - ''
+    - '--- 10.34.194.85 ping statistics ---'
+    - 2 packets transmitted, 0 received, 100% packet loss, time 1001ms
+  msg: '({''stderr_lines'': [], ''ansible_loop_var'': u''item'', u''end'': u''2020-03-31 21:52:04.397359'', u''failed'': True, u''stdout'': u''PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.\n\n--- 10.34.194.85 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 1001ms'', u''changed'': True, u''rc'': 1, u''invocation'': {u''module_args'': {u''creates'': None, u''executable'': None, u''_uses_shell'': True, u''strip_empty_ends'': True, u''_raw_params'': u''ping -c2 10.34.194.85'', u''removes'': None, u''argv'': None, u''warn'': False, u''chdir'': None, u''stdin_add_newline'': True, u''stdin'': None}}, ''item'': {u''name'': u''MSBC_ACTIVE2_ANSIBLE'', u''base_build'': u''sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2'', u''present_or_absent'': u''present'', u''MSBC_UPGRADED_BUILD1'': u''sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2'', u''role'': u''ACTIVE'', u''template'': u''MSBC_DISTRIBUTED_1TO1_ACTIVE2_PORT_RED.yml'', u''security_group'':
+    u''sbccoresvt-sg'', u''flavor'': u''ANSIBLE'', u''mgt0ipaddress'': u''10.34.194.85''}, u''cmd'': u''ping -c2 10.34.194.85'', u''stderr'': u'''', u''delta'': u''0:00:11.020910'', u''msg'': u''non-zero return code'', ''stdout_lines'': [u''PING 10.34.194.85 (10.34.194.85) 56(84) bytes of data.'', u'''', u''--- 10.34.194.85 ping statistics ---'', u''2 packets transmitted, 0 received, 100% packet loss, time 1001ms''], u''start'': u''2020-03-31 21:51:53.376449''}) donot ping'
+
+PLAY RECAP ******************************************************************************************************************************
+localhost                  : ok=43   changed=18   unreachable=0    failed=1    skipped=10   rescued=0    ignored=1   
+
+Tuesday 31 March 2020  21:52:05 +0530 (0:00:00.131)       0:22:58.929 ********* 
+=============================================================================== 
+spawning the MSBC  instances --------------------------------------------------------------------------------------------------- 199.11s
+Wait until the active OAM  instances pings ------------------------------------------------------------------------------------- 181.44s
+Wait until the standby OAM   instance pings ------------------------------------------------------------------------------------ 181.09s
+Wait until the MSBC  instance pings -------------------------------------------------------------------------------------------- 180.92s
+Spawning the OAM instances ----------------------------------------------------------------------------------------------------- 151.42s
+spawning the SSBC instances ---------------------------------------------------------------------------------------------------- 135.58s
+Waiting for service ------------------------------------------------------------------------------------------------------------ 132.25s
+Wait until the  SSBC  instances ping ------------------------------------------------------------------------------------------- 120.70s
+wait for 30 seconds ------------------------------------------------------------------------------------------------------------- 30.31s
+Checking the Management IP of MSBC instances  is pingable or not ---------------------------------------------------------------- 13.83s
+checking sync status ------------------------------------------------------------------------------------------------------------- 9.16s
+Checking if any core file generated, fails task if generated --------------------------------------------------------------------- 7.74s
+checking sync status ------------------------------------------------------------------------------------------------------------- 7.36s
+checking if any core file is  generated on standby oam , fails task if generated . ----------------------------------------------- 5.89s
+Checking the Management  IP of Standby OAM  is pingable or not ------------------------------------------------------------------- 4.79s
+checking if any core file generated, fails task if generated . ------------------------------------------------------------------- 4.32s
+Checking the Management  IP of Active OAM  is pingable or not -------------------------------------------------------------------- 4.05s
+Checking the Management IP of SSBC instances  is pingable or not ----------------------------------------------------------------- 2.57s
+Waiting for service -------------------------------------------------------------------------------------------------------------- 1.32s
+Waiting for service -------------------------------------------------------------------------------------------------------------- 1.19s
+Instance Failed to spawn --------------------------------------------------------------------------------------------------------- 0.29s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.20s
+include_tasks -------------------------------------------------------------------------------------------------------------------- 0.16s
+CORE FILE EXISTS in standby  OAM ------------------------------------------------------------------------------------------------- 0.14s
+Add instances to inventory ------------------------------------------------------------------------------------------------------- 0.14s
+MSBC  Instances Failed to spawn -------------------------------------------------------------------------------------------------- 0.14s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.13s
+MSBC  INSTANCES DIDNOT PING ------------------------------------------------------------------------------------------------------ 0.13s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.13s
+SSBC  Instances Failed to spawn -------------------------------------------------------------------------------------------------- 0.12s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.12s
+Add instances to inventory ------------------------------------------------------------------------------------------------------- 0.11s
+inventory_hostname for oam group ------------------------------------------------------------------------------------------------- 0.11s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.11s
+inventory_hostname for oam group ------------------------------------------------------------------------------------------------- 0.10s
+include -------------------------------------------------------------------------------------------------------------------------- 0.10s
+Service is not up ---------------------------------------------------------------------------------------------------------------- 0.10s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.10s
+Service is not up ---------------------------------------------------------------------------------------------------------------- 0.10s
+include_tasks -------------------------------------------------------------------------------------------------------------------- 0.10s
+inventory_hostname for group oam-1 ----------------------------------------------------------------------------------------------- 0.10s
+Core dump files ------------------------------------------------------------------------------------------------------------------ 0.10s
+include -------------------------------------------------------------------------------------------------------------------------- 0.10s
+CORE FILE EXISTS in active OAM --------------------------------------------------------------------------------------------------- 0.10s
+CORE FILE EXISTS in active OAM --------------------------------------------------------------------------------------------------- 0.10s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.09s
+Service is not up ---------------------------------------------------------------------------------------------------------------- 0.09s
+Add SSBC  instances to inventory ------------------------------------------------------------------------------------------------- 0.09s
+inventory_hostname for oam group ------------------------------------------------------------------------------------------------- 0.09s
+SSBC  INSTANCES DIDNOT PING ------------------------------------------------------------------------------------------------------ 0.09s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.08s
+include_tasks -------------------------------------------------------------------------------------------------------------------- 0.07s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.07s
+include_vars --------------------------------------------------------------------------------------------------------------------- 0.06s

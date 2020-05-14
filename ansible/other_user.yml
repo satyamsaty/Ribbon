@@ -1,0 +1,69 @@
+---
+- name: create stack
+  hosts: localhost
+  gather_facts: false
+  ignore_errors: false
+  tasks:
+  - name: ISBC
+    os_stack:
+       name: ISBC_active
+       tag: stack
+       state: present
+       validate_certs: false
+       template: Test_active_ISBC_SRIOV_1.yaml
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+  - name: Waiting for Mgmt IP to comeup       
+    wait_for: timeout=320
+  - name: Checking the Mgmt IP is pingable or not
+    shell: ping -c2 10.34.224.111
+    register: p
+  - debug: var=p.stdout_lines
+  - name: To do SSH, login as a root,check the SBC service and node is running in active role
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.111 "egrep 'SBC service is now running|Node is running in ' /var/log/sonus/lca/lca.log"
+    register: q
+  - debug: var=q.stdout_lines
+  - name: To check installed software version
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.111 "sh /opt/sonus/sbx/scripts/swinfo.sh"
+    register: r
+  - debug: var=r.stdout_lines
+  - name: to login as admin and execute commands
+    remote_user: root
+    become: true
+    become_user: admin
+    shell: source /home/Administrator/admin/CONFIG.txt
+    
+  - name: ISBC active is completed successfully , now spwanning ISBC standby mode
+    os_stack:
+       name: ISBC_standby
+       tag: stack
+       state: present
+       validate_certs: false
+       template: Test_standby_ISBC_SRIOV_1.yaml
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+  - name: Waiting for Mgmt IP to comeup
+    wait_for: timeout=320
+  - name: Checking the Mgmt IP is pingable or not
+    shell: ping -c2 10.34.224.112
+    register: s
+  - debug: var=s.stdout_lines
+  - name: To do SSH, login as a root,check the SBC service and node is running in standby role
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.112 "egrep 'SBC service is now running|Node is running in ' /var/log/sonus/lca/lca.log"
+    register: t
+  - debug: var=t.stdout_lines
+  - name: To check installed software version
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.112 "sh /opt/sonus/sbx/scripts/swinfo.sh"
+    register: u
+  - debug: var=u.stdout_lines
+  - name: Waiting for ISBC active and standby to make a cluster
+    wait_for: timeout=60
+  - name: ISBC active and standby mode is completed successfully , below are the software version installed on ISBC active and standby
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.111 "sh /opt/sonus/sbx/scripts/swinfo.sh"
+    register: n
+  - debug: var=n.stdout_lines
+

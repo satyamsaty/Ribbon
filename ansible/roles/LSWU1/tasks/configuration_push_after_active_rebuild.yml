@@ -1,0 +1,47 @@
+  #- name: Moving the files from localhost to active node
+  #  copy:
+  #    src: /home/ansible/config.txt
+  #    dest: /root/
+  #    mode: '0777'
+  #- name: To run configuration in active node
+  #  shell: cat /root/config.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+  #  register: b
+  #- debug: var=b.stdout_lines
+  #- name: check call status after rebuilding active
+  #  shell: echo "show status global callCountStatus"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+  #  delegate_to: standby-1
+  #  register: b
+  #- debug: var=b.stdout_lines
+
+
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+  - name: Moving the files from localhost to active node
+    copy:
+     src: "{{ Configuration_File_Path }}"
+     dest: /root/config.txt
+     mode: '0777'
+     force: yes
+    delegate_to: "{{ res.results[0].stdout }}"
+
+  - name: To run configuration in active  node after upgrade
+    shell: cat /root/config.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    register: b
+    delegate_to: "{{ res.results[0].stdout }}"
+
+  - name: check call status after rebuilding active
+    shell: echo "show status global callCountStatus"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    delegate_to: "{{ res.results[1].stdout }}"
+    register: b
+  - debug: var=b.stdout_lines
+
+
+
+

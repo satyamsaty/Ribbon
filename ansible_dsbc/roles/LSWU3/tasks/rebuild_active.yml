@@ -1,0 +1,64 @@
+---
+  - name: remove  the invalid key
+    shell: ssh-keygen -R "mgt0IPAddress_STANDBY"
+  - name: remove  the invalid key
+    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+  - name: Upgrading Active Instance by  Rebuild Method
+    os_stack:
+       name: "{{ stack_name_active }}"
+       tag: "{{ stack_name_active }}"
+       state: "{{ present_or_absent }}"
+       validate_certs: false
+       template: "{{ TEMPLATE_ACTIVE }}"
+       parameters:
+           flavor: "{{ ISBC_ACTIVE_FLAVOR }}"
+           image: "{{ ISBC_UPGRADED_BUILD }}"
+           security_group: "{{ ISBC_ACTIVE_SG }}"
+  - name: Wait until the rebuilded active instance pings
+    wait_for:
+       host: "{{ mgt0IPAddress_ACTIVE }}"
+       port: 2024
+       delay: 60
+       state: started
+       timeout: 180
+       msg: Instance is not pinging
+  - name: Checking the Mgmt IP is pingable or not for Active Node
+    shell: ping -c2 {{ mgt0IPAddress_ACTIVE }}
+    register: k
+  - debug: var=k.stdout_lines
+  - name: To wait until service starts running
+    shell: sh $HOME/timeout.sh {{ mgt0IPAddress_ACTIVE }}
+   # wait_for: timeout=60
+#  - name: waiting for sync
+#    shell: sh /home/ansible/process.sh  {{ mgt0IPAddress_ACTIVE }}
+#  - name:
+#    wait_for: timeout=10
+#  - name: checking sync status after rebuilding active instance 
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: l
+#  - debug: var=l.stdout_lines
+#  - name: 
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: m
+#  - debug: var=m.stdout_lines
+#  - name: To push license in active node after rebuilding active instance
+#    shell: /home/ansible/license_push_cloud.sh {{ mgt0IPAddress_ACTIVE }} null
+   #delegate_to: bats14
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key -P 2024 $HOME/config.sh root@{{ mgt0IPAddress_ACTIVE }}:/root
+#  - name: To run configuration in active node after upgrade
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "expect /root/config.sh"
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key -P 2024 $HOME/call.sh root@{{ mgt0IPAddress_STANDBY }}:/root
+#  - name: Call Count after Upgrade
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "expect /root/call.sh"
+#    register: n
+#  - debug: var=n.stdout_lines
+#  - name: Waiting for sync to be completed after active got rebuilded
+#    wait_for: timeout=120
+#  - name: checking sync status before final switchover
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: o
+#  - debug: var=o.stdout_lines
+
+

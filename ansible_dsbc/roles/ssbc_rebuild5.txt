@@ -1,0 +1,430 @@
+
+PLAY [localhost] ************************************************************************************************************************
+Monday 30 March 2020  01:35:07 +0530 (0:00:00.034)       0:00:00.034 ********** 
+
+TASK [include_vars] *********************************************************************************************************************
+ok: [localhost]
+
+PLAY [SPAWNING OAM INSTANCES] ***********************************************************************************************************
+
+PLAY [SPAWNING SSBC Instances] **********************************************************************************************************
+Monday 30 March 2020  01:35:07 +0530 (0:00:00.073)       0:00:00.108 ********** 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/ssbc.yml for localhost
+Monday 30 March 2020  01:35:08 +0530 (0:00:00.164)       0:00:00.272 ********** 
+
+TASK [spawning the SSBC instances] ******************************************************************************************************
+changed: [localhost] => (item={u'name': u'SSBC_ACTIVE_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'ACTIVE', u'template': u'SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBCAG10VCPU', u'mgt0ipaddress': u'10.34.194.120'})
+changed: [localhost] => (item={u'name': u'SSBC_STANDBY_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'STANDBY', u'template': u'SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBCAG10VCPU', u'mgt0ipaddress': u'10.34.194.83'})
+Monday 30 March 2020  01:37:33 +0530 (0:02:25.290)       0:02:25.563 ********** 
+Monday 30 March 2020  01:37:33 +0530 (0:00:00.152)       0:02:25.715 ********** 
+
+TASK [Wait until the  SSBC  instances ping] *********************************************************************************************
+ok: [localhost] => (item=10.34.194.120)
+ok: [localhost] => (item=10.34.194.83)
+Monday 30 March 2020  01:39:34 +0530 (0:02:00.833)       0:04:26.549 ********** 
+
+TASK [Checking the Management IP of SSBC instances  is pingable or not] *****************************************************************
+changed: [localhost] => (item=10.34.194.120)
+changed: [localhost] => (item=10.34.194.83)
+Monday 30 March 2020  01:39:37 +0530 (0:00:02.818)       0:04:29.367 ********** 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.194.120 (10.34.194.120) 56(84) bytes of data.', u'64 bytes from 10.34.194.120: icmp_seq=1 ttl=61 time=1.13 ms', u'64 bytes from 10.34.194.120: icmp_seq=2 ttl=61 time=1.16 ms', u'', u'--- 10.34.194.120 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 1.132/1.149/1.167/0.038 ms']) => 
+  msg:
+  - PING 10.34.194.120 (10.34.194.120) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.120: icmp_seq=1 ttl=61 time=1.13 ms'
+  - '64 bytes from 10.34.194.120: icmp_seq=2 ttl=61 time=1.16 ms'
+  - ''
+  - '--- 10.34.194.120 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1000ms
+  - rtt min/avg/max/mdev = 1.132/1.149/1.167/0.038 ms
+ok: [localhost] => (item=[u'PING 10.34.194.83 (10.34.194.83) 56(84) bytes of data.', u'64 bytes from 10.34.194.83: icmp_seq=1 ttl=61 time=16.4 ms', u'64 bytes from 10.34.194.83: icmp_seq=2 ttl=61 time=31.5 ms', u'', u'--- 10.34.194.83 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1001ms', u'rtt min/avg/max/mdev = 16.478/24.037/31.596/7.559 ms']) => 
+  msg:
+  - PING 10.34.194.83 (10.34.194.83) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.83: icmp_seq=1 ttl=61 time=16.4 ms'
+  - '64 bytes from 10.34.194.83: icmp_seq=2 ttl=61 time=31.5 ms'
+  - ''
+  - '--- 10.34.194.83 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+  - rtt min/avg/max/mdev = 16.478/24.037/31.596/7.559 ms
+Monday 30 March 2020  01:39:37 +0530 (0:00:00.128)       0:04:29.496 ********** 
+Monday 30 March 2020  01:39:37 +0530 (0:00:00.119)       0:04:29.616 ********** 
+
+TASK [wait for 30 seconds] **************************************************************************************************************
+ok: [localhost]
+Monday 30 March 2020  01:40:07 +0530 (0:00:30.282)       0:04:59.899 ********** 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/inventory_ssbc.yml for localhost
+Monday 30 March 2020  01:40:07 +0530 (0:00:00.107)       0:05:00.006 ********** 
+
+TASK [Add SSBC  instances to inventory] *************************************************************************************************
+changed: [localhost] => (item={u'name': u'SSBC_ACTIVE_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'ACTIVE', u'template': u'SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBCAG10VCPU', u'mgt0ipaddress': u'10.34.194.120'})
+changed: [localhost] => (item={u'name': u'SSBC_STANDBY_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'STANDBY', u'template': u'SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBCAG10VCPU', u'mgt0ipaddress': u'10.34.194.83'})
+Monday 30 March 2020  01:40:07 +0530 (0:00:00.129)       0:05:00.136 ********** 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => 
+  inventory_ssbc:
+    changed: true
+    msg: All items completed
+    results:
+    - add_host:
+        groups:
+        - ssbc
+        host_name: SSBC_ACTIVE_ANSIBLE
+        host_vars:
+          ansible_host: 10.34.194.120
+      ansible_loop_var: item
+      changed: true
+      failed: false
+      item:
+        SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+        base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+        flavor: ISBCAG10VCPU
+        mgt0ipaddress: 10.34.194.120
+        name: SSBC_ACTIVE_ANSIBLE
+        present_or_absent: present
+        role: ACTIVE
+        security_group: sbccoresvt-sg
+        template: SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+    - add_host:
+        groups:
+        - ssbc
+        host_name: SSBC_STANDBY_ANSIBLE
+        host_vars:
+          ansible_host: 10.34.194.83
+      ansible_loop_var: item
+      changed: true
+      failed: false
+      item:
+        SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+        base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+        flavor: ISBCAG10VCPU
+        mgt0ipaddress: 10.34.194.83
+        name: SSBC_STANDBY_ANSIBLE
+        present_or_absent: present
+        role: STANDBY
+        security_group: sbccoresvt-sg
+        template: SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml
+Monday 30 March 2020  01:40:08 +0530 (0:00:00.103)       0:05:00.239 ********** 
+
+TASK [inventory_hostname for group oam-1] ***********************************************************************************************
+ok: [localhost] => (item=SSBC_ACTIVE_ANSIBLE) => 
+  msg: SSBC_ACTIVE_ANSIBLE
+ok: [localhost] => (item=SSBC_STANDBY_ANSIBLE) => 
+  msg: SSBC_STANDBY_ANSIBLE
+Monday 30 March 2020  01:40:08 +0530 (0:00:00.133)       0:05:00.372 ********** 
+
+TASK [checking if any core file generated, fails task if generated .] *******************************************************************
+changed: [localhost -> 10.34.194.120] => (item=SSBC_ACTIVE_ANSIBLE)
+changed: [localhost -> 10.34.194.83] => (item=SSBC_STANDBY_ANSIBLE)
+Monday 30 March 2020  01:40:39 +0530 (0:00:30.903)       0:05:31.276 ********** 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'0']) => 
+  msg: SSBC_ACTIVE_ANSIBLE has 0 core files
+ok: [localhost] => (item=[u'0']) => 
+  msg: SSBC_STANDBY_ANSIBLE has 0 core files
+Monday 30 March 2020  01:40:39 +0530 (0:00:00.093)       0:05:31.369 ********** 
+Monday 30 March 2020  01:40:39 +0530 (0:00:00.080)       0:05:31.450 ********** 
+FAILED - RETRYING: Waiting for service (60 retries left).
+FAILED - RETRYING: Waiting for service (59 retries left).
+FAILED - RETRYING: Waiting for service (58 retries left).
+FAILED - RETRYING: Waiting for service (57 retries left).
+FAILED - RETRYING: Waiting for service (56 retries left).
+FAILED - RETRYING: Waiting for service (55 retries left).
+FAILED - RETRYING: Waiting for service (54 retries left).
+FAILED - RETRYING: Waiting for service (53 retries left).
+FAILED - RETRYING: Waiting for service (52 retries left).
+FAILED - RETRYING: Waiting for service (51 retries left).
+FAILED - RETRYING: Waiting for service (50 retries left).
+FAILED - RETRYING: Waiting for service (49 retries left).
+FAILED - RETRYING: Waiting for service (48 retries left).
+FAILED - RETRYING: Waiting for service (47 retries left).
+FAILED - RETRYING: Waiting for service (46 retries left).
+FAILED - RETRYING: Waiting for service (45 retries left).
+FAILED - RETRYING: Waiting for service (44 retries left).
+FAILED - RETRYING: Waiting for service (43 retries left).
+FAILED - RETRYING: Waiting for service (42 retries left).
+FAILED - RETRYING: Waiting for service (41 retries left).
+FAILED - RETRYING: Waiting for service (40 retries left).
+FAILED - RETRYING: Waiting for service (39 retries left).
+FAILED - RETRYING: Waiting for service (38 retries left).
+FAILED - RETRYING: Waiting for service (37 retries left).
+FAILED - RETRYING: Waiting for service (36 retries left).
+FAILED - RETRYING: Waiting for service (35 retries left).
+FAILED - RETRYING: Waiting for service (34 retries left).
+FAILED - RETRYING: Waiting for service (33 retries left).
+FAILED - RETRYING: Waiting for service (32 retries left).
+FAILED - RETRYING: Waiting for service (31 retries left).
+FAILED - RETRYING: Waiting for service (30 retries left).
+FAILED - RETRYING: Waiting for service (29 retries left).
+FAILED - RETRYING: Waiting for service (28 retries left).
+FAILED - RETRYING: Waiting for service (27 retries left).
+FAILED - RETRYING: Waiting for service (26 retries left).
+FAILED - RETRYING: Waiting for service (25 retries left).
+FAILED - RETRYING: Waiting for service (24 retries left).
+FAILED - RETRYING: Waiting for service (23 retries left).
+FAILED - RETRYING: Waiting for service (22 retries left).
+FAILED - RETRYING: Waiting for service (21 retries left).
+FAILED - RETRYING: Waiting for service (20 retries left).
+FAILED - RETRYING: Waiting for service (19 retries left).
+FAILED - RETRYING: Waiting for service (18 retries left).
+FAILED - RETRYING: Waiting for service (17 retries left).
+FAILED - RETRYING: Waiting for service (16 retries left).
+FAILED - RETRYING: Waiting for service (15 retries left).
+FAILED - RETRYING: Waiting for service (14 retries left).
+FAILED - RETRYING: Waiting for service (13 retries left).
+FAILED - RETRYING: Waiting for service (12 retries left).
+FAILED - RETRYING: Waiting for service (11 retries left).
+FAILED - RETRYING: Waiting for service (10 retries left).
+FAILED - RETRYING: Waiting for service (9 retries left).
+FAILED - RETRYING: Waiting for service (8 retries left).
+FAILED - RETRYING: Waiting for service (7 retries left).
+FAILED - RETRYING: Waiting for service (6 retries left).
+FAILED - RETRYING: Waiting for service (5 retries left).
+FAILED - RETRYING: Waiting for service (4 retries left).
+FAILED - RETRYING: Waiting for service (3 retries left).
+FAILED - RETRYING: Waiting for service (2 retries left).
+FAILED - RETRYING: Waiting for service (1 retries left).
+
+TASK [Waiting for service] **************************************************************************************************************
+failed: [localhost -> 10.34.194.120] (item=SSBC_ACTIVE_ANSIBLE) => changed=true 
+  ansible_loop_var: item
+  attempts: 60
+  cmd: /usr/bin/tail -n 10  /var/log/sonus/lca/lca.log
+  delta: '0:00:00.440942'
+  end: '2020-03-29 16:16:22.938876'
+  item: SSBC_ACTIVE_ANSIBLE
+  rc: 0
+  start: '2020-03-29 16:16:22.497934'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    2020-03-29 16:07:16.408 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.
+    2020-03-29 16:07:16.585 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200
+    2020-03-29 16:07:16.585 LifeCycleAgent INFO     Received 200 OK to password request
+    2020-03-29 16:07:16.600 LifeCycleAgent INFO     Getting the emssftp user credentials
+    2020-03-29 16:07:16.600 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.
+    2020-03-29 16:07:16.767 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200
+    2020-03-29 16:07:16.767 LifeCycleAgent INFO     Received 200 OK to password request
+    2020-03-29 16:07:16.931 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server
+    2020-03-29 16:07:17.123 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client
+    2020-03-29 16:07:17.124 LifeCycleAgent INFO     Starting SBC...
+  stdout_lines: <omitted>
+FAILED - RETRYING: Waiting for service (60 retries left).
+FAILED - RETRYING: Waiting for service (59 retries left).
+FAILED - RETRYING: Waiting for service (58 retries left).
+FAILED - RETRYING: Waiting for service (57 retries left).
+FAILED - RETRYING: Waiting for service (56 retries left).
+FAILED - RETRYING: Waiting for service (55 retries left).
+FAILED - RETRYING: Waiting for service (54 retries left).
+FAILED - RETRYING: Waiting for service (53 retries left).
+FAILED - RETRYING: Waiting for service (52 retries left).
+FAILED - RETRYING: Waiting for service (51 retries left).
+FAILED - RETRYING: Waiting for service (50 retries left).
+FAILED - RETRYING: Waiting for service (49 retries left).
+FAILED - RETRYING: Waiting for service (48 retries left).
+FAILED - RETRYING: Waiting for service (47 retries left).
+FAILED - RETRYING: Waiting for service (46 retries left).
+FAILED - RETRYING: Waiting for service (45 retries left).
+FAILED - RETRYING: Waiting for service (44 retries left).
+FAILED - RETRYING: Waiting for service (43 retries left).
+FAILED - RETRYING: Waiting for service (42 retries left).
+FAILED - RETRYING: Waiting for service (41 retries left).
+FAILED - RETRYING: Waiting for service (40 retries left).
+FAILED - RETRYING: Waiting for service (39 retries left).
+FAILED - RETRYING: Waiting for service (38 retries left).
+FAILED - RETRYING: Waiting for service (37 retries left).
+FAILED - RETRYING: Waiting for service (36 retries left).
+FAILED - RETRYING: Waiting for service (35 retries left).
+FAILED - RETRYING: Waiting for service (34 retries left).
+FAILED - RETRYING: Waiting for service (33 retries left).
+FAILED - RETRYING: Waiting for service (32 retries left).
+FAILED - RETRYING: Waiting for service (31 retries left).
+FAILED - RETRYING: Waiting for service (30 retries left).
+FAILED - RETRYING: Waiting for service (29 retries left).
+FAILED - RETRYING: Waiting for service (28 retries left).
+FAILED - RETRYING: Waiting for service (27 retries left).
+FAILED - RETRYING: Waiting for service (26 retries left).
+FAILED - RETRYING: Waiting for service (25 retries left).
+FAILED - RETRYING: Waiting for service (24 retries left).
+FAILED - RETRYING: Waiting for service (23 retries left).
+FAILED - RETRYING: Waiting for service (22 retries left).
+FAILED - RETRYING: Waiting for service (21 retries left).
+FAILED - RETRYING: Waiting for service (20 retries left).
+FAILED - RETRYING: Waiting for service (19 retries left).
+FAILED - RETRYING: Waiting for service (18 retries left).
+FAILED - RETRYING: Waiting for service (17 retries left).
+FAILED - RETRYING: Waiting for service (16 retries left).
+FAILED - RETRYING: Waiting for service (15 retries left).
+FAILED - RETRYING: Waiting for service (14 retries left).
+FAILED - RETRYING: Waiting for service (13 retries left).
+FAILED - RETRYING: Waiting for service (12 retries left).
+FAILED - RETRYING: Waiting for service (11 retries left).
+FAILED - RETRYING: Waiting for service (10 retries left).
+FAILED - RETRYING: Waiting for service (9 retries left).
+FAILED - RETRYING: Waiting for service (8 retries left).
+FAILED - RETRYING: Waiting for service (7 retries left).
+FAILED - RETRYING: Waiting for service (6 retries left).
+FAILED - RETRYING: Waiting for service (5 retries left).
+FAILED - RETRYING: Waiting for service (4 retries left).
+FAILED - RETRYING: Waiting for service (3 retries left).
+FAILED - RETRYING: Waiting for service (2 retries left).
+FAILED - RETRYING: Waiting for service (1 retries left).
+failed: [localhost -> 10.34.194.83] (item=SSBC_STANDBY_ANSIBLE) => changed=true 
+  ansible_loop_var: item
+  attempts: 60
+  cmd: /usr/bin/tail -n 10  /var/log/sonus/lca/lca.log
+  delta: '0:00:00.459540'
+  end: '2020-03-29 16:22:20.892479'
+  item: SSBC_STANDBY_ANSIBLE
+  rc: 0
+  start: '2020-03-29 16:22:20.432939'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    2020-03-29 16:10:56.272 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.
+    2020-03-29 16:10:56.537 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200
+    2020-03-29 16:10:56.537 LifeCycleAgent INFO     Received 200 OK to password request
+    2020-03-29 16:10:56.629 LifeCycleAgent INFO     Getting the emssftp user credentials
+    2020-03-29 16:10:56.629 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.
+    2020-03-29 16:10:56.891 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200
+    2020-03-29 16:10:56.891 LifeCycleAgent INFO     Received 200 OK to password request
+    2020-03-29 16:10:57.902 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server
+    2020-03-29 16:10:58.346 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client
+    2020-03-29 16:10:58.346 LifeCycleAgent INFO     Starting SBC...
+  stdout_lines: <omitted>
+...ignoring
+Monday 30 March 2020  01:52:26 +0530 (0:11:47.202)       0:17:18.653 ********** 
+
+TASK [Service is not up] ****************************************************************************************************************
+failed: [localhost] (item=[u'2020-03-29 16:07:16.408 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.', u'2020-03-29 16:07:16.585 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200', u'2020-03-29 16:07:16.585 LifeCycleAgent INFO     Received 200 OK to password request', u'2020-03-29 16:07:16.600 LifeCycleAgent INFO     Getting the emssftp user credentials', u'2020-03-29 16:07:16.600 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.', u'2020-03-29 16:07:16.767 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200', u'2020-03-29 16:07:16.767 LifeCycleAgent INFO     Received 200 OK to password request', u'2020-03-29 16:07:16.931 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server', u'2020-03-29 16:07:17.123 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client', u'2020-03-29 16:07:17.124 LifeCycleAgent INFO     Starting SBC...']) => changed=false 
+  ansible_loop_var: item
+  item:
+    ansible_loop_var: item
+    attempts: 60
+    changed: true
+    cmd: /usr/bin/tail -n 10  /var/log/sonus/lca/lca.log
+    delta: '0:00:00.440942'
+    end: '2020-03-29 16:16:22.938876'
+    failed: true
+    invocation:
+      module_args:
+        _raw_params: /usr/bin/tail -n 10  /var/log/sonus/lca/lca.log
+        _uses_shell: true
+        argv: null
+        chdir: null
+        creates: null
+        executable: null
+        removes: null
+        stdin: null
+        stdin_add_newline: true
+        strip_empty_ends: true
+        warn: false
+    item: SSBC_ACTIVE_ANSIBLE
+    rc: 0
+    start: '2020-03-29 16:16:22.497934'
+    stderr: ''
+    stderr_lines: []
+    stdout: |-
+      2020-03-29 16:07:16.408 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.
+      2020-03-29 16:07:16.585 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200
+      2020-03-29 16:07:16.585 LifeCycleAgent INFO     Received 200 OK to password request
+      2020-03-29 16:07:16.600 LifeCycleAgent INFO     Getting the emssftp user credentials
+      2020-03-29 16:07:16.600 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.
+      2020-03-29 16:07:16.767 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200
+      2020-03-29 16:07:16.767 LifeCycleAgent INFO     Received 200 OK to password request
+      2020-03-29 16:07:16.931 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server
+      2020-03-29 16:07:17.123 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client
+      2020-03-29 16:07:17.124 LifeCycleAgent INFO     Starting SBC...
+    stdout_lines:
+    - '2020-03-29 16:07:16.408 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.'
+    - '2020-03-29 16:07:16.585 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200'
+    - 2020-03-29 16:07:16.585 LifeCycleAgent INFO     Received 200 OK to password request
+    - 2020-03-29 16:07:16.600 LifeCycleAgent INFO     Getting the emssftp user credentials
+    - '2020-03-29 16:07:16.600 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.'
+    - '2020-03-29 16:07:16.767 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200'
+    - 2020-03-29 16:07:16.767 LifeCycleAgent INFO     Received 200 OK to password request
+    - '2020-03-29 16:07:16.931 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server'
+    - 2020-03-29 16:07:17.123 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client
+    - 2020-03-29 16:07:17.124 LifeCycleAgent INFO     Starting SBC...
+  msg: 'SBC service is not running for {''stderr_lines'': [], ''ansible_loop_var'': u''item'', u''end'': u''2020-03-29 16:16:22.938876'', ''failed'': True, u''stdout'': u''2020-03-29 16:07:16.408 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.\n2020-03-29 16:07:16.585 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200\n2020-03-29 16:07:16.585 LifeCycleAgent INFO     Received 200 OK to password request\n2020-03-29 16:07:16.600 LifeCycleAgent INFO     Getting the emssftp user credentials\n2020-03-29 16:07:16.600 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.\n2020-03-29 16:07:16.767 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200\n2020-03-29 16:07:16.767 LifeCycleAgent INFO     Received 200 OK to password request\n2020-03-29 16:07:16.931 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server\n2020-03-29 16:07:17.123
+    LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client\n2020-03-29 16:07:17.124 LifeCycleAgent INFO     Starting SBC...'', u''changed'': True, u''rc'': 0, ''item'': u''SSBC_ACTIVE_ANSIBLE'', ''attempts'': 60, u''cmd'': u''/usr/bin/tail -n 10  /var/log/sonus/lca/lca.log'', u''stderr'': u'''', u''delta'': u''0:00:00.440942'', u''invocation'': {u''module_args'': {u''creates'': None, u''executable'': None, u''_uses_shell'': True, u''strip_empty_ends'': True, u''_raw_params'': u''/usr/bin/tail -n 10  /var/log/sonus/lca/lca.log'', u''removes'': None, u''argv'': None, u''warn'': False, u''chdir'': None, u''stdin_add_newline'': True, u''stdin'': None}}, ''stdout_lines'': [u''2020-03-29 16:07:16.408 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.'', u''2020-03-29 16:07:16.585 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200'', u''2020-03-29 16:07:16.585 LifeCycleAgent INFO     Received 200 OK to password request'', u''2020-03-29 16:07:16.600 LifeCycleAgent
+    INFO     Getting the emssftp user credentials'', u''2020-03-29 16:07:16.600 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.'', u''2020-03-29 16:07:16.767 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200'', u''2020-03-29 16:07:16.767 LifeCycleAgent INFO     Received 200 OK to password request'', u''2020-03-29 16:07:16.931 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server'', u''2020-03-29 16:07:17.123 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client'', u''2020-03-29 16:07:17.124 LifeCycleAgent INFO     Starting SBC...''], u''start'': u''2020-03-29 16:16:22.497934''}'
+failed: [localhost] (item=[u'2020-03-29 16:10:56.272 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.', u'2020-03-29 16:10:56.537 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200', u'2020-03-29 16:10:56.537 LifeCycleAgent INFO     Received 200 OK to password request', u'2020-03-29 16:10:56.629 LifeCycleAgent INFO     Getting the emssftp user credentials', u'2020-03-29 16:10:56.629 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.', u'2020-03-29 16:10:56.891 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200', u'2020-03-29 16:10:56.891 LifeCycleAgent INFO     Received 200 OK to password request', u'2020-03-29 16:10:57.902 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server', u'2020-03-29 16:10:58.346 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client', u'2020-03-29 16:10:58.346 LifeCycleAgent INFO     Starting SBC...']) => changed=false 
+  ansible_loop_var: item
+  item:
+    ansible_loop_var: item
+    attempts: 60
+    changed: true
+    cmd: /usr/bin/tail -n 10  /var/log/sonus/lca/lca.log
+    delta: '0:00:00.459540'
+    end: '2020-03-29 16:22:20.892479'
+    failed: true
+    invocation:
+      module_args:
+        _raw_params: /usr/bin/tail -n 10  /var/log/sonus/lca/lca.log
+        _uses_shell: true
+        argv: null
+        chdir: null
+        creates: null
+        executable: null
+        removes: null
+        stdin: null
+        stdin_add_newline: true
+        strip_empty_ends: true
+        warn: false
+    item: SSBC_STANDBY_ANSIBLE
+    rc: 0
+    start: '2020-03-29 16:22:20.432939'
+    stderr: ''
+    stderr_lines: []
+    stdout: |-
+      2020-03-29 16:10:56.272 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.
+      2020-03-29 16:10:56.537 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200
+      2020-03-29 16:10:56.537 LifeCycleAgent INFO     Received 200 OK to password request
+      2020-03-29 16:10:56.629 LifeCycleAgent INFO     Getting the emssftp user credentials
+      2020-03-29 16:10:56.629 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.
+      2020-03-29 16:10:56.891 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200
+      2020-03-29 16:10:56.891 LifeCycleAgent INFO     Received 200 OK to password request
+      2020-03-29 16:10:57.902 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server
+      2020-03-29 16:10:58.346 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client
+      2020-03-29 16:10:58.346 LifeCycleAgent INFO     Starting SBC...
+    stdout_lines:
+    - '2020-03-29 16:10:56.272 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.'
+    - '2020-03-29 16:10:56.537 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200'
+    - 2020-03-29 16:10:56.537 LifeCycleAgent INFO     Received 200 OK to password request
+    - 2020-03-29 16:10:56.629 LifeCycleAgent INFO     Getting the emssftp user credentials
+    - '2020-03-29 16:10:56.629 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.'
+    - '2020-03-29 16:10:56.891 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200'
+    - 2020-03-29 16:10:56.891 LifeCycleAgent INFO     Received 200 OK to password request
+    - '2020-03-29 16:10:57.902 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server'
+    - 2020-03-29 16:10:58.346 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client
+    - 2020-03-29 16:10:58.346 LifeCycleAgent INFO     Starting SBC...
+  msg: 'SBC service is not running for {''stderr_lines'': [], ''ansible_loop_var'': u''item'', u''end'': u''2020-03-29 16:22:20.892479'', ''failed'': True, u''stdout'': u''2020-03-29 16:10:56.272 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.\n2020-03-29 16:10:56.537 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200\n2020-03-29 16:10:56.537 LifeCycleAgent INFO     Received 200 OK to password request\n2020-03-29 16:10:56.629 LifeCycleAgent INFO     Getting the emssftp user credentials\n2020-03-29 16:10:56.629 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.\n2020-03-29 16:10:56.891 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200\n2020-03-29 16:10:56.891 LifeCycleAgent INFO     Received 200 OK to password request\n2020-03-29 16:10:57.902 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server\n2020-03-29 16:10:58.346
+    LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client\n2020-03-29 16:10:58.346 LifeCycleAgent INFO     Starting SBC...'', u''changed'': True, u''rc'': 0, ''item'': u''SSBC_STANDBY_ANSIBLE'', ''attempts'': 60, u''cmd'': u''/usr/bin/tail -n 10  /var/log/sonus/lca/lca.log'', u''stderr'': u'''', u''delta'': u''0:00:00.459540'', u''invocation'': {u''module_args'': {u''creates'': None, u''executable'': None, u''_uses_shell'': True, u''strip_empty_ends'': True, u''_raw_params'': u''/usr/bin/tail -n 10  /var/log/sonus/lca/lca.log'', u''removes'': None, u''argv'': None, u''warn'': False, u''chdir'': None, u''stdin_add_newline'': True, u''stdin'': None}}, ''stdout_lines'': [u''2020-03-29 16:10:56.272 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.'', u''2020-03-29 16:10:56.537 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200'', u''2020-03-29 16:10:56.537 LifeCycleAgent INFO     Received 200 OK to password request'', u''2020-03-29 16:10:56.629
+    LifeCycleAgent INFO     Getting the emssftp user credentials'', u''2020-03-29 16:10:56.629 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: has body.'', u''2020-03-29 16:10:56.891 LifeCycleAgent INFO     emsUtils.sendRequestAndGetResponse: code: 200'', u''2020-03-29 16:10:56.891 LifeCycleAgent INFO     Received 200 OK to password request'', u''2020-03-29 16:10:57.902 LifeCycleAgent INFO     Successfully added linux user: emssftp group: sftponly,upload home directory: /home/sftproot/emssftp shell: /usr/lib/sftp-server'', u''2020-03-29 16:10:58.346 LifeCycleAgent INFO     OAM Managed Node, i.e. glusterfs client'', u''2020-03-29 16:10:58.346 LifeCycleAgent INFO     Starting SBC...''], u''start'': u''2020-03-29 16:22:20.432939''}'
+
+PLAY RECAP ******************************************************************************************************************************
+localhost                  : ok=14   changed=5    unreachable=0    failed=1    skipped=3    rescued=0    ignored=1   
+
+Monday 30 March 2020  01:52:26 +0530 (0:00:00.142)       0:17:18.795 ********** 
+=============================================================================== 
+Waiting for service ------------------------------------------------------------------------------------------------------------ 707.20s
+spawning the SSBC instances ---------------------------------------------------------------------------------------------------- 145.29s
+Wait until the  SSBC  instances ping ------------------------------------------------------------------------------------------- 120.83s
+checking if any core file generated, fails task if generated . ------------------------------------------------------------------ 30.90s
+wait for 30 seconds ------------------------------------------------------------------------------------------------------------- 30.28s
+Checking the Management IP of SSBC instances  is pingable or not ----------------------------------------------------------------- 2.82s
+include_tasks -------------------------------------------------------------------------------------------------------------------- 0.16s
+SSBC  Instances Failed to spawn -------------------------------------------------------------------------------------------------- 0.15s
+Service is not up ---------------------------------------------------------------------------------------------------------------- 0.14s
+inventory_hostname for group oam-1 ----------------------------------------------------------------------------------------------- 0.13s
+Add SSBC  instances to inventory ------------------------------------------------------------------------------------------------- 0.13s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.13s
+SSBC  INSTANCES DIDNOT PING ------------------------------------------------------------------------------------------------------ 0.12s
+include -------------------------------------------------------------------------------------------------------------------------- 0.11s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.10s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.09s
+CORE FILE EXISTS in active OAM --------------------------------------------------------------------------------------------------- 0.08s
+include_vars --------------------------------------------------------------------------------------------------------------------- 0.07s

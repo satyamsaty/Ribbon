@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  gather_facts: true
+  ignore_errors: false
+  tasks:
+  - name: Create a new instance and attaches to a network and passes metadata to the instance
+    os_server:
+       state: present
+       cloud: overcloud
+       auth:
+       #  auth_url: https://elt1.in.sonusnet.com:13000/v3
+       #  username: ribbon
+       #  password: ribbon1
+       #  project_name: admin
+       validate_certs: no
+       name: vm1
+       image: b3dce9f8-4aa5-46a2-b3b6-0ed242a604f1
+       key_name: ansiblekey
+       timeout: 200
+       flavor: 4daa1d1d-5d04-4a56-b794-7310ef6692b1
+       availability_zone: ansible
+       auto_ip: yes
+#       network: 0af61f03-c3e0-4aa5-ad65-565337ef779b
+       nics: "net-id=0af61f03-c3e0-4aa5-ad65-565337ef779b"
+       wait: false
+ #      meta: "hostname=test,group=test1" 

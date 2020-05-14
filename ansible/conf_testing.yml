@@ -1,0 +1,12 @@
+---
+- name: create stack
+  hosts: localhost
+  gather_facts: false
+  ignore_errors: false
+  tasks:
+  - name: To copy the config file to remote box
+    shell: scp -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key -P 2024 /home/ansible/config.sh root@10.34.224.111:/root 
+  - name: To run configuration
+    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key root@10.34.224.111 "expect /root/config.sh"
+#    register: r
+#  - debug: var=r.stdout_lines

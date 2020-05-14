@@ -1,0 +1,47 @@
+---
+  - name: Management IP
+    command: "echo {{ item.mgt0ipaddress }}"
+    register: result
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug:
+      var: result
+    no_log: True
+
+#  - name: To check port switchover time
+#    shell: Trsh /home/ansible/test_port_switchover.sh {{ mgt0IPAddress_ACTIVE }}
+#    register: b
+#  - debug: var=b.stdout_lines
+
+
+
+  - name: To check port switchover time
+    shell: "{{ PortSwitchoverTime_Path }} {{ result.results[0].stdout }}"
+    register: b
+  - debug: var=b.stdout_lines
+
+
+
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+
+
+
+
+
+#  - name: check call status
+#    shell: echo "show status global callCountStatus"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    delegate_to: "{{ res.results[0].stdout }}"
+#    register: b
+#  - debug: var=b.stdout_lines
+
+
+

@@ -1,0 +1,12 @@
+---
+- name: create stack
+  hosts: localhost
+  gather_facts: true
+  ignore_errors: false
+  tasks:
+  - name: To copy the callcount script in remote box
+    shell: scp -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key -P 2024 /home/ansible/call.sh root@10.34.224.111:/root
+  - name: Call Count
+    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key root@10.34.224.111 "expect /root/call.sh"
+    register: p
+  - debug: var=p.stdout_lines

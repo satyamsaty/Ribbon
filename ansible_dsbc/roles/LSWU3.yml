@@ -1,0 +1,276 @@
+---
+- name: 
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_vars: LSWU3/vars/main.yml
+      no_log: True
+  tags:
+  - local
+
+- name:
+  gather_facts: False
+  hosts: server1
+  tasks:
+    - include_vars: LSWU3/vars/main.yml
+      no_log: True
+  tags:
+  - server1
+
+  
+
+- name: 
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/oam.yml
+  tags:
+  - oam
+
+- name: SPAWNING SSBC Instances
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/ssbc.yml
+  tags:
+  - ssbc
+
+
+
+
+- name: SPAWNING MSBC Instances
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/msbc.yml
+  tags:
+  - msbc
+
+
+
+- name: SPAWNING TSBC Instances
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/tsbc.yml
+  tags:
+  - tsbc
+
+
+
+#- name: CONFIGURATION ON OAM
+#  ignore_errors: yes
+#  gather_facts: False
+#  hosts: localhost
+#  tasks:
+#    - include_tasks: LSWU3/tasks/call_configuration.yml
+#  tags:
+#  - call_configuration
+
+
+
+#- name: SaveAndActivate from OAM .
+#  gather_facts: False
+#  hosts: localhost
+#  tasks:
+#    - include_tasks: LSWU3/tasks/oam_configuration.yml
+#  tags:
+#  - oam_sa
+
+
+- name: Checking call
+  ignore_errors: yes
+  gather_facts: False
+  hosts: server1
+  tasks:
+    - include_tasks: LSWU3/tasks/call_count_passthrough.yml
+  tags:
+  - call_passthrough
+
+
+#- name: Checking call
+#  ignore_errors: yes
+#  gather_facts: False
+#  hosts: localhost
+#  tasks:
+#    - include_tasks: LSWU3/tasks/call_count_XCODE.yml
+#  tags:
+#  - call_XCODE
+#
+
+
+
+
+- name: Rebuilding SSBC OAM instances
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_oam_ssbc.yml
+  tags:
+  - oam_ssbc_rebuild
+
+
+
+
+
+
+
+
+- name: Rebuilding SSBC  standby instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_standby_ssbc.yml
+  tags:
+  - ssbc_standby_rebuild
+
+
+- name: Rebuilding SSBC  active instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_active_ssbc.yml
+  tags:
+  - ssbc_active_rebuild
+
+
+- name: Server switchover for SSBC
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/reboot_standby_ssbc.yml
+  tags:
+  - reboot_standby
+
+
+
+
+- name: Rebuilding MSBC OAM instances
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_oam_msbc.yml
+  tags:
+  - oam_msbc_rebuild
+
+
+
+
+- name: Rebuilding MSBC  standby instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_msbc_standby.yml
+  tags:
+  - msbc_standby_rebuild
+
+
+
+
+
+
+- name: Rebuilding MSBC  active1 instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_msbc_active1.yml
+  tags:
+  - msbc_active1_rebuild
+
+
+- name: Rebuilding MSBC  active2 instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_msbc_active2.yml
+  tags:
+  - msbc_active2_rebuild
+
+- name: Rebooting standby MSBC instance.
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/reboot_standby_msbc.yml
+  tags:
+  - reboot_msbc_standby
+
+
+
+
+- name: Rebuilding TSBC OAM instances
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_oam_tsbc.yml
+  tags:
+  - oam_tsbc_rebuild
+
+
+
+
+
+- name: Rebuilding TSBC  standby instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_tsbc_standby.yml
+  tags:
+  - tsbc_standby_rebuild
+
+
+
+
+
+- name: Rebuilding TSBC  active1 instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_tsbc_active1.yml
+  tags:
+  - tsbc_active1_rebuild
+
+
+- name: Rebuilding TSBC  active2 instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/rebuild_tsbc_active2.yml
+  tags:
+  - tsbc_active2_rebuild
+
+
+- name: Rebooting TSBC standby instance
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/reboot_standby_tsbc.yml
+  tags:
+  - reboot_tsbc_standby
+
+
+
+
+
+
+- name: Checking call
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - include_tasks: LSWU3/tasks/call_count.yml
+  tags:
+  - call
+
+
+
+
+
+#
+#
+#
+#
+#- name: 
+#  hosts: localhost
+#  tasks:
+#    - name: FINALLY KILL UAS AND UAC PROCESS IF WANT TO STOP CALL 
+#      include_tasks: LSWU3/tasks/call_processkill.yml
+#

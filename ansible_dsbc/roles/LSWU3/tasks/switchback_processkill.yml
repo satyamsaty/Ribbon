@@ -1,0 +1,12 @@
+  - name: remove  the invalid key
+    shell: ssh-keygen -R "mgt0IPAddress_STANDBY"
+    register: b
+    failed_when: b.rc not in (0,255)
+  - name: remove  the invalid key
+    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+    register: b
+    failed_when: b.rc not in (0,255)
+  - name: Switchback by Killing CHM process on current Active Instance installed role as Standby
+    shell:
+       "ps -few | grep -i chm |grep -i sonusad | grep -v grep | awk '{print $2}'|xargs kill"
+

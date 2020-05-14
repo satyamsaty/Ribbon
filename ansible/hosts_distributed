@@ -1,0 +1,16 @@
+#Variable Values are stored in group_vars directory.
+localhost ansible_connection=local
+
+ 
+[active]
+active-1 ansible_host=10.34.224.58  ansible_user=linuxadmin ansible_port=2024 ansible_password=sonus ansible_become=True   ansible_python_interpreter=/usr/bin/python3 ansible_ssh_private_key_file=/home/ansible/cloud_ats.key ansible_ssh_common_args=' -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' 
+
+[standby]
+standby-1 ansible_host=10.34.224.80 ansible_user=linuxadmin ansible_port=2024 ansible_password=sonus ansible_become=True  ansible_ssh_private_key_file=/home/ansible/cloud_ats.key ansible_python_interpreter=/usr/bin/python3 ansible_ssh_common_args=' -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+
+
+[bats2]
+bats14 ansible_host=10.54.81.66 ansible_user=satykumar ansible_port=22 ansible_ssh_pass=Welcome123 ansible_python_interpreter=/usr/bin/python ansible_ssh_common_args=' -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' ansible_ssh_private_key_file=/home/ansible/.ssh/id_rsa
+
+
+

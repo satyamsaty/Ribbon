@@ -1,0 +1,148 @@
+---
+
+Configuration_File_Path_SSBC: ../SBCCONFIG_EXTPSX.txt
+Configuration_File_Path_TSBC: ../TSBCCONFIG_EXTPSX.txt
+Configuration_File_Path_MSBC: ../MSBCCONFIG_EXTPSX.txt
+uas_script_passthrough: sipp -sn uas -i 10.54.52.201 -p 23412
+uac_script_passthrough: sipp -sn uac -i 10.54.52.203 -p 23544 -s 9828561111 10.34.208.41 -d 1h -m 50
+uas_script_XCODE: sipp -sf uacULAW.xml -i 10.54.52.202 -p 32412 -s 9934522222 -d 1m -m 1 10.34.208.41 
+uac_script_XCODE: sipp -sf uasALAW.xml -i 10.54.52.200 -p 23444
+
+SyncStatus_Path: ../sync_status.sh
+
+oam_nodes:
+  - name: OAM_SSBC_ANSIBLE 
+    present_or_absent: present
+    template: OAM_SSBC_PROVIDER.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress_active: 10.34.194.65
+    mgt0ipaddress_standby: 10.34.194.66
+   # OAM_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    OAM_UPGRADED_BUILD: TARGET_BUILD
+
+
+  - name: OAM_MSBC_ANSIBLE
+    present_or_absent: present
+    template: OAM_MSBC_PROVIDER.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress_active: 10.34.194.61
+    mgt0ipaddress_standby: 10.34.194.62
+   # OAM_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    OAM_UPGRADED_BUILD: TARGET_BUILD
+
+
+
+
+  - name: OAM_TSBC_ANSIBLE
+    present_or_absent: present
+    template: OAM_TSBC_PROVIDER.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress_active: 10.34.194.23
+    mgt0ipaddress_standby: 10.34.194.25
+   # OAM_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    OAM_UPGRADED_BUILD: TARGET_BUILD
+
+
+
+
+ssbc_nodes:
+  - name: SSBC_ACTIVE_ANSIBLE
+    present_or_absent: present
+    template: SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress: 10.34.194.120
+    role: ACTIVE
+#    SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    SSBC_UPGRADED_BUILD: TARGET_BUILD
+
+  - name: SSBC_STANDBY_ANSIBLE
+    present_or_absent: present
+    template: SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress: 10.34.194.83
+    role: STANDBY
+#    SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    SSBC_UPGRADED_BUILD: TARGET_BUILD
+
+
+msbc_nodes:
+  - name: MSBC_ACTIVE1_ANSIBLE
+    present_or_absent: present
+    template: MSBC_DISTRIBUTED_1TO1_ACTIVE1_PORT_RED.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress: 10.34.194.84
+#    MSBC_UPGRADED_BUILD1: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    MSBC_UPGRADED_BUILD1: TARGET_BUILD
+    role: ACTIVE
+
+  - name: MSBC_ACTIVE2_ANSIBLE
+    present_or_absent: present
+    template: MSBC_DISTRIBUTED_1TO1_ACTIVE2_PORT_RED.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress: 10.34.194.85
+ #   MSBC_UPGRADED_BUILD1: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    MSBC_UPGRADED_BUILD1: TARGET_BUILD
+    role: ACTIVE
+
+  - name: MSBC_STANDBY_ANSIBLE
+    present_or_absent: present  
+    template: MSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress: 10.34.194.86
+   # MSBC_UPGRADED_BUILD1: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    MSBC_UPGRADED_BUILD1: TARGET_BUILD
+    role: STANDBY
+
+tsbc_nodes:
+  - name: TSBC_ACTIVE1_ANSIBLE
+    present_or_absent: present
+    template: TSBC_DISTRIBUTED_2TO1_ACTIVE1_PORT_RED.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress: 10.34.194.29
+  #  TSBC_UPGRADED_BUILD1: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    TSBC_UPGRADED_BUILD1: TARGET_BUILD
+    role: ACTIVE
+
+  - name: TSBC_ACTIVE2_ANSIBLE
+    present_or_absent: present
+    template: TSBC_DISTRIBUTED_2TO1_ACTIVE2_PORT_RED.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress: 10.34.194.129
+ #   TSBC_UPGRADED_BUILD1: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    TSBC_UPGRADED_BUILD1: TARGET_BUILD
+    role: ACTIVE
+
+
+  - name: TSBC_STANDBY_ANSIBLE
+    present_or_absent: present
+    template: TSBC_DISTRIBUTED_2TO1_STANDBY_PORT_RED.yml
+    flavor: ANSIBLE
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    security_group: sbccoresvt-sg
+    mgt0ipaddress: 10.34.194.130
+#    TSBC_UPGRADED_BUILD1: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    TSBC_UPGRADED_BUILD1: TARGET_BUILD
+    role: STANDBY
+
+
+

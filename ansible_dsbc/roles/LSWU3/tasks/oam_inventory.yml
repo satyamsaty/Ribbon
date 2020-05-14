@@ -1,0 +1,16 @@
+  - name: Wait for active instance  to come up
+    wait_for:
+       port: 2024
+       host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+       search_regex: OpenSSH
+       sleep: 5
+       timeout: 240
+    vars:
+       ansible_connection: local
+
+  - name: Append public key to authorized_keys file of controller
+    authorized_key:
+       user: linuxadmin
+       key: "{{ lookup('file','id_rsa.pub') }}"
+       state: present
+

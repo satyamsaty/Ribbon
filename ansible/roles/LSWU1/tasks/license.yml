@@ -1,0 +1,108 @@
+---
+#  - name: management ip of server
+#    shell: >
+#            openstack server list -f json |
+#            grep -A 5 -w "{{ item.name }}" |
+#            sed 's|[\" ]||g' |
+#            tr \; \\n |
+#            grep -w  "{{ item.mgt0ipaddress }}" |
+#            cut -d"=" -f2 |
+#            cut -d"," -f1
+#    register: result
+#    loop: "{{ isbc_distributed_nodes }}" 
+#  - debug:
+#      var: result
+#  - name: add bats2 to inventory
+#    add_host:
+#      name: "bats14"
+#      groups: "bats2"
+#      ansible_host: "10.54.81.66"
+#      ansible_user: "satykumar"
+#      ansible_connection: "ssh"
+    
+#  - name: make direcotry
+#    file:
+#      path: "$HOME/.ssh"
+#      state: directory
+#  - name: create empty file
+#    file:
+#      path: "$HOME/.ssh/authorized_keys"
+#      state: touch
+#  - name: put pubkey
+#    lineinfile:
+#      path: "$HOME/.ssh/authorized_keys"
+#      line: "{{ pubkey }}"
+  - name: Management IP 
+    command: "echo {{ item.mgt0ipaddress }}"
+    register: result
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug: 
+      var: result 
+    no_log: True 
+
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_STANDBY"
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+  
+  - name: Pushing license in active node  as well as standby node as it is distributed ISBC .
+    script: "{{ LicenseScript_Path }} {{ result.results[0].stdout }} {{ result.results[1].stdout }}"
+#    script: "{{ LicenseScript_Path }}" {{ result.results[0].stdout }} {{ result.results[1].stdout }}
+#if more than one variable , use escape characters.
+#        script: /home/ansible/license_push_cloud1.sh {{result.results[0].stdout}} {{result.results[1].stdout}}
+        
+       # shell: "{{ groups['isbc_active'] | map('extract', hostvars, ['ansible_mgt0', 'ipv4', 'address']) }}" 
+        
+    register: result
+    failed_when:
+         - result.rc == 1
+         - '"license bundle b1 already exists" not in result.stdout'
+  
+  - debug: var=result
+    #    register: command_result
+  #      failed_when: command_result.rc == 0 or command_result.rc >= 99
+  - name: License pushed on boxes 
+    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/licenseInfo | grep -wE '(usageLimit|inUse)' | head -2
+    register: b
+    loop: "{{ isbc_distributed_nodes }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ b.results }}"
+    loop_control:
+      label: "{{ item.stdout_lines }}"
+
+#  - debug: var=b.stdout_lines
+#  - name: License pushed on standby box
+#    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_STANDBY}}/api/operational/system/licenseInfo | grep -wE '(usageLimit|inUse)' | head -2
+#    register: b
+#  - debug: var=b.stdout_lines
+#  - name: 
+#    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/coredumpList/| grep  "No Content"
+#    register: b
+#    loop: "{{ isbc_distributed_nodes }}"
+#  - debug:
+#      msg: "{{ item.stdout_lines }}"
+#    loop: "{{ b.results }}"
+#    loop_control:
+#      label: "{{ item.stdout_lines }}"
+
+#  - debug: var=b.stdout_lines
+  - name: CoredumpAndTraceCount
+    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/coredumpSummary/vsbc1 | grep "coredumpAndTraceCount"
+    register: b
+    loop: "{{ isbc_distributed_nodes }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ b.results }}"
+    loop_control:
+      label: "{{ item.stdout_lines }}"
+
+#  - debug: var=b.stdout_lines
+
+  
+
+  
+
+

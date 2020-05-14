@@ -1,0 +1,9 @@
+- name: Launch instance on OpenStack
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - os_user_facts:
+        name: ribbon
+    - debug:
+        var: openstack_users

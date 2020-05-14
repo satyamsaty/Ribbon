@@ -1,0 +1,37 @@
+---
+
+  - include: delegate_ssbc.yml
+  - name: 
+    ignore_errors: False
+    copy:
+      src: "{{ SyncStatus_Path }}"
+      dest: $HOME/sync_status.sh
+      mode: '0777'
+      force: yes
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['msbc'][1] }}"
+
+
+
+  - name: Waiting for rebuilded SSBC instances to sync after switchover
+    ignore_errors: yes
+    shell: $HOME/sync_status.sh {{ result_m.results[1].stdout }}
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['msbc'][1] }}"
+    register: b
+    failed_when: b.rc not in (0,126)
+
+
+
+  - name: checking installed software version after performing switchover & rebulding SSBC instances .
+    ignore_errors: yes
+    shell:
+          "/opt/sonus/sbx/scripts/swinfo.sh"
+    delegate_to: "{{ item }}"
+    loop: "{{ groups['msbc'] }}"
+    register: version
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ version.results }}"
+
+ 

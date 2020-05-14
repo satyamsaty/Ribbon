@@ -1,0 +1,16 @@
+- name: rollover
+  shell: |
+    set timeout 300
+    spawn ssh admin@10.34.224.58
+
+    expect ">"
+    send "yes\n"
+    expect ">"
+    send "request oam eventLog typeAdmin system rolloverLogNow\n"
+    expect ">"
+
+
+    exit 0
+  args:
+     executable: /usr/bin/expect
+#  delegate_to: localhost

@@ -1,0 +1,184 @@
+---
+  - name: spawning the instances
+    ignore_errors: yes
+    register: stack_create
+    os_stack:
+       name: "{{ item.name }}"
+       tag: "{{ item.name }}"  
+       state: "{{ item.present_or_absent }}"
+       validate_certs: false
+       template: "{{ item.template }}"
+       parameters:
+           flavor: "{{ item.flavor }}"
+           image: "{{ item.TSBC_UPGRADED_BUILD1 }}"
+           security_group: "{{ item.security_group }}"
+           mgt0IPAddress: "{{ item.mgt0ipaddress }}"
+    loop: "{{ tsbc_nodes }}"
+
+  - name: TSBC  Instances Failed to spawn
+    fail:
+      msg: " Stack ({{ item.stack.stack_name }})status: FAILED "
+    when: item.stack.status != "COMPLETE"
+    loop: "{{ stack_create.results }}"
+    loop_control:
+       label: "{{ item.item }}"
+
+
+  - name: Wait until the  instance pings
+    ignore_errors: yes
+    wait_for:
+       host: "{{ item.mgt0ipaddress }}"
+       port: 2024
+       delay: 60
+       timeout: 120
+       state: started
+       msg: '"{{ item.mgt0ipaddress }}" didnot ping'
+    loop: "{{ tsbc_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+
+       
+  - name: Checking the Management Ip of TSBC instances is pingable or not
+    ignore_errors: yes
+    shell: ping -c2 {{ item.mgt0ipaddress }}
+    register: ping 
+    loop: "{{ tsbc_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ ping.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+  - name: MSBC  INSTANCES DIDNOT PING
+    fail:
+      msg: ({{ item }}) donot ping
+    when: item.rc != 0
+    loop: "{{ ping.results }}"
+
+  - include: inventory_tsbc.yml
+ 
+  - name: wait for 30 seconds
+    wait_for:
+      timeout: 30
+  
+
+  - name: checking if any core file generated, fails task if generated .
+    ignore_errors: yes
+    shell:
+      "ls -alrt | grep -w core|wc -l"
+    args:
+     chdir: /var/log/sonus/sbx/coredump/
+    delegate_to: "{{item}}"
+
+    loop: "{{groups['tsbc']}}"
+
+
+    register: core
+    failed_when: '"0" not in core.stdout'
+
+  - debug:
+      msg: "{{ item.item }} has {{ item.stdout }} core files"
+    loop: "{{ core.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+  - name: CORE FILE EXISTS in active OAM
+    fail:
+      msg: core dump exists in {{ item }}
+    when: item.stdout != '0'
+    loop: "{{ core.results }}"
+
+
+  - name: Waiting for service
+    ignore_errors: yes
+    shell:
+       "/usr/bin/tail -n 10  /var/log/sonus/lca/lca.log"
+    register: service
+    until: service.stdout.find("SBC service is now running") != -1
+    retries: 60
+    delay: 5
+    delegate_to: "{{item}}"
+    loop: "{{groups['tsbc']}}"
+
+
+  - name: Service is not up
+    fail:
+      msg: "SBC service is not running for {{ item }}"
+    when: "'SBC service is now running' not  in item.stdout"
+    loop: "{{ service.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+#  - name: Checking Sync Status
+#    ignore_errors: yes
+#    shell: |
+#       set timeout 15
+#       spawn bash
+#
+#
+#       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+#
+#       expect ">"
+#       send "show table system syncStatus\n"
+#
+#       expect ">"
+#       send "\n"
+#
+#       exit 0
+#    args:
+#        executable: /usr/bin/expect
+#    delegate_to: "{{ item }}"
+#    loop: "{{groups['tsbc']}}"
+#
+#    #delegate_to: "{{ res.results[0].stdout }}"
+#    register: sync_status
+#
+#
+#  - name: sync status
+#    debug:
+#      msg: "{{ item }}"
+#    loop: "{{ sync_status.results }}"
+#    loop_control:
+#       label: "{{ item }}"
+#
+#  - name: services are not in sync
+#    fail:
+#      msg: services are not in sync for {{ item }}
+#    when: "'syncCompleted' not  in item.stdout"
+#    loop: "{{ sync_status.results }}"
+#    loop_control:
+#       label: "{{ item.stdout_lines }}"
+#
+
+
+
+
+
+
+
+  - name: checking sync status
+    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/syncStatus/ | grep status
+    register: sync_status
+    loop: "{{ tsbc_nodes }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ sync_status.results }}"
+
+
+    
+
+
+#  - name: Service is not up
+#    fail:
+#      msg: sync didnot happen
+#    when: "'syncCompleted' not  in item.stdout"
+#    loop: "{{ sync_status.results }}"
+
+
+
+ 

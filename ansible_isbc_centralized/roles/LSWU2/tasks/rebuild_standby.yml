@@ -1,0 +1,131 @@
+---
+  - include_tasks: delegate.yml
+  - name: Rebuilding the standby instance
+    ignore_errors: False
+    register: stack_create
+    os_stack:
+       name: "{{ item.name }}"
+       tag: "{{ item.name }}"
+       state: "{{ item.present_or_absent }}"
+       validate_certs: false
+       template: "{{ item.template }}"
+       rollback: no
+       parameters:
+           flavor: "{{ item.flavor }}"
+           image: "{{ item.upgraded_build }}"
+           security_group: "{{ item.security_group }}"
+           mgt0IPAddress: "{{ item.mgt0ipaddress }}"
+           sbc_ceRole: "{{ item.role }}"
+  
+    loop: "{{ isbc_centralized_nodes }}"
+    when: item.role == 'STANDBY'
+  - meta: clear_host_errors
+
+  - name: Instance Failed to spawn
+    fail:
+      msg: " Stack ({{ stack_create.results[1].stack.stack_name }})status: FAILED "
+    when: stack_create.results[1].stack.status != "COMPLETE"
+    loop: "{{ isbc_centralized_nodes }}"
+
+
+  - name: Wait until the  instance pings
+    ignore_errors: yes
+    wait_for:
+       host: "{{ item.mgt0ipaddress }}"
+       port: 2024
+       delay: 60
+       timeout: 300
+       state: started
+       msg: " Standby Instance waiting to ping "
+    loop: "{{ isbc_centralized_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+    when: item.role == 'STANDBY'
+
+
+  - include_tasks: inventory.yml
+
+
+
+  - name: Checking the Management node  is pingable or not
+    ignore_errors: yes
+    shell: ping -c5 {{ item.mgt0ipaddress }}
+    register: ping
+    loop: "{{ isbc_centralized_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ ping.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+  - name: INSTANCE DIDNOT PING
+    fail:
+      msg: ({{ item }}) donot ping
+    when: item.rc != 0
+    loop: "{{ ping.results }}"
+
+
+
+
+
+  - name: Checking if any core file generated, fails task if generated
+    ignore_errors: yes
+    shell:
+      "ls -alrt | grep -w core|wc -l"
+    args:
+     chdir: /var/log/sonus/sbx/coredump/
+    delegate_to: "{{ item }}"
+    loop: "{{groups['isbc']}}"
+
+
+    register: core
+    failed_when: '"0" not in core.stdout'
+
+  - name: core dump files
+    debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ core.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+  - name: CORE FILE EXISTS
+    fail:
+      msg: core dump exists in {{ item }}
+    when: item.rc != 0
+    loop: "{{ core.results }}"
+
+
+  - name: wait
+    wait_for:
+      timeout: 120
+
+  - name: Waiting for service
+    ignore_errors: yes
+    shell:
+       "/usr/bin/tail -n 10  /var/log/sonus/lca/lca.log"
+    register: service
+    until: service.stdout.find("SBC service is now running") != -1
+    retries: 60
+    delay: 10
+    delegate_to: "{{item}}"
+    loop: "{{groups['isbc']}}"
+  - meta: clear_host_errors
+
+  - name: Service is not up
+    fail:
+      msg: "SBC service is not running for {{ item }}"
+    when: "'SBC service is now running' not  in item.stdout"
+    loop: "{{ service.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+
+
+
+
+
+
+

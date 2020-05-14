@@ -1,0 +1,19 @@
+  - name: Moving the files from localhost to standby node
+    become: True
+    copy:
+      src: /home/ansible/config.txt
+      dest: /root/
+      mode: '0777'
+  - name: To run configuration in standby node
+    become: True
+    shell: cat /root/config.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    register: b
+  - debug: var=b.stdout_lines
+  - name: check call status after rebuilding standby 
+    become: True
+    shell: echo "show status global callCountStatus"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    delegate_to: active-1
+    register: b
+  - debug: var=b.stdout_lines
+
+

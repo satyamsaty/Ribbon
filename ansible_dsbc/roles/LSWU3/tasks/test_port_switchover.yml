@@ -1,0 +1,6 @@
+---
+  - name: To check port switchover time
+    shell: sh /home/ansible/test_port_switchover.sh {{ mgt0IPAddress_ACTIVE }}
+    register: b
+  - debug: var=b.stdout_lines
+

@@ -1,0 +1,15 @@
+---
+  - name: To check installed software version
+#    become: true
+    shell:
+          "/opt/sonus/sbx/scripts/swinfo.sh"
+    delegate_to: active-1
+    register: b
+  - debug: var=b.stdout_lines
+
+  - name: checking sync status
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/system/syncStatus/ | grep status        
+    register: b
+  - debug: var=b.stdout_lines
+    
+

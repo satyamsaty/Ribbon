@@ -1,0 +1,79 @@
+---
+#variables for active instance
+
+#stack_name_active: ISBC_ACTIVE
+#ISBC_ACTIVE_FLAVOR: ISBC4VCPU 
+#mgt0IPAddress_ACTIVE: 10.34.224.58
+##ISBC_ACTIVE_IMAGE: sbc-V08.00.00R000_R000_4
+#ISBC_BASE_BUILD: sbc-V08.00.00R000_R000_4
+#TEMPLATE_ACTIVE: ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+#ISBC_ACTIVE_SG: ansible
+#present_or_absent: present
+##TIMEOUT_SCRIPT_PATH: /home/ansible
+##variables for standby instance
+#
+#stack_name_standby: ISBC_STANDBY
+#ISBC_STANDBY_FLAVOR: ISBC4VCPU
+#mgt0IPAddress_STANDBY: 10.34.224.75
+#ISBC_STANDBY_IMAGE: sbc-V08.00.00R000_R000_4
+#TEMPLATE_STANDBY: ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml
+#ISBC_UPGRADED_BUILD: sbc-V08.01.00R001-connexip-os_07.01.01-R001_509_amd64.qcow2
+#ISBC_STANDBY_SG: ansible
+##variables to push license and configuration and call checking 
+#
+#pkt0IPAddress_ACTIVE: 10.34.226.177
+#path_script: /home/ansible/
+#
+##variables for rebuilded standby instance 
+#
+##ISBC_STANDBY_IMAGE_UPGRADE: sbc-V08.01.00R001-connexip-os_07.01.01-R001_509_amd64.qcow2
+#
+##variables for rebuilded active instance
+#
+##ISBC_ACTIVE_IMAGE_UPGRADE: sbc-V08.01.00R001-connexip-os_07.01.01-R001_509_amd64.qcow2
+#
+#new_ip: 10.34.224.58
+#new_port: 2024  
+TimeOutScript_Path: ../timeout1.sh
+LicenseScript_Path: ../license_push_cloud1.sh
+Configuration_File_Path: ../config.txt
+uas_script: /ats/bin/sipp -sn uas -i 10.54.81.11 -p 14088 -m 50 
+uac_script: /ats/bin/sipp -sn uac -i 10.54.81.11 -p 14333 10.34.226.177 -s 9966896446 -m 50 -d 120m -r 1 -rp 1000
+RollOver_Path: ../oamrollover.sh
+SyncStatus_Path: ../sync_status.sh
+SwitchoverTime_Path: ../test_system_switchover.sh
+SwitchbackTime_Path: ../test_system_switchback.sh
+PortSwitchover_Path: ../port_switchover.sh
+PortSwitchoverTime_Path: ../test_port_switchover.sh
+PortSwitchback_Path: ../port_switchback.sh
+ServerSwitchover_Path: ../switch.sh
+CallCheck_Path: ../call.txt
+pubkey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCpynW0JpU2PeI9CVaq9Pt7elpf0uV1SvYMcsg7SuabnJhmY1g8hz1Ga+c7eZvPT1kGffVFaUScUyd1ZqnF8vxnLu3aQMwvOPAtnuewI0SDuaFLhZDK0Gu2mGrhrXLLTLSKdgoJYUk6Ur426D5YvghWiVERzCrWC7OU0nhDGH0wxuIor2oSvOWom1CPh8vlOWq3yj7yjES6yCKywAO+pWO5KK00CVrFtN1n/NIq795zlmvLW4693MMHamMgQ1AMAmF5Cw/yyQU/lvK0ME8dGPS/hUON5aG17iWaV17HXQW3+rFVXAVItFcDiWQ+x9ZcleLSqYZ35TwXqdC1hdrb+vt7 satykumar@bats12
+#public key of bats12
+
+isbc_distributed_nodes:
+    - name: ISBC_DISTRIBUTED_ACTIVE
+      present_or_absent: present
+      template: ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+      flavor: ISBC4VCPU
+      base_build: sbc-V08.00.00R000_R000_4
+      #upgraded_build: TARGET_BUILD
+      upgraded_build: jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64
+      security_group: ansible
+      mgt0ipaddress: 10.34.224.58
+      role: ACTIVE
+
+    - name: ISBC_DISTRIBUTED_STANDBY
+      present_or_absent: present
+      template: ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml
+      flavor: ISBC4VCPU
+      base_build: sbc-V08.00.00R000_R000_4
+    #  upgraded_build: TARGET_BUILD
+      upgraded_build: jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64
+      security_group: ansible
+      mgt0ipaddress: 10.34.224.75
+      role: STANDBY
+
+
+
+

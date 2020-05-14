@@ -1,0 +1,10 @@
+---
+  - name: To check box switchback time
+  #  shell:
+  #        " sh test_system_switchover.sh" {{ mgt0IPAddress_ACTIVE }} {{ mgt0IPAddress_STANDBY }}
+  #  args:
+  #    chdir: /home/ansible/
+    shell: /home/ansible/test_system_switchback.sh {{ mgt0IPAddress_STANDBY }} {{ mgt0IPAddress_ACTIVE }} 
+    register: b
+  - debug: var=b.stdout_lines
+

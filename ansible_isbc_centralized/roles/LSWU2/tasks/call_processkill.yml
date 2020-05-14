@@ -1,0 +1,19 @@
+---
+  - name: kill uas process on bats server 
+    
+    shell: " ps -few | grep -i '{{ uas_script }} -bg'|grep -v grep| awk  '{print $2}'"
+    register: running_processes
+  - name: Kill running processes
+    shell: "kill {{ item }}"
+    with_items: "{{ running_processes.stdout_lines }}"
+  - name: Kill  uac process on bats server
+    shell: " ps -few | grep -i '{{ uac_script }} -bg' |grep -v grep | awk  '{print $2}'"
+    register: running_processes
+  - name: Kill running processes
+    shell: "kill {{ item }}"
+    with_items: "{{ running_processes.stdout_lines }}"
+
+
+ 
+
+ 

@@ -1,0 +1,27 @@
+---
+
+  - name: Management IP
+    command: "echo {{ item.mgt0ipaddress }}"
+    register: result
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug:
+      var: result
+#    no_log: True
+
+#  - name: To check box switchover time
+  #  shell:
+  #        " sh test_system_switchover.sh" {{ mgt0IPAddress_ACTIVE }} {{ mgt0IPAddress_STANDBY }}
+  #  args:
+  #    chdir: /home/ansible/
+#    shell: /home/ansible/test_system_switchover.sh {{ mgt0IPAddress_ACTIVE }} {{ mgt0IPAddress_STANDBY }} 
+#    register: b
+#  - debug: var=b.stdout_lines
+
+  - name: To check box switchover time 
+    shell: "{{ SwitchoverTime_Path }} {{ result.results[0].stdout }} {{ result.results[1].stdout }}"
+    register: b
+  - debug: var=b.stdout_lines
+
+

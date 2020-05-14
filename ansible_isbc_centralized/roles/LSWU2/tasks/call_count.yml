@@ -1,0 +1,27 @@
+---
+  - include_tasks: inventory.yml
+  - include_tasks: delegate.yml
+
+#  - name: 
+#    command: "echo {{ item.name }}"
+#    register: res
+#    loop: "{{ isbc_centralized_nodes }}"
+#    loop_control:
+#       label: "{{ item.name }}"
+#  - debug:
+#      var: res
+#    no_log: True
+#
+
+
+
+
+  - name: check call status 
+    ignore_errors: False
+    shell: echo "show status global callCountStatus"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: call_count
+  - debug: 
+      var: call_count.stdout_lines  
+
+

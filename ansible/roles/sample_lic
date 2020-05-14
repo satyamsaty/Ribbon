@@ -1,0 +1,51 @@
+# This file contains lines to allow the customization of all the license file attributes and features
+# Defaults will be used for any lines omitted.  If no Feature Tokens are specified, the resulting license
+# will not contain any features
+# The following optional tokens are supported
+#     customerId,    <value>  - default sonus
+#     purchaseOrderId,<value> - default 4023
+#     licenseId,<value>       - default 3772
+#     generationDate,<value> -  default the current date in the form 2014-06-26T14:27:59.206-04:00
+#     Feature,<featureName>,<lineid>,<usage>,<expirationDate|permanent>#<feature type> - feature type not read in
+#
+customerId,sonus
+purchaseOrderId,4023
+licenseId,3772
+generationDate,2020-02-14T21:01:48.294+05:30
+Feature, SBC-POL-RTU    , 154365    , 10000   , 2020-12-31-05:00# count
+Feature, SBC-POL-E911   , 154366    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-POL-ENUM   , 154367    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-RTU        , 154368    , 150000  , 2020-12-31-05:00# count
+Feature, SBC-SIP-I      , 154369    , 1       , 2020-12-31-05:00# on/off
+Feature, SRTP           , 154370    , 10000   , 2020-12-31-05:00# count
+Feature, ENCRYPT        , 154371    , 10000   , 2020-12-31-05:00# count
+Feature, SBC-SIP323     , 154372    , 1       , 2020-12-31-05:00# on/off
+Feature, DSP-AMRWB      , 154373    , 10000   , 2020-12-31-05:00# count
+Feature, DSP-G722       , 154374    , 1       , 2020-12-31-05:00# on/off
+Feature, DSP-AMRNB      , 154375    , 10000   , 2020-12-31-05:00# count
+Feature, DSP-EVRC       , 154376    , 10000   , 2020-12-31-05:00# count
+Feature, POL-BASE       , 154377    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-SIPREC     , 154378    , 10000   , 2020-12-31-05:00# count
+Feature, SBC-VIDEO      , 154379    , 10000   , 2020-12-31-05:00# count
+Feature, VDSP-RTU       , 154380    , 10000   , 2020-12-31-05:00# count
+Feature, SWE-INSTANCE   , 154381    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-4X1GMP     , 154382    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-1X10GMP    , 154383    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-NICEREC    , 154384    , 10000   , 2020-12-31-05:00# count
+Feature, SBC-LI         , 154385    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-MRF-RTU    , 154386    , 10000   , 2020-12-31-05:00# count
+Feature, SBC-PSX-RTU    , 154387    , 10000   , 2020-12-31-05:00# count
+Feature, SBC-CAPACITY   , 154388    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-P-DCS-LAES , 154389    , 1       , 2020-12-31-05:00# on/off
+Feature, DSP-EVS        , 154390    , 1       , 2020-12-31-05:00# on/off
+Feature, DSP-SILK       , 154391    , 10000   , 2020-12-31-05:00# count
+Feature, MRFP-INSTANCE  , 154392    , 1       , 2020-12-31-05:00# on/off
+Feature, MRFP-RTU       , 154393    , 10000   , 2020-12-31-05:00# count
+Feature, MRFP-DSP-RTU   , 154394    , 10000   , 2020-12-31-05:00# count
+Feature, MRFP-DSP-AMRWB , 154395    , 10000   , 2020-12-31-05:00# count
+Feature, MRFP-DSP-AMR   , 154396    , 10000   , 2020-12-31-05:00# count
+Feature, MRFP-DSP-EVRC  , 154397    , 10000   , 2020-12-31-05:00# count
+Feature, MRFP-CAPACITY  , 154398    , 1       , 2020-12-31-05:00# on/off
+Feature, LB-INSTANCE    , 154399    , 1       , 2020-12-31-05:00# on/off
+Feature, SBC-LB         , 154400    , 10000   , 2020-12-31-05:00# count
+Feature, MRFP-DSP-EVS   , 154401    , 10000   , 2020-12-31-05:00# count

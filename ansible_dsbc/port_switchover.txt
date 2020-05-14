@@ -1,0 +1,11 @@
+request system ethernetPort packetAdmin vsbc1 pkt0 switchover
+show table system ethernetPort portMonitorStatus
+request system ethernetPort packetAdmin vsbc1 pkt1 switchover
+show table system ethernetPort portMonitorStatus
+request system ethernetPort packetAdmin vsbc1 pkt0 switchover
+show table system ethernetPort portMonitorStatus
+request system ethernetPort packetAdmin vsbc1 pkt1 switchover
+exit
+
+
+

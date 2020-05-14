@@ -1,0 +1,9 @@
+---
+  - name: kill uas process on bats server 
+    shell: ps -few | grep -i "/ats/bin/sipp -sn uas -i 10.54.81.66 -p 14088 -m 50 -bg" |grep -v grep | awk  '{print $2}'|xargs kill
+  - name: Kill  uac process on bats server
+    shell: ps -few | grep -i "/ats/bin/sipp -sn uac -i 10.54.81.66 -p 14333 {{ pkt0IPAddress_ACTIVE }} -s 9966896446 -m 50 -d 120m -r 1 -rp 1000 -bg"|grep -v grep | awk  '{print $2}'|xargs kill
+
+ 
+
+ 

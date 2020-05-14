@@ -1,0 +1,21 @@
+---
+- name:  Creates a new instance and attaches to a specific network
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: Deploy an instance
+    os_server:
+       state: present
+       auth:
+         auth_url: https://sbc-core-svt.in.sonusnet.com:13000
+         username: ribbon
+         password: ribbon1
+         project_name: admin
+       name: vm
+       image: ubuntu_16.04_server
+       key_name: ansible
+       timeout: 200
+       flavor: test
+       network: PR_MGMT
+       meta:
+         hostname: vm.localdomain

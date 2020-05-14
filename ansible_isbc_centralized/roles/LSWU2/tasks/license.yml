@@ -1,0 +1,114 @@
+---
+
+  - include_tasks: delegate.yml 
+  - include_tasks: inventory.yml
+#  - name:  
+#    command: "echo {{ item.mgt0ipaddress }}"
+#    register: result
+#    loop: "{{ isbc_centralized_nodes }}"
+#    loop_control:
+#       label: "{{ item.mgt0ipaddress }}"
+#  - debug: 
+#      var: result 
+#    no_log: True
+#
+#
+#  - name: 
+#    command: "echo {{ item.name }}"
+#    register: res
+#    loop: "{{ isbc_centralized_nodes }}"
+#    loop_control:
+#       label: "{{ item.name }}"
+#  - debug:
+#      var: res
+#    no_log: True
+
+  - name:
+    ignore_errors: yes 
+#    run_once: yes
+    shell: "export MARLIN_ROOT=/ats/tools/SbcLicenseJar/marlin ;setenv MARLIN_ROOT /ats/tools/SbcLicenseJar/marlin; java -jar /ats/tools/SbcLicenseJar/orca/runTransform.jar -w sample_lic && java -jar /ats/tools/SbcLicenseJar/orca/runTransform.jar -i sample_lic -l {{ result.results[0].stdout }} sonusLicense.xml /home/Administrator/ {{ result.results[0].stdout }} {{ result.results[1].stdout }}"
+#    register: s
+#  - debug: 
+#      var: s
+
+  - name: License push in active box in ISBC 1:1 mode
+    ignore_errors: yes
+    shell: "/opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator/sonusLicense.xml"
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: license
+    failed_when:
+         - license.rc == 1
+         - '"license bundle b1 already exists" not in license.stdout'
+
+  - debug:
+      var: license.stdout_lines
+
+  - name : License is not pushed
+    fail:
+     msg: License is not pushed successfully
+    when:
+      - license.rc == 1
+      - '"license bundle b1 already exists" not in license.stdout'
+
+
+ 
+ 
+
+  
+#  - name: Pushing license in active node as it is centralized .
+#    script: "{{ LicenseScript_Path }} {{ result.results[0].stdout }} {{ result.results[1].stdout }}"
+#       
+#    register: license
+#    failed_when:
+#         - license.rc == 1
+#         - '"license bundle b1 already exists" not in result.stdout'
+  
+#  - debug: var=license
+#  - name: License pushed on boxes 
+#    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/licenseInfo | grep -wE '(usageLimit|inUse)' | head -2
+#    register: b
+##    delegate_to: "{{ res.results[0].stdout }}"
+#    loop: "{{ isbc_centralized_nodes }}"
+#  - debug:
+#      msg: "{{ item.stdout_lines }}"
+##      msg: "{% set temp_var_tag_list = [] %}{% for result in b.results %}{% if result.stdout is defined -%}{{ temp_var_tag_list.append(result.stdout ) }}{%- endif %}{%- endfor %}{{ temp_var_tag_list }}"
+#    loop: "{{ b.results }}"
+#    loop_control:
+#      label: "{{ item.stdout_lines }}"
+
+
+  - name: Checking license
+    ignore_errors: yes
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+       expect ">"
+       send "show table system licenseInfo\n"
+
+       expect ">"
+       send "\n"
+
+       exit 0
+    args:
+        executable: /usr/bin/expect
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: license_status
+  - debug:
+        var: license_status.stdout_lines
+  
+
+  
+
+
+
+
+
+  
+
+  
+
+

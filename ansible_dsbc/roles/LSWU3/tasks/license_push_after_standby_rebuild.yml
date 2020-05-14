@@ -1,0 +1,9 @@
+  - name: to push license in standby node after upgrade
+    shell: sh /home/ansible/license_push_cloud.sh null {{mgt0IPAddress_STANDBY}}
+    delegate_to: localhost
+    register: command_result
+  - name: License pushed on standby box
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_STANDBY}}/api/operational/system/licenseInfo | grep -wE '(usageLimit|inUse)' | head -2
+    register: b
+  - debug: var=b.stdout_lines
+

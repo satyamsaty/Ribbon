@@ -1,0 +1,11 @@
+---
+
+ - hosts: all
+   become: yes
+
+   tasks:
+     - name: Execute /boot usage on Hosts
+       command: 'df -h /boot'
+       register: dfboot
+
+     - debug: var=dfboot.stdout_lines

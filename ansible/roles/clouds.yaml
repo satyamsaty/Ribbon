@@ -1,0 +1,31 @@
+clouds:
+  elt-ext:
+    auth:
+      auth_url: https://elt1.in.sonusnet.com:13000/v3
+      project_name: admin
+      username: ribbon
+      password: ribbon1
+      user_domain_name: Default
+      project_domain_name: Default
+    region_name: regionOne
+    interface: internal
+    identity_api_version: 3
+
+#  elt:
+#    auth:
+#      auth_url: https://elt.in.sonusnet.com:13000/v2.0
+#      project_name: admin
+#      username: admin
+#      password: sonus1
+#  sbc-core-queens:
+#    auth:
+#      auth_url: https://sbc-core-svt.in.sonusnet.com:13000/v3
+#      project_name: admin
+#      username: ribbon
+#      password: ribbon1
+#      user_domain_name: Default
+#      project_domain_name: default
+#    region_name: regionOne
+#    interface: public
+#    identity_api_version: 3
+        

@@ -1,0 +1,21 @@
+---
+- name: Launch instance on OpenStack
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - /home/ansible/SRIOV.yaml
+  tasks:
+    - name: Deploy an instance
+      os_server:
+        state: present
+        name: mukulSBC2
+        image: SRIOV.yaml
+        validate_certs: false
+        key_name: ansiblemaster
+        timeout: 200
+        flavor: test
+        network: PR_MGMT
+        meta:
+          hostname: mukulSBC2.localdomain
+

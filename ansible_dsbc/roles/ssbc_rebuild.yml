@@ -1,0 +1,123 @@
+
+PLAY [localhost] ************************************************************************************************************************
+Monday 30 March 2020  00:46:59 +0530 (0:00:00.039)       0:00:00.039 ********** 
+
+TASK [include_vars] *********************************************************************************************************************
+ok: [localhost]
+
+PLAY [SPAWNING OAM INSTANCES] ***********************************************************************************************************
+
+PLAY [SPAWNING SSBC Instances] **********************************************************************************************************
+
+PLAY [SPAWNING MSBC Instances] **********************************************************************************************************
+
+PLAY [SPAWNING TSBC Instances] **********************************************************************************************************
+
+PLAY [Rebuilding OAM instances] *********************************************************************************************************
+
+PLAY [Rebuilding SSBC instances] ********************************************************************************************************
+Monday 30 March 2020  00:47:00 +0530 (0:00:00.078)       0:00:00.117 ********** 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/rebuild_standby_ssbc.yml for localhost
+Monday 30 March 2020  00:47:00 +0530 (0:00:00.144)       0:00:00.261 ********** 
+
+TASK [spawning the SSBC instances] ******************************************************************************************************
+failed: [localhost] (item={u'name': u'SSBC_ACTIVE_ANSIBLE', u'base_build': u'sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2', u'SSBC_UPGRADED_BUILD': u'sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2', u'security_group': u'sbccoresvt-sg', u'role': u'ACTIVE', u'template': u'SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBCAG10VCPU', u'mgt0ipaddress': u'10.34.194.120'}) => changed=false 
+  ansible_loop_var: item
+  item:
+    SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+    base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+    flavor: ISBCAG10VCPU
+    mgt0ipaddress: 10.34.194.120
+    name: SSBC_ACTIVE_ANSIBLE
+    present_or_absent: present
+    role: ACTIVE
+    security_group: sbccoresvt-sg
+    template: SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+  msg: 'Failure in updating stack: Resource UPDATE failed: Error: resources.vSBC_ACTIVE: Rebuilding server failed, status ''ERROR'''
+...ignoring
+Monday 30 March 2020  00:47:24 +0530 (0:00:24.597)       0:00:24.860 ********** 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => 
+  stack_create.results:
+  - ansible_loop_var: item
+    changed: false
+    failed: true
+    invocation:
+      module_args:
+        api_timeout: null
+        auth: null
+        auth_type: null
+        availability_zone: null
+        ca_cert: null
+        client_cert: null
+        client_key: null
+        environment: null
+        interface: public
+        name: SSBC_ACTIVE_ANSIBLE
+        parameters:
+          flavor: ISBCAG10VCPU
+          image: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+          mgt0IPAddress: 10.34.194.120
+          sbc_ceRole: ACTIVE
+          security_group: sbccoresvt-sg
+          tags: SSBC_ACTIVE_ANSIBLE
+        region_name: null
+        rollback: false
+        state: present
+        tag: SSBC_ACTIVE_ANSIBLE
+        template: SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+        timeout: 3600
+        validate_certs: false
+        wait: true
+    item:
+      SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+      base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+      flavor: ISBCAG10VCPU
+      mgt0ipaddress: 10.34.194.120
+      name: SSBC_ACTIVE_ANSIBLE
+      present_or_absent: present
+      role: ACTIVE
+      security_group: sbccoresvt-sg
+      template: SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+    msg: 'Failure in updating stack: Resource UPDATE failed: Error: resources.vSBC_ACTIVE: Rebuilding server failed, status ''ERROR'''
+  - ansible_loop_var: item
+    changed: false
+    item:
+      SSBC_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+      base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+      flavor: ISBCAG10VCPU
+      mgt0ipaddress: 10.34.194.83
+      name: SSBC_STANDBY_ANSIBLE
+      present_or_absent: present
+      role: STANDBY
+      security_group: sbccoresvt-sg
+      template: SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml
+    skip_reason: Conditional result was False
+    skipped: true
+Monday 30 March 2020  00:47:24 +0530 (0:00:00.205)       0:00:25.065 ********** 
+
+TASK [Instance Failed to spawn] *********************************************************************************************************
+fatal: [localhost]: FAILED! => 
+  msg: |-
+    The conditional check 'stack_create.results[0].stack.status != "COMPLETE"' failed. The error was: error while evaluating conditional (stack_create.results[0].stack.status != "COMPLETE"): 'dict object' has no attribute 'stack'
+  
+    The error appears to be in '/home/satykumar/Distributed/roles/LSWU3/tasks/rebuild_standby_ssbc.yml': line 66, column 5, but may
+    be elsewhere in the file depending on the exact syntax problem.
+  
+    The offending line appears to be:
+  
+  
+      - name: Instance Failed to spawn
+        ^ here
+
+PLAY RECAP ******************************************************************************************************************************
+localhost                  : ok=4    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=1   
+
+Monday 30 March 2020  00:47:25 +0530 (0:00:00.085)       0:00:25.151 ********** 
+=============================================================================== 
+spawning the SSBC instances ----------------------------------------------------------------------------------------------------- 24.60s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.21s
+include_tasks -------------------------------------------------------------------------------------------------------------------- 0.15s
+Instance Failed to spawn --------------------------------------------------------------------------------------------------------- 0.09s
+include_vars --------------------------------------------------------------------------------------------------------------------- 0.08s

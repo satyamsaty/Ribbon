@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Executing a Command Using Shell Module
+      shell: ls -lrt > temp.txt
+      register: out
+
+    - debug: var=out.stdout_lines

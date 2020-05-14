@@ -1,0 +1,70 @@
+---
+#  - name: Running the call(uas)
+#    shell: ssh -p 22 -o  "stricthostkeychecking no" satykumar@10.54.81.66 "/ats/bin/sipp -sn uas -i 10.54.81.66 -p 14088 -m 50 -bg"
+#    delegate_to: localhost
+#    register: command_result
+#    failed_when: command_result.rc not in (0,99)
+#  - name: Running the call(uac)
+#    shell: ssh -p 22 -o  "stricthostkeychecking no" satykumar@10.54.81.66 "/ats/bin/sipp -sn uac -i 10.54.81.66 -p 14333 {{ pkt0IPAddress_ACTIVE }} -s 9966896446 -m 50 -d 120m -r 1 -rp 1000 -bg "
+#    delegate_to: localhost
+#    register: command_result
+#    failed_when: command_result.rc not in (0,99)
+#  - name: wait for 1 minute
+#    wait_for:
+#       timeout: 60 
+
+
+  - name: Running the call(uas)
+    shell: "/ats/bin/sipp -sn uas -i 10.54.81.66 -p 14088 -m 10 -bg"
+    delegate_to: bats14
+#    args:
+#      chdir: /home/satykumar/
+#      executable: /bin/bash 
+#    register: command_result
+  - debug: var=command_result.stdout_lines
+    failed_when: command_result.rc not in (0,99)
+  - name: Running the call(uac)
+    shell: "/ats/bin/sipp -sn uac -i 10.54.81.66 -p 14333 {{ pkt0IPAddress_ACTIVE }} -s 9966896447 -m 10 -d 120m -bg"
+    delegate_to: bats14
+    #args:
+    #  chdir: /home/satykumar/
+    #  executable: /bin/bash
+   # register: command_result
+  - debug: var=command_result.stdout_lines
+    failed_when: command_result.rc not in (0,99)
+  - name: Moving the files from localhost to active node
+    become: True
+    copy:
+      src: /home/ansible/call.sh
+      dest: /root/call.sh
+      mode: '0777'
+    delegate_to: active-1
+  - name: To check call count status
+    become: True
+    shell: expect /root/call.sh
+    delegate_to: active-1
+    register: b
+  - debug: var=b.stdout_lines
+  - name: Moving the files from localhost to active node
+    copy:
+      src: /home/ansible/call.txt
+      dest: /root/call.txt
+      mode: '0777'
+      force: yes
+    delegate_to: active-1
+  - name: checking call
+    shell: cat /root/call.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    delegate_to: active-1
+    register: b
+  - debug: var=b.stdout_lines
+
+  - name: checking call count status
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'
+    register: command_result
+  - debug: var=command_result.stdout_lines
+     
+
+
+  
+
+

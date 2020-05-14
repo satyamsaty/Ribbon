@@ -1,0 +1,9 @@
+  - name: Add instances to inventory
+    ignore_errors: yes
+    add_host:
+      name: "{{ item.name }}"
+      groups: "isbc"
+      ansible_host: "{{ item.mgt0ipaddress }}"
+    
+    loop: "{{ isbc_centralized_nodes }}"
+

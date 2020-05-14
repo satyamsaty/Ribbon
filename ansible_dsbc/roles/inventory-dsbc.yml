@@ -1,0 +1,78 @@
+---
+#localhost ansible_connection=local
+
+
+#  hosts:
+#   localhost:
+#    vars:
+#      ansible_connection: local
+  
+  
+#ansible_ssh_common_args=' -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+#ansible_python_interpreter=/usr/bin/python
+#ansible_ssh_pipelining=True
+#ansible_connection=ssh
+#ansible_shell_type=sh
+#ansible_shell_executable=sh
+
+#[servers]
+#oam-1
+#oam-2
+#ssbc
+#
+#
+#
+#[servers:vars]
+#
+#ansible_user=linuxadmin
+#ansible_ssh_pass=sonus
+#ansible_port=2024
+#ansible_become=True
+#ansible_ssh_private_key_file=/home/ansible/cloud_ats.key
+  all:
+   children:
+      servers:
+         hosts:
+           oam-1:
+           oam-2:
+           ssbc:
+         vars:
+           ansible_user: linuxadmin
+           ansible_ssh_pass: sonus
+           ansible_port: 2024
+           ansible_become: True
+           ansible_ssh_private_key_file: /home/ansible/cloud_ats.key
+  vars:
+    ansible_python_interpreter: /usr/bin/python
+    ansible_ssh_pipelining: True
+    ansible_connection: ssh
+
+
+#[oam-1:vars]
+#
+#ansible_user=linuxadmin
+#ansible_ssh_pass=sonus
+#ansible_port=2024
+#ansible_become=True
+#ansible_ssh_private_key_file=/home/ansible/cloud_ats.key
+#
+#
+#
+#[oam-2:vars]
+#
+#ansible_user=linuxadmin
+#ansible_ssh_pass=sonus
+#ansible_port=2024
+#ansible_become=True
+#ansible_ssh_private_key_file=/home/ansible/cloud_ats.key
+#[oam-1]
+#[oam-2]
+#
+#
+#[ssbc:vars]
+#
+#ansible_user=linuxadmin
+#ansible_ssh_pass=sonus
+#ansible_port=2024
+#ansible_become=True
+#

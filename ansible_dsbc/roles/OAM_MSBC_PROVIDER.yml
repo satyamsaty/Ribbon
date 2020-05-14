@@ -1,0 +1,1066 @@
+heat_template_version: 2014-10-16
+description: Template to setup and deploy a 1x1 OAM compute instances
+##################################################################################################
+# IMPORTANT NOTE to configure second management port 'mgt1': 
+# 
+#  1. By Default, configuration of second management port is commented out in this template.
+# 
+#  2. To enable configuration of second management port 'mgt1', search for the following tag and follow the instructions with the tag:
+#     Tag to search : 'MGT1_EDIT'
+#
+#  3. Add the entries for second management port 'mgt1' in userdata/metadata section of each instance corressponding to the entries 
+#     that are already there for 'mgt0' interface.
+#
+#     For example:
+#      In metadata section: add the IF metadata and LOGICAL_MGMT_IP related data for second management port like:
+#
+#        IF4: { "Port":"Mgt1", 
+#               "DHCP": { get_param: isDhcpEnabledOnMgt1},
+#               "GWV4": { get_param: mgt1Gateway },
+#               "IPV4": { list_join: ['/', [ { get_attr: [mgt1_port1, fixed_ips, 0, ip_address] }, { get_param: mgt1SubnetPrefix}]] },
+#               "FIPV4": { get_attr: [mgt1_floating_ip1, floating_ip_address] } 
+#             }
+#       
+#        LOGICAL_MGMT_IP_1: { "IFName":"IF4", 
+#                           "IPV4"  : { get_attr: [mgt1_vip_port, fixed_ips, 0, ip_address] }, 
+#                           "FIPV4" : { get_attr: [mgt1_log_floating_ip1, floating_ip_address] } 
+#                         }
+#
+#      And in 'write_files' under userdata section, add the peer's second management port entries like:
+#
+#                          "PeerCEMgt0IPv4Prefix"    : "24",
+#                          "PeerCEMgt0IPv4Address"   : "$peer_ipv4_mgt0",
+#                          "PeerCEMgt1IPv4Prefix"    : "24",
+#                          "PeerCEMgt1IPv4Address"   : "$peer_ipv4_mgt1",
+#
+# NOTE: Please read the below instructions before using this template,
+#       it may need some edits depending on the usecase(s).
+#       This template assumes ALL the interfaces are non-DHCP and with the instructions in-line
+#       it can be tailored to make some interfaces use DHCP and/or SR-IOV.
+#
+# 1. By Default, DHCP is disabled on all the interfaces
+#
+# 2. To Enable/Disable DHCP or SR-IOV on any interface, search for '<interfaceName> EDIT:'
+#    and follow instructions there
+#
+#    E.g. To Enable DHCP on Packet Port 0 (pkt0):
+#         Search for: 'pkt0 EDIT:' (without quotes)
+#         (Replace pkt0 with mgt0, ha0 or pkt1 as applicable)
+#
+#    Sample code segment:
+#        # pkt0 EDIT: uncomment below line to DISABLE DHCP or comment to ENABLE DHCP
+#        - ip_address: { get_param: pkt0IPAddress}
+#
+#        # pkt0 EDIT: uncomment below line to ENABLE DHCP or comment to DISABLE DHCP
+#        #- subnet: { get_param: private_subnet_pkt0}
+#
+#      # pkt0 EDIT: uncomment below line to ENABLE SR-IOV support or comment to 
+#      # disable it
+#      #binding:vnic_type: direct
+#
+#
+#
+# 3. Additional private IPs and/or floating IPs will be queried by the template when launched as a comma-separeted input. 
+#    These IP addresses will be queried inside template at multiple places, and the procedure for the same is given in next point.
+#    Make sure that the comma-separated input doesn't have spaces between them. That would lead to template-load error.
+#
+# 4. Procedure for adding additional IP address to ports.
+#
+#    This involves the following steps which are described in detail below:
+#       - Private port creation, virtual port creation, floating IP creation and
+#         meta data updates.
+#
+#    Procedure:
+#
+#    a) Search for the tag "EDIT - VIP PORT CREATION"
+#       * Add additional IP address to the PKT ports by uncommenting out
+#         "- ip_address:" parameters and query the IP address from the list input as give below:
+#
+#         - ip_address: {get_param: [pkt0_vips,0]}
+#
+#       * Repeat this multiple times based on number
+#         of IP addresses to be assigned to the port
+#
+#    b) Search for the tag "EDIT - PRIVATE PORT CREATION - ACTIVE"
+#       * Add the IP address created in the above steps in the
+#         "allowed_address_pairs" section of corresponding PKT port by
+#         uncommenting the "- ip_address:" section as shown below:
+#
+#         - ip_address: {get_param: [pkt0_vips,0]}
+#
+#       * Repeat the process for all the IP addresses assigned to the
+#         corresponding VIP port in step 4.a
+#       
+#     c) Search for the tag "EDIT - PRIVATE PORT CREATION - STANDBY"
+#        * Repeat the same process as explained in section 4.b
+#
+#     d) Optional : Adding Floating IP to the additional IP address created
+#        above.
+#
+#        * Search for the tag "ADD - ADDITIONAL FLOATING IP CREATION"
+#        * Create the Floating IP as shown below:
+#
+#          pktX_floating_ip_A:
+#            type: OS::Neutron::FloatingIP
+#            properties:
+#              floating_network: { get_param: pktX_ext_network }
+#              port_id: { get_resource: pktX_vip_port }
+#              fixed_ip_address: {get_param: [pktX_vips,Y]}
+#              floating_ip_address: {get_param: [additional_Fips_pktX,Z]}
+#
+#        * Where:
+#          - X can be 0 or 1.
+#          - Y can be 0 to n-1, where, n is number of IPs given in the comma 
+#            separated list pktX_alt_ips.
+#          - Z can be 0 to m-1, where, m is number of IPs given in the comma separated list additional_Fips_pktX.
+#          - "pktX_floating_ip_A" is the resource name. Make sure it is unique and
+#            not repeated.
+#
+#        * Comment out the "floating_ip_address" section here if you want Floating IP 
+#          to be assigned from floating IP pool automatically
+#
+#        * Please note, DO NOT PUT TABS, use 2 spaces instead.
+#
+#     e) Appending Metadata content of ACTIVE and STANDBY server above the
+#         section METADATA_APPEND_ABOVE.
+#         * With Floating IP : 
+#           ALT_PKTX_01: { "IFName": "YYY", "IP": {get_param: [pktX_vips,0]}, "FIPV4": { get_attr: [pktX_floating_ip_A, floating_ip_address] } }
+#
+#         * Without Floating IP:
+#           ALT_PKTX_01: { "IFName": "YYY", "IP": {get_param: [pktX_vips,0]}}
+#
+#         * Where:
+#          - X can be 0 or 1.
+#          - ALT_PKTX_01 can be replaced with any valid name for alternate IP.
+#          - YYY is the corresponding IF name of PKT port. Eg: IF2 for Pkt0
+#          - "pktX_floating_ip_A" is the Public IP resource name , created in step 4.d.
+#           
+#
+# 5. Sample Environment content to be sourced with this template:
+#
+#    parameters:
+#
+#      # System Settings
+#      image:           myImage
+#      flavor:          cloudSBC.lite
+#      security_group:  vSBC_security_group
+#
+#      # External Network Settings
+#      mgt0_ext_network: ext_net
+#      mgt1_ext_network: ext_net
+#      pkt0_ext_network: ext_net
+#      pkt1_ext_network: ext_net
+#
+#      # Private Network Settings
+#      private_network_mgt0: mgt0
+#      private_network_mgt1: mgt1
+#      private_network_ha:   ha0
+#      private_network_pkt0: pkt0
+#      private_network_pkt1: pkt1
+#
+#      # Private Subnet Settings
+#      private_subnet_mgt0: mgt0_subnet
+#      private_subnet_mgt1: mgt1_subnet
+#      private_subnet_ha:   ha0_subnet
+#      private_subnet_pkt0: pkt0_subnet
+#      private_subnet_pkt1: pkt1_subnet
+#
+#      # Below lines are optional in enviroment file. You can provide the IP
+#      # address here
+#
+#      # MGT0 subnet description
+#      mgt0Gateway:
+#      mgt0SubnetPrefix:
+#
+#      # MGT1 subnet description
+#      mgt1Gateway:
+#      mgt1SubnetPrefix:
+#
+#      # HA0 subnet description
+#      ha0Gateway:
+#      ha0SubnetPrefix:
+#
+#      # PKT0 subnet description
+#      pkt0Gateway:
+#      pkt0SubnetPrefix:
+#      vlanIdPkt0:
+#
+#      # PKT1 subnet description
+#      pkt1Gateway:
+#      pkt1SubnetPrefix:
+#      vlanIdPkt1:
+#
+#      # ACTIVE server port's IP address
+#      mgt0IPAddressActive:
+#      mgt1IPAddressActive:
+#      ha0IPAddressActive:
+#      pkt0IPAddressActive:
+#      pkt1IPAddressActive:
+#
+#      # STANDBY server port's IP address
+#      mgt0IPAddressStandby:
+#      mgt1IPAddressStandby:
+#      ha0IPAddressStandby:
+#      pkt0IPAddressStandby:
+#      pkt1IPAddressStandby:
+#
+#      # VIRTUAL port's IP address
+#      logicalManagementIpAddress:
+#      pkt0VirtualIpAddress:
+#      pkt1VirtualIpAddress:
+#
+#      # Alternate IP addresses
+#      pkt0_vips:
+#      pkt1_vips:
+#      additional_Fips_pkt0:
+#      additional_Fips_pkt1:
+#
+# IMPORTANT NOTE to be able to login with ssh keys or password.
+#
+# From 7.1 onwards users have to give ssh keys or passwords in the heat template to login into CLI or linux shell.
+# Since use of ssh keys is more secured hence it is a mandatory field now in the heat template.
+#
+# Users can use ssh-keygen command to generate keys. This command generates two files id_rsa and id_rsa.pub
+# in /home/<user>/.ssh directory. The content of id_rsa.pub file will be the input value for the keys in this
+# heat template. Optionally keys can also be protected using a passphrase. For more options on ssh-keygen please do man ssh-keygen.
+#
+# By default, login through passwords is not enabled and the sections are commented out in this template.
+# To enable password, search for the following tag and uncomment the sections for admin and linuxadmin that follow: 'PASSWORD_EDIT'
+# Passwords are optional fields. Please note that the password input is not a plain text password. It is a hash of
+# the password. The hash password can be generated using the command mkpasswd --method=SHA-512 --rounds=4096.
+# For more options on mkpasswd please do man mkpasswd.
+#
+##################################################################################################
+
+parameter_groups:
+- label: System Settings
+  description: System Level Settings
+  parameters:
+  - image
+  - flavor
+  - security_group
+  - sbc_system_name
+  - personality
+  - availability_zone
+
+- label: Instance Specific Settings
+  description: Instance Specific Settings
+  parameters:
+  - sbc_active_name
+  - sbc_standby_name
+
+- label: External Network Settings
+  description: External Network Settings
+  parameters:
+  - mgt0_ext_network
+  - floating_ip_count_mgt0
+
+- label: Private Network Settings
+  description: External Network Settings
+  parameters:
+  - private_network_mgt0
+  - private_network_ha
+  - private_network_pkt0
+  - private_network_pkt1
+
+- label: Private Subnet Settings
+  description: Subnet Settings
+  parameters:
+  - private_subnet_mgt0
+  - private_subnet_ha
+  - private_subnet_pkt0
+  - private_subnet_pkt1
+
+- label: MGT0 Subnet Gateway and Prefix settings
+  description: MGT0 Subnet Gateway and Prefix settings
+  parameters:
+  - isDhcpEnabledOnMgt0
+  - mgt0Gateway
+  - mgt0SubnetPrefix
+
+- label: HA0 Subnet Gateway and Prefix settings
+  description: HA0 Subnet Gateway and Prefix settings
+  parameters:
+  - isDhcpEnabledOnHa0
+  - ha0Gateway
+  - ha0SubnetPrefix
+
+- label: PKT0 Subnet Gateway and Prefix settings
+  description: PKT0 Subnet Gateway and Prefix settings
+  parameters:
+  - isDhcpEnabledOnPkt0
+  - pkt0Gateway
+
+- label: PKT1 Subnet Gateway and Prefix settings
+  description: PKT1 Subnet Gateway and Prefix settings
+  parameters:
+  - isDhcpEnabledOnPkt1
+  - pkt1Gateway
+
+- label: Active instance IP address settings
+  description: Active instance IP address settings
+  parameters:
+  - mgt0IPAddressActive
+  - ha0IPAddressActive
+  - pkt0IPAddressActive
+  - pkt1IPAddressActive
+
+- label: Standby instance IP address settings
+  description: Standby IP address settings
+  parameters:
+  - mgt0IPAddressStandby
+  - ha0IPAddressStandby
+  - pkt0IPAddressStandby
+  - pkt1IPAddressStandby
+
+- label: EMS Settings
+  description: EMS Settings
+  parameters:
+  - ems_user_name
+  - ems_password
+  - ems_ip_1
+  - ems_ip_2
+  - cluster_id
+  - download_config
+
+#- label: SBC Login Credentials
+#  description: SBC Login input - ssh key or password
+#  parameters:
+#  - adminSshKey
+#  - linuxAdminSshKey
+  #PASSWORD_EDIT
+  #- adminPassword
+  #- linuxAdminPassword
+
+parameters:
+
+############################
+# System Level Settings
+############################
+
+  image:
+    type: string
+    label: Image Name
+    description: Image to be used for launching the instance(s)
+    default: cSBC_sbc-V08.01.00R000_9
+#    constraints:
+#      - custom_constraint: 'glance.image'
+
+  flavor:
+    type: string
+    label: Flavor
+    description: Flavor to be used for instance(s)
+    default: 4vCPU_W
+#    constraints:
+#     - custom_constraint: 'nova.flavor'
+
+  availability_zone:
+    type: string
+    label: Zone
+    description: Zone to be used for instance(s)
+    default: LCM
+
+  security_group:
+    type: string
+    label: Security Group
+    description: Security group of instance(s)
+    default: sbccoresvt-sg
+
+  sbc_system_name:
+    type: string
+    label: SBC System Name
+    description: SBC system name
+    default: OAMMSBC
+    constraints:
+      - length: { min: 0, max: 26 }
+        description: "Enter valid system name. Length of this string should be less than 26"
+      - allowed_pattern: "^[A-Za-z]{1}[-A-Za-z0-9]*[A-Za-z0-9]{1}$"
+        description: "Enter valid system name. Regex: ^[A-Za-z]{1}[-A-Za-z0-9]*[A-Za-z0-9]{1}$ "
+    
+
+  personality:
+    type: string
+    label: SBC Personality Type
+    description: Configures SBC instance to be Signaling,Media or Integrated node.
+    default: msbc
+    constraints:
+      - allowed_values: [ssbc,msbc,isbc,mrfp,slb]
+
+############################
+# External Network Settings
+############################
+
+  mgt0_ext_network:
+    type: string
+    label: Management Port 0 Public Network Name or ID
+    description: Public network with floating IP addresses for mgt0 (used only if "Floating IP Count" is non-zero for mgt0).
+    default: 3db24a75-6103-47f8-a44e-74c593f98733
+#    constraints:
+#     - custom_constraint: 'neutron.network'
+
+#############################
+# Setting up the count values
+#############################
+
+  floating_ip_count_mgt0:
+    type: number
+    label: Number of Floating IPs on mgt0
+    description: Number of public IPs on mgt0.
+    default: 0
+    constraints:
+      - range: { min: 0, max: 1 }
+
+############################
+# Private Network Settings
+############################
+
+  private_network_mgt0:
+    type: string
+    label: Management Port 0 Private Network Name or ID
+    description: Name/ID of private network for mgt0.
+    default: PR_MGMT
+#    constraints:
+#      - custom_constraint: 'neutron.network'
+
+  private_network_ha:
+    type: string
+    label: HA Port Private Network Name or ID
+    description: Name/ID of private network for ha0.
+    default: PR_HA
+ #   constraints:
+ #     - custom_constraint: 'neutron.network'
+
+  private_network_pkt0:
+    type: string
+    label: Packet Port 0 Private Network Name or ID
+    description: Name/ID of private network for pkt0.
+    default: PR_PKT0
+#    constraints:
+#      - custom_constraint: 'neutron.network'
+
+  private_network_pkt1:
+    type: string
+    label: Packet Port 1 Private Network Name or ID
+    description: Name/ID of private network for pkt1.
+    default: PR_PKT1
+ #   constraints:
+ #     - custom_constraint: 'neutron.network'
+
+############################
+# Private Subnet Settings
+############################
+
+  private_subnet_mgt0:
+    type: string
+    label: Management Port 0 Private Subnet Name or ID
+    description: Name/ID of private subnet for mgt0.
+    default: PR_MGMT_SN_V4
+
+  private_subnet_ha:
+    type: string
+    label: HA Port Private Subnet Name or ID
+    description: Name/ID of private subnet for ha0.
+    default: PR_HA_SN_V4
+
+  private_subnet_pkt0:
+    type: string
+    label: Packet Port 0 Private Subnet Name or ID
+    description: Name/ID of private subnet for pkt0.
+    default: PR_PKT0_SN_V4
+
+  private_subnet_pkt1:
+    type: string
+    label: Packet Port 1 Private Subnet Name or ID
+    description: Name/ID of private subnet for pkt1.
+    default: PR_PKT1_SN_V4
+
+#################
+# ACTIVE INSTANCE
+#################
+##################################
+# IP address of the Non-DHCP ports
+##################################
+  mgt0IPAddressActive:
+    type: string
+    label: Management Port 0 IP Address (Active Instance)
+    description: IP address for mgt0 port on Active instance
+    default : 10.34.194.61
+
+  ha0IPAddressActive:
+    type: string
+    label: High Availability Port IP Address (Active Instance)
+    description: IP address for ha0 port on Active instance
+    default : 10.34.195.61
+
+  pkt0IPAddressActive:
+    type: string
+    label: Packet Port 0 IP Address (Active Instance)
+    description: IP address for pkt0 port on Active instance
+    default : 10.34.196.62
+
+  pkt1IPAddressActive:
+    type: string
+    label: Packet Port 1 IP Address (Active Instance)
+    description: IP address for pkt1 port on Active instance
+    default : 10.34.197.60
+
+##################
+# STANDBY INSTANCE
+##################
+##################################
+# IP address of the Non-DHCP ports
+##################################
+  mgt0IPAddressStandby:
+    type: string
+    label: Management Port 0 IP Address (Standby Instance)
+    description: IP address for mgt0 port on Standby instance
+    default : 10.34.194.62
+
+  ha0IPAddressStandby:
+    type: string
+    label: High Availability Port IP Address (Standby Instance)
+    description: IP address for ha0 port on Standby instance
+    default : 10.34.195.62 
+
+  pkt0IPAddressStandby:
+    type: string
+    label: Packet Port 0 IP Address (Standby Instance)
+    description: IP address for pkt0 port on Standby instance
+    default : 10.34.196.64
+
+  pkt1IPAddressStandby:
+    type: string
+    label: Packet Port 1 IP Address (Standby Instance)
+    description: IP address for pkt1 port on Standby instance
+    default : 10.34.197.61
+
+####################################
+# Netmask for each Non-DHCP networks
+####################################
+  mgt0SubnetPrefix:
+    type: string
+    label: Management Port 0 Subnet prefix 
+    description: Subnet prefix  for mgt0 port
+    default : 24
+
+  ha0SubnetPrefix:
+    type: string
+    label: High Availability Port Subnet prefix 
+    description: Subnet prefix  for ha0 port 
+    default : 24
+
+###############################
+# Non DHCP Network's gateway IP
+###############################
+
+  mgt0Gateway:
+    type: string
+    label: Management Port 0 Gateway IP
+    description: Gateway IP Address for mgt0 port
+    default : 10.34.194.1
+
+  ha0Gateway:
+    type: string
+    label: High Availability Port Gateway IP
+    description: Gateway IP Address for ha0 port
+    default : 10.34.195.1
+
+  pkt0Gateway:
+    type: string
+    label: Packet Port 0 Gateway IP
+    description: Gateway IP Address for pkt0 port
+    default : 10.34.196.1
+
+  pkt1Gateway:
+    type: string
+    label: Packet Port 1 Gateway IP
+    description: Gateway IP Address for pkt1 port 
+    default : 10.34.197.1
+
+############################
+# Instance Specific Settings
+############################
+  sbc_active_name:
+    type: string
+    label: SBC (Assigned) Active Instance Name
+    description: SBC active instance name.
+    default: OAMMSBCACTIVE
+ #   constraints:
+ #     - length: { min: 0, max: 63 }
+ #       description: "Enter valid active instance name. Length of this string should be less than 63"
+ #     - allowed_pattern: "^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$"
+  #      description: "Enter valid active instance name. Regex: ^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$ "
+
+
+  sbc_standby_name:
+    type: string
+    label: SBC (Assigned) Standby Instance Name
+    description: SBC standby instance name.
+ #   constraints:
+ #     - length: { min: 0, max: 63 }
+ #       description: "Enter valid standby instance name. Length of this string should be less than 63"
+ #     - allowed_pattern: "^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$"
+ #       description: "Enter valid standby instance name. Regex: ^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$ "
+    default: OAMMSBCSTANDBY
+
+################
+  ems_user_name:
+    type: string
+    label: EMS User Name
+    description: User name for registering with EMS
+    default: "restuser"
+
+  ems_password:
+    type: string
+    label: EMS Password
+    description: EMS registration password
+    hidden: true
+    default: "sonus123"
+
+  ems_ip_1:
+    type: string
+    label: EMS IP 1
+    description: EMS IP Address 1 - e.g. 10.52.13.40 (No quotes required)
+    default: "10.54.8.108"
+
+  ems_ip_2:
+    type: string
+    label: EMS IP 2
+    description: EMS IP Address 2 - e.g. 51.12.30.24 (No quotes required)
+    default: "None"
+
+  cluster_id:
+    type: string
+    label: Cluster ID
+    description: Cluster/VNF ID value from EMS Cluster Mgmt.
+    default: "ansiblemsbc"
+
+  download_config:
+    type: string
+    label: Download Configuration from EMS
+    description: Download Configuration from EMS
+    default: True
+    constraints:
+      - allowed_values: [True,False]
+
+###############################
+# DHCP flags
+###############################
+
+  isDhcpEnabledOnMgt0:
+    type: string
+    label: Is DHCP enabled on Mgt0 Subnet?
+    description: Is DHCP enabled on Mgt0 Subnet?
+    default : False
+    constraints:
+      - allowed_values: [True,False]
+
+  isDhcpEnabledOnHa0:
+    type: string
+    label: Is DHCP enabled on Ha0 Subnet?
+    description: Is DHCP enabled on Ha0 Subnet?
+    default : False
+    constraints:
+      - allowed_values: [True,False]
+
+  isDhcpEnabledOnPkt0:
+    type: string
+    label: Is DHCP enabled on Pkt0 Subnet?
+    description: Is DHCP enabled on Pkt0 Subnet?
+    default : False
+    constraints:
+      - allowed_values: [True,False]
+
+  isDhcpEnabledOnPkt1:
+    type: string
+    label: Is DHCP enabled on Pkt1 Subnet?
+    description: Is DHCP enabled on Pkt1 Subnet?
+    default : False
+    constraints:
+      - allowed_values: [True,False]
+
+###############################
+# SBC login credentials
+###############################
+
+#  adminSshKey:
+#    type: string
+#    label: adminSshKey
+#    description: public key to login to SBC CLI as admin user
+
+#  linuxAdminSshKey:
+#    type: string
+#    label: linuxAdminSshKey
+#    description: public key to login to SBC shell as linuxadmin user
+
+  #PASSWORD_EDIT
+  #adminPassword:
+  #  type: string
+  #  label: adminPasswordHash
+  #  description: password hash to login to SBC CLI as admin user
+  #  default : "*"
+
+  #linuxAdminPassword:
+  #  type: string
+  #  label: linuxAdminPasswordHash
+  #  description: password hash to login to SBC shell as linuxadmin user
+  #  default : "*"
+
+# Resource definitions for all openstack objects to be configured during
+# template execution
+resources:
+
+  # Create standby vSBC instance
+  vSBC_STANDBY:
+    type: OS::Nova::Server
+    properties:
+     # name: { list_join: ['-', [ { get_param: "OS::stack_name" }, '2']] }
+      name: { get_param: sbc_standby_name } 
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      availability_zone: { get_param: availability_zone }
+      config_drive: True
+      #personality: 
+        #"baseConfig.cli": {get_file: "RIBBON_BASE_CONFIG.cli"}
+        #"baseConfig.cli": {get_file: "http://10.11.12.13/sbcCliFiles/RIBBON_BASE_CONFIG.cli"}
+
+      # Attach previously created network ports to the instnace
+      networks:
+        - port: { get_resource: mgt0_port2 }
+        - port: { get_resource: ha0_port2 }
+        - port: { get_resource: pkt0_port2 }
+        - port: { get_resource: pkt1_port2 }
+        # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+        #- port: { get_resource: mgt1_port2 }
+
+      # Publish the assigned floating IP addresses with appended subnet mask to the openstack metadata service.
+      # Subnet prefix for floating ips not used - hard coded to 32 for consistencey.
+      metadata:
+
+        IF0: { "Port":"Mgt0", 
+               "DHCP": { get_param: isDhcpEnabledOnMgt0},
+               "GWV4": { get_param: mgt0Gateway },
+               "IPV4": { list_join: ['/', [ { get_attr: [mgt0_port2, fixed_ips, 0, ip_address] }, { get_param: mgt0SubnetPrefix}]] },
+             }
+
+        IF1: { "Port":"Ha0", 
+               "DHCP": { get_param: isDhcpEnabledOnHa0},
+               "GWV4": { get_param: ha0Gateway },
+               "IPV4": { list_join: ['/', [ { get_attr: [ha0_port2, fixed_ips, 0, ip_address] }, { get_param: ha0SubnetPrefix}]] }
+             }
+
+        IF2: { "Port":"Pkt0", 
+               "DHCP": "False"
+             }
+
+        IF3: { "Port":"Pkt1", 
+               "DHCP": "False"
+             }
+
+        ClusterIp: { get_attr: [ha0_port1, fixed_ips, 0, ip_address]}
+
+      # Set the format to RAW to pass data directly as userdata set the floating and virtual IP counts
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+                #cloud-config
+                ### USER EDITABLE SECTION FOR SSH KEYS ###
+                users:
+                    - name: admin
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: admin
+                      lock_passwd: false
+                    - name: linuxadmin
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: sonus
+                      lock_passwd: false
+                    - name: root
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: sonus1                    
+                      lock_passwd: false
+                runcmd:
+                    - [ usermod, -p, '$6$io3njQos$gZtBJ4MazQeWC0beqQwRPUDZCQcKXhMr2B8QLWYGajchR2BtkyHPvBTCQj0LctHAFaYTwbsIsUkm12ta4IoLe/', linuxadmin ]
+                    - sed -i -e "/^AllowUsers/s/\slinuxadmin\(\s\|$\)/ /g" -e "/^AllowUsers/s/\sroot\(\s\|$\)/ /g" /etc/ssh/sshd_config
+                    - sed -i "/^AllowUsers/s/AllowUsers /AllowUsers root linuxadmin /" /etc/ssh/sshd_config
+                    - sed -i "/PasswordAuthentication no/s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
+                    - sed -i "/^PermitRootLogin/s/ no/ yes/" /etc/ssh/sshd_config
+                    - sed -i "s/allowSshAccess=n/allowSshAccess=y/" /opt/sonus/conf/sbx.conf
+                write_files:
+                -   content: |
+                        {
+                          "CERole"                  : "STANDBY",
+                          "CEMode"                  : "oam",
+                          "CEName"                  : "$ce_name",
+                          "SystemName"              : "$system_name",
+                          "SbcPersonalityType"      : "$personality",
+                          "SbcHaMode"               : "Nto1",
+                          "OamIP"                   : ["$oam_ip1","$oam_ip2"],
+                          "Oam1Ip"                  : "$oam_ip1",
+                          "Oam2Ip"                  : "$oam_ip2",
+                          "EmsUsername"             : "$ems_user_name",
+                          "EmsPassword"             : "$ems_password",
+                          "EmsIP"                   : [ "$ems_ip_1", "$ems_ip_2" ], 
+                          "EmsDownloadConfig"       : "$downloadConfig",
+                          "EmsPrivateNodeParameters": { "cluster_id": "$cluster_id" , "vnfc_id": "$vnfc_id" }
+                        }
+                    path: /opt/sonus/conf/userData.json
+                    
+          params:
+              $ce_name:          { get_param: sbc_standby_name }
+              $system_name:    { get_param: sbc_system_name }
+              $personality:      { get_param: personality }
+              $oam_ip1:          { get_attr: [ha0_port1, fixed_ips, 0, ip_address] }
+              $oam_ip2:          { get_attr: [ha0_port2, fixed_ips, 0, ip_address] }
+              $ems_user_name:    { get_param: ems_user_name }
+              $ems_password:     { get_param: ems_password }
+              $ems_ip_1:       { get_param: ems_ip_1 }
+              $ems_ip_2:       { get_param: ems_ip_2 }
+              $cluster_id:       { get_param: cluster_id }
+              $downloadConfig:   { get_param: download_config }
+              $vnfc_id:          { list_join: ['-', [ { get_param: "OS::stack_name" }, { get_param: cluster_id }, '2']] }
+#              $adminSshKey:           { get_param: adminSshKey }
+#              $linuxAdminSshKey:      { get_param: linuxAdminSshKey }
+              #PASSWORD_EDIT
+              #$adminPassword:         { get_param: adminPassword }
+              #$linuxAdminPassword:    { get_param: linuxAdminPassword }
+
+
+  # Create active vSBC instance
+  vSBC_ACTIVE:
+    type: OS::Nova::Server
+    properties:
+ #     name: { list_join: ['-', [ { get_param: "OS::stack_name" }, '1']] }
+      name: { get_param: sbc_active_name }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      availability_zone: { get_param: availability_zone }
+      config_drive: True
+      #personality: 
+        #"baseConfig.cli": {get_file: "RIBBON_BASE_CONFIG.cli"}
+        #"baseConfig.cli": {get_file: "http://10.11.12.13/sbcCliFiles/RIBBON_BASE_CONFIG.cli"}
+
+      # Attach previously created network ports to the instance
+      networks:
+        - port: { get_resource: mgt0_port1 }
+        - port: { get_resource: ha0_port1 }
+        - port: { get_resource: pkt0_port1 }
+        - port: { get_resource: pkt1_port1 }
+        # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+        #- port: { get_resource: mgt1_port1 }
+
+      # Publish the assigned floating IP addresses with appended subnet mask to the openstack metadata service.
+      # Subnet prefix for floating ips not used - hard coded to 32 for consistencey.
+      metadata:
+
+        IF0: { "Port":"Mgt0",
+               "DHCP": { get_param: isDhcpEnabledOnMgt0},
+               "GWV4": { get_param: mgt0Gateway },
+               "IPV4": { list_join: ['/', [ { get_attr: [mgt0_port1, fixed_ips, 0, ip_address] }, { get_param: mgt0SubnetPrefix}]] },
+             }
+
+        IF1: { "Port":"Ha0",
+               "DHCP": { get_param: isDhcpEnabledOnHa0},
+               "GWV4": { get_param: ha0Gateway },
+               "IPV4": { list_join: ['/', [ { get_attr: [ha0_port1, fixed_ips, 0, ip_address] }, { get_param: ha0SubnetPrefix}]] }
+             }
+
+        IF2: { "Port":"Pkt0",
+               "DHCP": "False"
+             }
+
+        IF3: { "Port":"Pkt1",
+               "DHCP": "False"
+             }
+
+        ClusterIp: { get_attr: [ha0_port2, fixed_ips, 0, ip_address]}
+
+      # Set the format to RAW to pass data directly as userdata set the floating and virtual IP counts
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+                #cloud-config
+                ### USER EDITABLE SECTION FOR SSH KEYS ###
+                users:
+                    - name: admin
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: admin
+                      lock_passwd: false
+                    - name: linuxadmin
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: sonus
+                      lock_passwd: false
+                    - name: root
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: sonus1                    
+                      lock_passwd: false
+                runcmd:
+                    - [ usermod, -p, '$6$io3njQos$gZtBJ4MazQeWC0beqQwRPUDZCQcKXhMr2B8QLWYGajchR2BtkyHPvBTCQj0LctHAFaYTwbsIsUkm12ta4IoLe/', linuxadmin ]
+                    - sed -i -e "/^AllowUsers/s/\slinuxadmin\(\s\|$\)/ /g" -e "/^AllowUsers/s/\sroot\(\s\|$\)/ /g" /etc/ssh/sshd_config
+                    - sed -i "/^AllowUsers/s/AllowUsers /AllowUsers root linuxadmin /" /etc/ssh/sshd_config
+                    - sed -i "/PasswordAuthentication no/s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
+                    - sed -i "/^PermitRootLogin/s/ no/ yes/" /etc/ssh/sshd_config
+                    - sed -i "s/allowSshAccess=n/allowSshAccess=y/" /opt/sonus/conf/sbx.conf
+                write_files:
+                -   content: |
+                        {
+                          "CERole"                  : "ACTIVE",
+                          "CEMode"                  : "oam",
+                          "CEName"                  : "$ce_name",
+                          "SystemName"              : "$system_name",
+                          "SbcPersonalityType"      : "$personality",
+                          "SbcHaMode"               : "Nto1",
+                          "OamIP"                   : ["$oam_ip1","$oam_ip2"],
+                          "Oam1Ip"                  : "$oam_ip1",
+                          "Oam2Ip"                  : "$oam_ip2",
+                          "EmsUsername"             : "$ems_user_name",
+                          "EmsPassword"             : "$ems_password",
+                          "EmsIP"                   : [ "$ems_ip_1", "$ems_ip_2" ], 
+                          "EmsDownloadConfig"       : "$downloadConfig",
+                          "EmsPrivateNodeParameters": { "cluster_id": "$cluster_id" , "vnfc_id": "$vnfc_id" }
+                        }
+                    path: /opt/sonus/conf/userData.json
+                
+          params:
+              $ce_name:          { get_param: sbc_active_name  }
+              $system_name:    { get_param: sbc_system_name }
+              $personality:      { get_param: personality }
+              $oam_ip1:          { get_attr: [ha0_port1, fixed_ips, 0, ip_address] }
+              $oam_ip2:          { get_attr: [ha0_port2, fixed_ips, 0, ip_address] }
+              $ems_user_name:    { get_param: ems_user_name }
+              $ems_password:     { get_param: ems_password }
+              $ems_ip_1:       { get_param: ems_ip_1 }
+              $ems_ip_2:       { get_param: ems_ip_2 }
+              $cluster_id:       { get_param: cluster_id }
+              $downloadConfig:   { get_param: download_config }
+              $vnfc_id:          { list_join: ['-', [ { get_param: "OS::stack_name" }, { get_param: cluster_id }, '1']] }
+ #             $adminSshKey:           { get_param: adminSshKey }
+ #             $linuxAdminSshKey:      { get_param: linuxAdminSshKey }
+              #PASSWORD_EDIT
+              #$adminPassword:         { get_param: adminPassword }
+              #$linuxAdminPassword:    { get_param: linuxAdminPassword }
+
+  # PRIVATE PORT CREATION - ACTIVE
+  # Create the four required virtual nics (ports) to attach to virtual SBC instance 1
+  mgt0_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_mgt0 }
+      fixed_ips:
+        - ip_address: { get_param: mgt0IPAddressActive}
+      security_groups:
+        - { get_param: security_group }
+
+  ha0_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_ha }
+      fixed_ips:
+        - ip_address: { get_param: ha0IPAddressActive}
+
+  # EDIT - PRIVATE PORT CREATION - ACTIVE
+  pkt0_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_pkt0 }
+      fixed_ips:
+        - ip_address: { get_param: pkt0IPAddressActive}
+#      binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }
+
+  # EDIT - PRIVATE PORT CREATION - ACTIVE
+  pkt1_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_pkt1 }
+      fixed_ips:
+        - ip_address: { get_param: pkt1IPAddressActive}
+ #     binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }
+
+
+  # PRIVATE PORT CREATION - STANDBY
+  # Create the four required virtual nics (ports) to attach to virtual SBC instance 2
+  mgt0_port2:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_mgt0 }
+      fixed_ips:
+        - ip_address: { get_param: mgt0IPAddressStandby}
+      security_groups:
+        - { get_param: security_group }
+
+  ha0_port2:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_ha }
+      fixed_ips:
+        - ip_address: { get_param: ha0IPAddressStandby}
+
+  # EDIT - PRIVATE PORT CREATION - STANDBY
+  pkt0_port2:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_pkt0 }
+      fixed_ips:
+        - ip_address: { get_param: pkt0IPAddressStandby}
+ #     binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }
+
+
+  # EDIT - PRIVATE PORT CREATION - STANDBY
+  pkt1_port2:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_pkt1 }
+      fixed_ips:
+        - ip_address: { get_param: pkt1IPAddressStandby}
+ #     binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }
+
+  # Floating IP creation
+  # Create and associate floating IP addresses to the mgt0
+
+  mgt0_floating_ip1:
+    type: "OS::Heat::ResourceGroup"
+    depends_on: mgt0_port1
+    properties:
+      count: { get_param: floating_ip_count_mgt0 }
+      resource_def:
+        type: OS::Neutron::FloatingIP
+        properties:
+          floating_network: { get_param: mgt0_ext_network }
+          port_id: { get_resource: mgt0_port1 }
+
+  mgt0_floating_ip2:
+    type: "OS::Heat::ResourceGroup"
+    depends_on: mgt0_port2
+    properties:
+      count: { get_param: floating_ip_count_mgt0 }
+      resource_def:
+        type: OS::Neutron::FloatingIP
+        properties:
+          floating_network: { get_param: mgt0_ext_network }
+          port_id: { get_resource: mgt0_port2 }
+
+# output some stuff for debug
+outputs:
+  instance1_name:
+    description: Name of the instance
+    value: { get_attr: [vSBC_ACTIVE, name] }
+
+  instance2_name:
+    description: Name of the instance
+    value: { get_attr: [vSBC_STANDBY, name] }
+

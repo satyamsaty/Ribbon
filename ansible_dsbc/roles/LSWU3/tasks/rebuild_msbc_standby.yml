@@ -1,0 +1,178 @@
+---
+  - include: inventory_msbc.yml
+    no_log: True
+  - include: delegate_msbc.yml
+  - name: Rebuilding Standby  MSBC instance
+    ignore_errors: False
+    register: stack_create
+    os_stack:
+       name: "{{ item.name }}"
+       tag: "{{ item.name }}"  
+       state: "{{ item.present_or_absent }}"
+       validate_certs: false
+       template: "{{ item.template }}"
+       parameters:
+           flavor: "{{ item.flavor }}"
+           image: "{{ item.MSBC_UPGRADED_BUILD1 }}"
+           security_group: "{{ item.security_group }}"
+           mgt0IPAddress: "{{ item.mgt0ipaddress }}"
+    loop: "{{ msbc_nodes }}"
+    when: item.role == 'STANDBY'
+   
+  - name: Standby  instance Failed to rebuild.
+    fail:
+      msg: " Stack ({{ stack_create.results[2].stack.stack_name }})status: FAILED "
+    when: stack_create.results[2].stack.status != "COMPLETE"
+    loop: "{{ msbc_nodes }}"
+
+
+
+
+
+  - name: Waiting  till the standby  MSBC  instance pings
+    ignore_errors: yes
+    wait_for:
+       host: "{{ item.mgt0ipaddress }}"
+       port: 2024
+       delay: 60
+       timeout: 120
+       state: started
+       msg: '"{{ item.mgt0ipaddress }}" didnot ping'
+    loop: "{{ msbc_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+
+       
+  - name: Checking the Management  IP of standby  MSBC  instance is pinging.
+    ignore_errors: yes
+    shell: ping -c2 {{ item.mgt0ipaddress }}
+    register: ping
+    retries: 5
+    until: ping.stdout.find("0% packet loss") != -1
+    loop: "{{ msbc_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ ping.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+  - name: MSBC  INSTANCES DIDNOT PING
+    fail:
+      msg: ({{ item }}) donot ping
+    when: item.rc != 0
+    loop: "{{ ping.results }}"
+
+
+
+  - name: wait for 30 seconds
+    wait_for:
+      timeout: 30
+
+
+
+ 
+  - name: Checking if any core file generated on standby   MSBC instance .
+    ignore_errors: yes
+    shell:
+      "ls -alrt | grep -w core|wc -l"
+    args:
+     chdir: /var/log/sonus/sbx/coredump/
+    delegate_to: "{{item}}"
+    loop: "{{groups['msbc']}}"
+    register: core
+    failed_when: '"0" not in core.stdout'
+
+  - debug:
+      msg: "{{ item.item }} has {{ item.stdout }} core files"
+    loop: "{{ core.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+  - name: Failed as core dump  file exist in  standby   MSBC instance . See msg for more explanation .
+    fail:
+      msg: core dump exists in {{ item }}
+    when: item.rc != 0
+    loop: "{{ core.results }}"
+
+
+  - name: Waiting for application to come up for standby   rebuilded  MSBC instance.
+    ignore_errors: yes
+    shell:
+       "/usr/bin/tail -n 10  /var/log/sonus/lca/lca.log"
+    register: service
+    until: service.stdout.find("SBC service is now running") != -1
+    retries: 60
+    delay: 5
+    delegate_to: "{{item}}"
+    loop: "{{groups['msbc']}}"
+
+
+  - name: Application didnot come up for  rebuilded standby   MSBC instance .See msg for the specific instance.
+    fail:
+      msg: "SBC service is not running for {{ item }}"
+    when: "'SBC service is now running' not  in item.stdout"
+    loop: "{{ service.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+  
+
+  - name: Sync status after standby MSBC  rebuilded
+    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/syncStatus/ | grep status
+    register: sync_status
+    loop: "{{ msbc_nodes }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ sync_status.results }}"
+
+
+
+  - set_fact:
+       msbc_active1: "{{ sync_status.results[0].stdout }}"
+       msbc_active2: "{{ sync_status.results[1].stdout }}"
+       msbc_standby: "{{ sync_status.results[2].stdout }}"
+
+
+  - name: Active1 MSBC instance is not in sync after rebuild
+    fail:
+      msg: services are not in sync for {{ sync_status.results[0].item.name }}
+    when: "'syncCompleted' not   in (msbc_active1)"
+    loop: "{{ msbc_nodes }}"
+
+
+  - name: Active2 MSBC instance is not in sync after rebuild
+    fail:
+      msg: services are not in sync for {{ sync_status.results[1].item.name }}
+    when: "'syncCompleted' not   in (msbc_active2)"
+    loop: "{{ msbc_nodes }}"
+
+
+  - name: Standby MSBC instance is not in sync after rebuild
+    fail:
+      msg: services are not in sync for {{ sync_status.results[2].item.name }}
+    when: "'unprotectedRunningStandby' not   in (msbc_standby)"
+    loop: "{{ msbc_nodes }}"
+
+  - wait_for:
+       timeout: 20
+
+
+  - name: checking installed software version after rebuilded standby   MSBC instance.
+    ignore_errors: yes
+    shell:
+          "/opt/sonus/sbx/scripts/swinfo.sh"
+    delegate_to: "{{ item }}"
+    loop: "{{ groups['msbc'] }}"
+    register: version
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ version.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+
+ 

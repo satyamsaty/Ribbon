@@ -1,0 +1,83 @@
+---
+  - name: spawning the standby instance
+    register: stack_create
+    os_stack:
+       name: "{{ stack_name_standby }}"
+       tag: "{{ stack_name_standby }}"
+       state: "{{ present_or_absent }}"
+       validate_certs: false
+       template: "{{ TEMPLATE_STANDBY }}"
+       parameters:
+           flavor: "{{ ISBC_STANDBY_FLAVOR }}"
+           image: "{{  ISBC_BASE_BUILD }}"
+           security_group: "{{ ISBC_STANDBY_SG }}"
+           mgt0IPAddress: "{{ mgt0IPAddress_STANDBY }}"
+  - name: Wait until the standby instance pings
+    wait_for:
+       host: "{{ mgt0IPAddress_STANDBY }}"
+       port: 2024
+       delay: 60
+       timeout: 120
+       state: started
+       msg: " Standby Instance waiting to ping "
+
+  - name: Checking the Mgmt IP of Standby Node is pingable or not
+    shell: ping -c2 {{ mgt0IPAddress_STANDBY }}
+    register: c
+  - debug: var=c.stdout_lines
+  - name: checking if any core file generated, fails task if generated .
+    shell:
+      "ls -alrt | grep -w core|wc -l"
+    args:
+     chdir: /var/log/sonus/sbx/coredump/
+    delegate_to: standby-1
+    register: b
+    failed_when: '"0" not in b.stdout'
+  - debug: var=b.stdout_lines
+
+
+
+
+  - block:
+      - name: Moving the files from localhost to active node
+        copy:
+          src: /home/ansible/timeout1.sh
+          dest: /root/
+          mode: '0777'
+          force: yes
+        delegate_to: standby-1
+
+
+
+      - name: waiting for service to become available for active node
+        shell: sh timeout1.sh
+        args:
+         chdir: /root/
+        delegate_to: standby-1
+        register: command_result
+        failed_when: command_result.rc not in (0,255)
+        when: c is succeeded
+    rescue:
+      - name: Standby Instance didnot come up.
+        debug: msg="There was an error in the block."
+
+  - name: system_coredumplist
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_STANDBY}}/api/operational/system/coredumpSummary/vsbc1|grep -w "coredumpAndTraceCount"
+    register: b
+    delegate_to: bats14
+  - debug: var=b.stdout_lines
+  - name: To check installed software version
+    shell:
+          "/opt/sonus/sbx/scripts/swinfo.sh"
+    delegate_to: standby-1
+    register: b
+  - debug: var=b.stdout_lines
+  - name: checking sync status
+    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_STANDBY}}/api/operational/system/syncStatus/ | grep status
+    register: b
+  - debug: var=b.stdout_lines
+
+
+
+
+

@@ -1,0 +1,77 @@
+co
+set addressContext default ipInterfaceGroup LIF1 ipInterface pkt_a_v4v6 ceName vsbc1 portName pkt0 ipVarV4 IF2.IPV4 prefixVarV4 IF2.PrefixV4 vlanTagVar IF2.VlanId
+co
+set system dsbc dsbcSigPort addressContext default ipInterfaceGroup LIF1 ipVarV4 IF2.IPV4
+co
+set system dsbc dsbcSigPort addressContext default mode inService state enabled
+co
+set addressContext default ipInterfaceGroup LIF1 ipInterface pkt_a_v4v6 ipVarV6 IF2.IPV6 prefixVarV6 IF2.PrefixV6
+co
+set addressContext default ipInterfaceGroup LIF1 ipInterface pkt_a_v4v6 mode inService state enabled
+co
+show addressContext default ipInterfaceGroup
+set addressContext default ipInterfaceGroup LIF2 ipInterface pkt_b_v4v6 ceName vsbc1 portName pkt1 ipVarV4 IF3.IPV4 prefixVarV4 IF3.PrefixV4 vlanTagVar IF3.VlanId
+co
+set addressContext default ipInterfaceGroup LIF2 ipInterface pkt_b_v4v6 ipVarV6 IF3.IPV6 prefixVarV6 IF3.PrefixV6
+co
+set addressContext default ipInterfaceGroup LIF2 ipInterface pkt_b_v4v6 mode inService state enabled
+co
+q
+set addressContext default staticRoute 0.0.0.0 0 10.34.208.1 LIF1 pkt_a_v4v6 preference 100
+co
+set addressContext default staticRoute 0.0.0.0 0 10.34.209.1 LIF2 pkt_b_v4v6 preference 100
+co
+set addressContext default dnsGroup DNS_GROUP_DEFAULT type ip interface LIF1
+set addressContext default dnsGroup DNS_GROUP_DEFAULT server DNS1 ipAddress 10.54.80.240
+set addressContext default dnsGroup DNS_GROUP_DEFAULT server DNS1 priority 80 weight 50 state enabled
+co
+set system dsbc cluster type policer dnsGroup DNS_GROUP_DEFAULT fqdn msbc01.satyam.com state enabled
+co
+set system dsbc cluster type dsp dnsGroup DNS_GROUP_DEFAULT fqdn tsbc01.satyam.com state enabled
+co
+
+
+
+
+
+
+
+
+
+
+set addressContext default zone ZONE_ING id 10
+co
+set addressContext default zone ZONE_Ing_Pass sipSigPort 20 ipInterfaceGroupName LIF1 ipVarV4 IF2.IPV4 transportProtocolsAllowed sip-udp,sip-tcp portNumber 5060 mode inService state enabled
+co
+set addressContext default zone ZONE_ING sipSigPort 20 ipInterfaceGroupName LIF1 ipVarV4 IF2.IPV4 transportProtocolsAllowed sip-udp,sip-tcp portNumber 5060 mode inService state enabled
+co
+set addressContext default zone ZONE_ING sipTrunkGroup TG_INT_Pass media mediaIpInterfaceGroupName LIF1
+set addressContext default zone ZONE_ING sipTrunkGroup TG_INT_Pass mode inService state enabled
+co
+set addressContext default zone ZONE_ING sipTrunkGroup TG_INT_Xcode media mediaIpInterfaceGroupName LIF1
+set addressContext default zone ZONE_ING sipTrunkGroup TG_INT_Xcode mode inService state enabled
+co
+show addressContext default zone
+set addressContext default zone ZONE_EGR id 20
+co
+set addressContext default zone ZONE_EGR sipSigPort 21 ipInterfaceGroupName LIF2 ipVarV4 IF3.IPV4 transportProtocolsAllowed sip-udp,sip-tcp portNumber 5060 mode inService state enabled
+co
+set addressContext default zone ZONE_EGR sipTrunkGroup TG_EXT_Pass media mediaIpInterfaceGroupName LIF2
+co
+set addressContext default zone ZONE_EGR sipTrunkGroup TG_EXT_Pass mode inService state enabled
+co
+set addressContext default zone ZONE_EGR sipTrunkGroup TG_EXT_Xcode media mediaIpInterfaceGroupName LIF2
+co
+set addressContext default zone ZONE_EGR sipTrunkGroup TG_EXT_Xcode mode inService state enabled
+co
+set addressContext default zone ZONE_ING sipTrunkGroup TG_INT_Pass ingressIpPrefix 10.54.81.88 32
+co
+set addressContext default zone ZONE_ING sipTrunkGroup TG_INT_Xcode ingressIpPrefix 10.54.81.89 32
+co
+set system policyServer localServer PSX_LOCAL_SERVER state disabled mode outOfService
+co
+set system policyServer remoteServer PSX ipAddress 10.54.221.124 state enabled mode active
+co
+quit
+
+

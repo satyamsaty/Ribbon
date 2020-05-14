@@ -1,0 +1,27 @@
+localhost ansible_connection=local
+
+[all:vars]
+ansible_ssh_common_args=' -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_pipelining=True
+ansible_connection=ssh
+ansible_shell_type=sh
+ansible_shell_executable=sh
+
+[servers:children]
+isbc
+
+[servers:vars]
+ansible_user=linuxadmin
+ansible_port=2024
+ansible_password=sonus
+ansible_become=True
+ansible_ssh_private_key_file=/home/ansible/cloud_ats.key
+
+[isbc]
+active-1     ansible_host=10.34.224.58
+standby-1    ansible_host=10.34.224.75 
+
+[bats2]
+bats14 ansible_host=10.54.81.66 ansible_user=satykumar ansible_port=22 ansible_password=Welcome123
+

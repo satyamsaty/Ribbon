@@ -1,0 +1,1488 @@
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:03:28 +0530 (0:00:00.054)       0:00:00.054 ******* 
+
+TASK [include_vars] *********************************************************************************************************************
+ok: [localhost]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:03:28 +0530 (0:00:00.062)       0:00:00.117 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/isbc.yml for localhost
+Friday 14 February 2020  16:03:28 +0530 (0:00:00.146)       0:00:00.263 ******* 
+
+TASK [Spawning the instances] ***********************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:05:16 +0530 (0:01:48.363)       0:01:48.627 ******* 
+
+TASK [Wait until the  instance pings] ***************************************************************************************************
+ok: [localhost] => (item=10.34.224.58)
+ok: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:09:50 +0530 (0:04:34.047)       0:06:22.674 ******* 
+
+TASK [Add instances to inventory] *******************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:09:50 +0530 (0:00:00.126)       0:06:22.801 ******* 
+
+TASK [Checking the Management IP  is pingable or not] ***********************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:09:53 +0530 (0:00:02.773)       0:06:25.575 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.224.58 (10.34.224.58) 56(84) bytes of data.', u'64 bytes from 10.34.224.58: icmp_seq=1 ttl=61 time=3.03 ms', u'64 bytes from 10.34.224.58: icmp_seq=2 ttl=61 time=6.85 ms', u'', u'--- 10.34.224.58 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 3.038/4.948/6.859/1.911 ms']) => {
+    "msg": [
+        "PING 10.34.224.58 (10.34.224.58) 56(84) bytes of data.", 
+        "64 bytes from 10.34.224.58: icmp_seq=1 ttl=61 time=3.03 ms", 
+        "64 bytes from 10.34.224.58: icmp_seq=2 ttl=61 time=6.85 ms", 
+        "", 
+        "--- 10.34.224.58 ping statistics ---", 
+        "2 packets transmitted, 2 received, 0% packet loss, time 1000ms", 
+        "rtt min/avg/max/mdev = 3.038/4.948/6.859/1.911 ms"
+    ]
+}
+ok: [localhost] => (item=[u'PING 10.34.224.75 (10.34.224.75) 56(84) bytes of data.', u'64 bytes from 10.34.224.75: icmp_seq=1 ttl=61 time=17.5 ms', u'64 bytes from 10.34.224.75: icmp_seq=2 ttl=61 time=5.46 ms', u'', u'--- 10.34.224.75 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 5.464/11.526/17.589/6.063 ms']) => {
+    "msg": [
+        "PING 10.34.224.75 (10.34.224.75) 56(84) bytes of data.", 
+        "64 bytes from 10.34.224.75: icmp_seq=1 ttl=61 time=17.5 ms", 
+        "64 bytes from 10.34.224.75: icmp_seq=2 ttl=61 time=5.46 ms", 
+        "", 
+        "--- 10.34.224.75 ping statistics ---", 
+        "2 packets transmitted, 2 received, 0% packet loss, time 1000ms", 
+        "rtt min/avg/max/mdev = 5.464/11.526/17.589/6.063 ms"
+    ]
+}
+Friday 14 February 2020  16:09:53 +0530 (0:00:00.199)       0:06:25.774 ******* 
+
+TASK [wait_for] *************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:10:24 +0530 (0:00:30.347)       0:06:56.122 ******* 
+
+TASK [Checking if any core file generated, fails task if generated] *********************************************************************
+changed: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:10:27 +0530 (0:00:03.815)       0:06:59.937 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'0']) => {
+    "msg": [
+        "0"
+    ]
+}
+ok: [localhost] => (item=[u'0']) => {
+    "msg": [
+        "0"
+    ]
+}
+Friday 14 February 2020  16:10:27 +0530 (0:00:00.079)       0:07:00.017 ******* 
+
+TASK [Moving the file timeout1.sh from localhost to both nodes] *************************************************************************
+changed: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:10:31 +0530 (0:00:03.042)       0:07:03.059 ******* 
+
+TASK [Waiting for service to become available] ******************************************************************************************
+changed: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:10:35 +0530 (0:00:04.462)       0:07:07.522 ******* 
+
+TASK [Checking sync status] *************************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:10:38 +0530 (0:00:03.300)       0:07:10.822 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'    <status>syncCompleted</status>', u'    <status>syncCompleted</status>']) => {
+    "msg": [
+        "    <status>syncCompleted</status>", 
+        "    <status>syncCompleted</status>"
+    ]
+}
+ok: [localhost] => (item=[u'    <status>unprotectedRunningStandby</status>', u'    <status>unprotectedRunningStandby</status>']) => {
+    "msg": [
+        "    <status>unprotectedRunningStandby</status>", 
+        "    <status>unprotectedRunningStandby</status>"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:10:38 +0530 (0:00:00.119)       0:07:10.941 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/license.yml for localhost
+Friday 14 February 2020  16:10:38 +0530 (0:00:00.053)       0:07:10.994 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:10:39 +0530 (0:00:00.430)       0:07:11.425 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:10:39 +0530 (0:00:00.046)       0:07:11.472 ******* 
+
+TASK [Pushing license in active node  as well as standby node as it is distributed ISBC .] **********************************************
+changed: [localhost]
+Friday 14 February 2020  16:10:50 +0530 (0:00:11.374)       0:07:22.846 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "result": {
+        "changed": true, 
+        "failed": false, 
+        "failed_when_result": false, 
+        "rc": 0, 
+        "stderr": "/home/satykumar/.ansible/tmp/ansible-tmp-1581676839.48-88932577833576/license_push_cloud1.sh: line 15: setenv: command not found\nWarning: Permanently added '[10.34.224.58]:2024' (ECDSA) to the list of known hosts.\r\n/home/satykumar/.ansible/tmp/ansible-tmp-1581676839.48-88932577833576/license_push_cloud1.sh: line 17: setenv: command not found\nWarning: Permanently added '[10.34.224.75]:2024' (ECDSA) to the list of known hosts.\r\n", 
+        "stderr_lines": [
+            "/home/satykumar/.ansible/tmp/ansible-tmp-1581676839.48-88932577833576/license_push_cloud1.sh: line 15: setenv: command not found", 
+            "Warning: Permanently added '[10.34.224.58]:2024' (ECDSA) to the list of known hosts.", 
+            "/home/satykumar/.ansible/tmp/ansible-tmp-1581676839.48-88932577833576/license_push_cloud1.sh: line 17: setenv: command not found", 
+            "Warning: Permanently added '[10.34.224.75]:2024' (ECDSA) to the list of known hosts."
+        ], 
+        "stdout": "Wrote create license default data to file sample_lic\ngetHostId: Connecting to host 10.34.224.58\ngetHostId: hostid: 03302A36-1AA5-484F-8299-C570A5CBD66F retrieved\nHostid1 = 03302A36-1AA5-484F-8299-C570A5CBD66F Hostid2 \nConnecting to host10.34.224.58 for scp\nFile /home/Administrator//sonusLicense.xml copied to host 10.34.224.58\nTo install the license on the target host host 10.34.224.58, use the following command: /opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator//sonusLicense.xml\nLicense bundle b1 has been successfully installed.\nWrote create license default data to file sample_lic\ngetHostId: Connecting to host 10.34.224.75\ngetHostId: hostid: B56E18B2-F5FB-49FB-BFEE-891686111EBD retrieved\nHostid1 = B56E18B2-F5FB-49FB-BFEE-891686111EBD Hostid2 \nConnecting to host10.34.224.75 for scp\nFile /home/Administrator//sonusLicense.xml copied to host 10.34.224.75\nTo install the license on the target host host 10.34.224.75, use the following command: /opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator//sonusLicense.xml\nLicense bundle b1 has been successfully installed.\n", 
+        "stdout_lines": [
+            "Wrote create license default data to file sample_lic", 
+            "getHostId: Connecting to host 10.34.224.58", 
+            "getHostId: hostid: 03302A36-1AA5-484F-8299-C570A5CBD66F retrieved", 
+            "Hostid1 = 03302A36-1AA5-484F-8299-C570A5CBD66F Hostid2 ", 
+            "Connecting to host10.34.224.58 for scp", 
+            "File /home/Administrator//sonusLicense.xml copied to host 10.34.224.58", 
+            "To install the license on the target host host 10.34.224.58, use the following command: /opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator//sonusLicense.xml", 
+            "License bundle b1 has been successfully installed.", 
+            "Wrote create license default data to file sample_lic", 
+            "getHostId: Connecting to host 10.34.224.75", 
+            "getHostId: hostid: B56E18B2-F5FB-49FB-BFEE-891686111EBD retrieved", 
+            "Hostid1 = B56E18B2-F5FB-49FB-BFEE-891686111EBD Hostid2 ", 
+            "Connecting to host10.34.224.75 for scp", 
+            "File /home/Administrator//sonusLicense.xml copied to host 10.34.224.75", 
+            "To install the license on the target host host 10.34.224.75, use the following command: /opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator//sonusLicense.xml", 
+            "License bundle b1 has been successfully installed."
+        ]
+    }
+}
+Friday 14 February 2020  16:10:50 +0530 (0:00:00.054)       0:07:22.901 ******* 
+
+TASK [License pushed on boxes] **********************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:10:54 +0530 (0:00:03.810)       0:07:26.711 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'    <usageLimit>10000</usageLimit>', u'    <inUse>0</inUse>']) => {
+    "msg": [
+        "    <usageLimit>10000</usageLimit>", 
+        "    <inUse>0</inUse>"
+    ]
+}
+ok: [localhost] => (item=[u'    <usageLimit>10000</usageLimit>', u'    <inUse>0</inUse>']) => {
+    "msg": [
+        "    <usageLimit>10000</usageLimit>", 
+        "    <inUse>0</inUse>"
+    ]
+}
+Friday 14 February 2020  16:10:54 +0530 (0:00:00.070)       0:07:26.782 ******* 
+
+TASK [CoredumpAndTraceCount] ************************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:10:55 +0530 (0:00:01.135)       0:07:27.917 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'  <coredumpAndTraceCount>0</coredumpAndTraceCount>']) => {
+    "msg": [
+        "  <coredumpAndTraceCount>0</coredumpAndTraceCount>"
+    ]
+}
+ok: [localhost] => (item=[u'  <coredumpAndTraceCount>0</coredumpAndTraceCount>']) => {
+    "msg": [
+        "  <coredumpAndTraceCount>0</coredumpAndTraceCount>"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:10:55 +0530 (0:00:00.057)       0:07:27.975 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/active_standby_configuration.yml for localhost
+Friday 14 February 2020  16:10:56 +0530 (0:00:00.055)       0:07:28.031 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+changed: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:10:58 +0530 (0:00:02.534)       0:07:30.565 ******* 
+
+TASK [To run configuration in both nodes] ***********************************************************************************************
+changed: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:11:31 +0530 (0:00:33.162)       0:08:03.728 ******* 
+
+TASK [Gathering Facts] ******************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:11:36 +0530 (0:00:04.677)       0:08:08.406 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/call_script.yml for localhost
+Friday 14 February 2020  16:11:36 +0530 (0:00:00.181)       0:08:08.588 ******* 
+
+TASK [Running the call(uas)] ************************************************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:11:36 +0530 (0:00:00.307)       0:08:08.895 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "command_result.stdout_lines": [
+        "Background mode - PID=[6370]"
+    ]
+}
+Friday 14 February 2020  16:11:36 +0530 (0:00:00.085)       0:08:08.981 ******* 
+
+TASK [Running the call(uac)] ************************************************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:11:37 +0530 (0:00:00.314)       0:08:09.295 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "result.stdout_lines": [
+        "Background mode - PID=[6383]"
+    ]
+}
+Friday 14 February 2020  16:11:37 +0530 (0:00:00.054)       0:08:09.349 ******* 
+
+TASK [wait for call to get completed] ***************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:12:37 +0530 (0:01:00.358)       0:09:09.708 ******* 
+
+TASK [checking call count status] *******************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:12:38 +0530 (0:00:01.288)       0:09:10.996 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item={'stderr_lines': [], 'ansible_loop_var': u'item', u'end': u'2020-02-14 16:12:38.859575', u'stderr': u'', u'stdout': u'    <activeCalls>50</activeCalls>\n    <stableCalls>50</stableCalls>', u'changed': True, 'failed': False, u'delta': u'0:00:00.912337', u'cmd': u"curl -kisu 'admin:admin' -X GET https://10.34.224.58/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'", 'item': {u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'present_or_absent': u'present', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'security_group': u'ansible', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'}, u'rc': 0, u'invocation': {u'module_args': {u'warn': False, u'executable': None, u'_uses_shell': True, u'strip_empty_ends': True, u'_raw_params': u"curl -kisu 'admin:admin' -X GET https://10.34.224.58/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'", u'removes': None, u'argv': None, u'creates': None, u'chdir': None, u'stdin_add_newline': True, u'stdin': None}}, 'stdout_lines': [u'    <activeCalls>50</activeCalls>', u'    <stableCalls>50</stableCalls>'], u'start': u'2020-02-14 16:12:37.947238'}) => {
+    "msg": {
+        "ansible_loop_var": "item", 
+        "changed": true, 
+        "cmd": "curl -kisu 'admin:admin' -X GET https://10.34.224.58/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'", 
+        "delta": "0:00:00.912337", 
+        "end": "2020-02-14 16:12:38.859575", 
+        "failed": false, 
+        "invocation": {
+            "module_args": {
+                "_raw_params": "curl -kisu 'admin:admin' -X GET https://10.34.224.58/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'", 
+                "_uses_shell": true, 
+                "argv": null, 
+                "chdir": null, 
+                "creates": null, 
+                "executable": null, 
+                "removes": null, 
+                "stdin": null, 
+                "stdin_add_newline": true, 
+                "strip_empty_ends": true, 
+                "warn": false
+            }
+        }, 
+        "item": {
+            "base_build": "sbc-V08.00.00R000_R000_4", 
+            "flavor": "ISBC4VCPU", 
+            "mgt0ipaddress": "10.34.224.58", 
+            "name": "ISBC_DISTRIBUTED_ACTIVE", 
+            "present_or_absent": "present", 
+            "role": "ACTIVE", 
+            "security_group": "ansible", 
+            "template": "ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml", 
+            "upgraded_build": "jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64"
+        }, 
+        "rc": 0, 
+        "start": "2020-02-14 16:12:37.947238", 
+        "stderr": "", 
+        "stderr_lines": [], 
+        "stdout": "    <activeCalls>50</activeCalls>\n    <stableCalls>50</stableCalls>", 
+        "stdout_lines": [
+            "    <activeCalls>50</activeCalls>", 
+            "    <stableCalls>50</stableCalls>"
+        ]
+    }
+}
+ok: [localhost] => (item={'skip_reason': u'Conditional result was False', 'item': {u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'present_or_absent': u'present', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'security_group': u'ansible', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'}, 'skipped': True, 'ansible_loop_var': u'item', 'changed': False}) => {
+    "msg": {
+        "ansible_loop_var": "item", 
+        "changed": false, 
+        "item": {
+            "base_build": "sbc-V08.00.00R000_R000_4", 
+            "flavor": "ISBC4VCPU", 
+            "mgt0ipaddress": "10.34.224.75", 
+            "name": "ISBC_DISTRIBUTED_STANDBY", 
+            "present_or_absent": "present", 
+            "role": "STANDBY", 
+            "security_group": "ansible", 
+            "template": "ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml", 
+            "upgraded_build": "jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64"
+        }, 
+        "skip_reason": "Conditional result was False", 
+        "skipped": true
+    }
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:12:39 +0530 (0:00:00.200)       0:09:11.197 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/oam_rollover.yml for localhost
+Friday 14 February 2020  16:12:39 +0530 (0:00:00.165)       0:09:11.362 ******* 
+
+TASK [Rolling over logs] ****************************************************************************************************************
+changed: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:12:43 +0530 (0:00:04.381)       0:09:15.744 ******* 
+
+TASK [Packet Port switchover and port switchback] ***************************************************************************************
+changed: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:12:46 +0530 (0:00:02.335)       0:09:18.080 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=None)
+ok: [localhost] => (item=None)
+ok: [localhost]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:12:46 +0530 (0:00:00.099)       0:09:18.179 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/switchover_processkill.yml for localhost
+Friday 14 February 2020  16:12:46 +0530 (0:00:00.128)       0:09:18.307 ******* 
+
+TASK [Name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:12:46 +0530 (0:00:00.423)       0:09:18.731 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:12:46 +0530 (0:00:00.079)       0:09:18.810 ******* 
+
+TASK [Switchover by killing CHM process on Active Instance] *****************************************************************************
+changed: [localhost -> 10.34.224.58]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:12:47 +0530 (0:00:00.638)       0:09:19.449 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/active_standby_sync_after_rebuild.yml for localhost
+Friday 14 February 2020  16:12:47 +0530 (0:00:00.217)       0:09:19.667 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:12:48 +0530 (0:00:00.404)       0:09:20.071 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:12:48 +0530 (0:00:00.102)       0:09:20.174 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:12:48 +0530 (0:00:00.490)       0:09:20.664 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:12:48 +0530 (0:00:00.088)       0:09:20.753 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:12:49 +0530 (0:00:00.880)       0:09:21.634 ******* 
+
+TASK [Waiting for ISBC active and standby to make a cluster] ****************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:15:03 +0530 (0:02:14.219)       0:11:35.853 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "Both the  servers are in Sync"
+    ]
+}
+Friday 14 February 2020  16:15:03 +0530 (0:00:00.087)       0:11:35.941 ******* 
+
+TASK [sleep for 30 seconds and continue with play] **************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:15:34 +0530 (0:00:30.341)       0:12:06.283 ******* 
+
+TASK [Sync status after active and standby spawned successfully] ************************************************************************
+changed: [localhost -> 10.34.224.75]
+Friday 14 February 2020  16:15:39 +0530 (0:00:05.288)       0:12:11.571 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "a.stdout_lines": [
+        "===================================================", 
+        "SERVER:          vsbc1", 
+        "OS:              V07.00.00-R000", 
+        "EMA:             V08.00.00-R000", 
+        "SBC:             V08.00.00-R000", 
+        "SBC Type:        isbc", 
+        "Management mode: distributed", 
+        "Build Number:    4", 
+        "===================================================", 
+        "Installed host role:   standby", 
+        "Current   host role:   active", 
+        "===================================================", 
+        "", 
+        "===================================================", 
+        "SERVER:          vsbc1", 
+        "OS:              V07.00.00-R000", 
+        "EMA:             V08.00.00-R000", 
+        "SBC:             V08.00.00-R000", 
+        "SBC Type:        isbc", 
+        "Management mode: distributed", 
+        "Build Number:    4", 
+        "===================================================", 
+        "Installed host role:   active", 
+        "Current   host role:   standby", 
+        "==================================================="
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:15:39 +0530 (0:00:00.112)       0:12:11.684 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/test_system_switchover.yml for localhost
+Friday 14 February 2020  16:15:39 +0530 (0:00:00.104)       0:12:11.788 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:15:40 +0530 (0:00:00.548)       0:12:12.337 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:15:40 +0530 (0:00:00.103)       0:12:12.441 ******* 
+
+TASK [To check box switchover time] *****************************************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:15:42 +0530 (0:00:01.801)       0:12:14.242 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "/home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles", 
+        "\\n\\n\\nFile value is -rw-r----- 1 sonusadmin upload 736 Feb 14 05:42 /var/log/sonus/sbx/evlog/1000002.SYS\\n\\n\\n", 
+        "/home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles", 
+        "switchover time for sync : ", 
+        "2.862"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:15:42 +0530 (0:00:00.090)       0:12:14.332 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/oam_rollover.yml for localhost
+Friday 14 February 2020  16:15:42 +0530 (0:00:00.154)       0:12:14.486 ******* 
+
+TASK [Rolling over logs] ****************************************************************************************************************
+ok: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+ok: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:15:47 +0530 (0:00:04.941)       0:12:19.428 ******* 
+
+TASK [Packet Port switchover and port switchback] ***************************************************************************************
+changed: [localhost -> 10.34.224.58] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost -> 10.34.224.75] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:15:51 +0530 (0:00:03.735)       0:12:23.163 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=None)
+ok: [localhost] => (item=None)
+ok: [localhost]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:15:51 +0530 (0:00:00.102)       0:12:23.265 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/switchback_processkill.yml for localhost
+Friday 14 February 2020  16:15:51 +0530 (0:00:00.113)       0:12:23.378 ******* 
+
+TASK [Name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:15:51 +0530 (0:00:00.388)       0:12:23.767 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:15:51 +0530 (0:00:00.124)       0:12:23.891 ******* 
+
+TASK [Switchback by Killing CHM process on current Active Instance installed role as Standby] *******************************************
+changed: [localhost -> 10.34.224.75]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:15:52 +0530 (0:00:00.687)       0:12:24.579 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/active_standby_sync.yml for localhost
+Friday 14 February 2020  16:15:52 +0530 (0:00:00.179)       0:12:24.758 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:15:53 +0530 (0:00:00.616)       0:12:25.374 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:15:53 +0530 (0:00:00.078)       0:12:25.453 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:15:53 +0530 (0:00:00.502)       0:12:25.955 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:15:54 +0530 (0:00:00.096)       0:12:26.051 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:15:54 +0530 (0:00:00.563)       0:12:26.615 ******* 
+
+TASK [Waiting for ISBC active and standby to make a cluster] ****************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:18:09 +0530 (0:02:14.525)       0:14:41.141 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "Both the  servers are in Sync"
+    ]
+}
+Friday 14 February 2020  16:18:09 +0530 (0:00:00.078)       0:14:41.219 ******* 
+
+TASK [sleep for 30 seconds and continue with play] **************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:18:39 +0530 (0:00:30.396)       0:15:11.616 ******* 
+
+TASK [Sync status after active and standby spawned successfully] ************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:18:45 +0530 (0:00:05.510)       0:15:17.127 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "a.stdout_lines": [
+        "===================================================", 
+        "SERVER:          vsbc1", 
+        "OS:              V07.00.00-R000", 
+        "EMA:             V08.00.00-R000", 
+        "SBC:             V08.00.00-R000", 
+        "SBC Type:        isbc", 
+        "Management mode: distributed", 
+        "Build Number:    4", 
+        "===================================================", 
+        "Installed host role:   active", 
+        "Current   host role:   active", 
+        "===================================================", 
+        "", 
+        "===================================================", 
+        "SERVER:          vsbc1", 
+        "OS:              V07.00.00-R000", 
+        "EMA:             V08.00.00-R000", 
+        "SBC:             V08.00.00-R000", 
+        "SBC Type:        isbc", 
+        "Management mode: distributed", 
+        "Build Number:    4", 
+        "===================================================", 
+        "Installed host role:   standby", 
+        "Current   host role:   standby", 
+        "==================================================="
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:18:45 +0530 (0:00:00.099)       0:15:17.226 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/test_system_switchback.yml for localhost
+Friday 14 February 2020  16:18:45 +0530 (0:00:00.110)       0:15:17.336 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:18:45 +0530 (0:00:00.419)       0:15:17.756 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:18:45 +0530 (0:00:00.085)       0:15:17.841 ******* 
+
+TASK [To check box switchback time] *****************************************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:18:47 +0530 (0:00:01.979)       0:15:19.820 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "switchover time for sync : ", 
+        "3.973"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:18:47 +0530 (0:00:00.107)       0:15:19.928 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/switchover_port.yml for localhost
+Friday 14 February 2020  16:18:48 +0530 (0:00:00.114)       0:15:20.042 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:18:48 +0530 (0:00:00.368)       0:15:20.410 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:18:48 +0530 (0:00:00.155)       0:15:20.566 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:18:49 +0530 (0:00:00.931)       0:15:21.498 ******* 
+
+TASK [Packet Port switchover] ***********************************************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:19:00 +0530 (0:00:10.806)       0:15:32.304 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "f.stdout_lines": [
+        "spawn bash", 
+        "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin", 
+        "[root@ISBC-vsbc1 192.168.20.43 ~]# /opt/sonus/sbx/tailf/bin/confd_cli -uadmin", 
+        "", 
+        "admin connected from 10.54.81.11 using ssh on vsbc1", 
+        "\u001b[?7h", 
+        "Your last successful login was at 2020-2-14 5:42:16", 
+        "", 
+        "Your last successful login was from 10.54.81.11", 
+        "admin@vsbc1-192.168.20.43> request system ethernetPort packetAdmin vsbc1 pkt0 switchover", 
+        "This command will switch the physical port associated with logical port. Do you want to continue (yes/no)  [no,yes] yes", 
+        "result success", 
+        "reason manual switch completed", 
+        "[ok][2020-02-14 05:48:32]", 
+        "admin@vsbc1-192.168.20.43> show table system ethernetPort portMonitorStatus", 
+        "CE               PM      PORT                                       FAULT     ", 
+        "NAME   PRG NAME  NAME    NAME    MAC ADDRESS        ROLE     STATE  STATE     ", 
+        "------------------------------------------------------------------------------", 
+        "vsbc1  prg_mgt0  mgt0    mgt0    fa:16:3e:c0:b0:91  noRole   up     restored  ", 
+        "vsbc1  prg_pkt0  pkt0_p  pkt0_p  fa:16:3e:6:d:78    standby  up     restored  ", 
+        "vsbc1  prg_pkt0  pkt0_s  pkt0_s  fa:16:3e:68:16:f5  active   up     restored  ", 
+        "vsbc1  prg_pkt1  pkt1_p  pkt1_p  fa:16:3e:25:1e:85  active   up     restored  ", 
+        "vsbc1  prg_pkt1  pkt1_s  pkt1_s  fa:16:3e:36:b1:b3  standby  up     restored  ", 
+        "[ok][2020-02-14 05:48:32]", 
+        "admin@vsbc1-192.168.20.43> "
+    ]
+}
+Friday 14 February 2020  16:19:00 +0530 (0:00:00.135)       0:15:32.440 ******* 
+
+TASK [checking call count status] *******************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:19:01 +0530 (0:00:01.548)       0:15:33.988 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item={'stderr_lines': [], 'ansible_loop_var': u'item', u'end': u'2020-02-14 16:19:01.854775', u'stderr': u'', u'stdout': u'    <activeCalls>50</activeCalls>\n    <stableCalls>50</stableCalls>', u'changed': True, 'failed': False, u'delta': u'0:00:01.197604', u'cmd': u"curl -kisu 'admin:admin' -X GET https://10.34.224.58/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'", 'item': {u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'present_or_absent': u'present', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'security_group': u'ansible', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'}, u'rc': 0, u'invocation': {u'module_args': {u'warn': False, u'executable': None, u'_uses_shell': True, u'strip_empty_ends': True, u'_raw_params': u"curl -kisu 'admin:admin' -X GET https://10.34.224.58/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'", u'removes': None, u'argv': None, u'creates': None, u'chdir': None, u'stdin_add_newline': True, u'stdin': None}}, 'stdout_lines': [u'    <activeCalls>50</activeCalls>', u'    <stableCalls>50</stableCalls>'], u'start': u'2020-02-14 16:19:00.657171'}) => {
+    "msg": {
+        "ansible_loop_var": "item", 
+        "changed": true, 
+        "cmd": "curl -kisu 'admin:admin' -X GET https://10.34.224.58/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'", 
+        "delta": "0:00:01.197604", 
+        "end": "2020-02-14 16:19:01.854775", 
+        "failed": false, 
+        "invocation": {
+            "module_args": {
+                "_raw_params": "curl -kisu 'admin:admin' -X GET https://10.34.224.58/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'", 
+                "_uses_shell": true, 
+                "argv": null, 
+                "chdir": null, 
+                "creates": null, 
+                "executable": null, 
+                "removes": null, 
+                "stdin": null, 
+                "stdin_add_newline": true, 
+                "strip_empty_ends": true, 
+                "warn": false
+            }
+        }, 
+        "item": {
+            "base_build": "sbc-V08.00.00R000_R000_4", 
+            "flavor": "ISBC4VCPU", 
+            "mgt0ipaddress": "10.34.224.58", 
+            "name": "ISBC_DISTRIBUTED_ACTIVE", 
+            "present_or_absent": "present", 
+            "role": "ACTIVE", 
+            "security_group": "ansible", 
+            "template": "ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml", 
+            "upgraded_build": "jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64"
+        }, 
+        "rc": 0, 
+        "start": "2020-02-14 16:19:00.657171", 
+        "stderr": "", 
+        "stderr_lines": [], 
+        "stdout": "    <activeCalls>50</activeCalls>\n    <stableCalls>50</stableCalls>", 
+        "stdout_lines": [
+            "    <activeCalls>50</activeCalls>", 
+            "    <stableCalls>50</stableCalls>"
+        ]
+    }
+}
+ok: [localhost] => (item={'skip_reason': u'Conditional result was False', 'item': {u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'present_or_absent': u'present', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'security_group': u'ansible', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'}, 'skipped': True, 'ansible_loop_var': u'item', 'changed': False}) => {
+    "msg": {
+        "ansible_loop_var": "item", 
+        "changed": false, 
+        "item": {
+            "base_build": "sbc-V08.00.00R000_R000_4", 
+            "flavor": "ISBC4VCPU", 
+            "mgt0ipaddress": "10.34.224.75", 
+            "name": "ISBC_DISTRIBUTED_STANDBY", 
+            "present_or_absent": "present", 
+            "role": "STANDBY", 
+            "security_group": "ansible", 
+            "template": "ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml", 
+            "upgraded_build": "jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64"
+        }, 
+        "skip_reason": "Conditional result was False", 
+        "skipped": true
+    }
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:19:02 +0530 (0:00:00.190)       0:15:34.179 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/test_port_switchover.yml for localhost
+Friday 14 February 2020  16:19:02 +0530 (0:00:00.175)       0:15:34.354 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:19:03 +0530 (0:00:00.716)       0:15:35.071 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:19:03 +0530 (0:00:00.156)       0:15:35.228 ******* 
+
+TASK [To check port switchover time] ****************************************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:19:05 +0530 (0:00:01.943)       0:15:37.172 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "switchover time for sync : ", 
+        "0.005"
+    ]
+}
+Friday 14 February 2020  16:19:05 +0530 (0:00:00.103)       0:15:37.275 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:19:06 +0530 (0:00:01.409)       0:15:38.685 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:19:06 +0530 (0:00:00.106)       0:15:38.791 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/switchback_port.yml for localhost
+Friday 14 February 2020  16:19:06 +0530 (0:00:00.162)       0:15:38.954 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:19:07 +0530 (0:00:00.499)       0:15:39.453 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:19:07 +0530 (0:00:00.102)       0:15:39.556 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:19:08 +0530 (0:00:00.904)       0:15:40.460 ******* 
+
+TASK [Packet Port switchback] ***********************************************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:19:19 +0530 (0:00:10.744)       0:15:51.204 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "f.stdout_lines": [
+        "spawn bash", 
+        "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin", 
+        "[root@ISBC-vsbc1 192.168.20.43 ~]# /opt/sonus/sbx/tailf/bin/confd_cli -uadmin", 
+        "", 
+        "admin connected from 10.54.81.11 using ssh on vsbc1", 
+        "\u001b[?7h", 
+        "Your last successful login was at 2020-2-14 5:48:22", 
+        "", 
+        "Your last successful login was from 10.54.81.11", 
+        "admin@vsbc1-192.168.20.43> request system ethernetPort packetAdmin vsbc1 pkt0 switchover", 
+        "This command will switch the physical port associated with logical port. Do you want to continue (yes/no)  [no,yes] yes", 
+        "result success", 
+        "reason manual switch completed", 
+        "[ok][2020-02-14 05:48:51]", 
+        "admin@vsbc1-192.168.20.43> show table system ethernetPort portMonitorStatus", 
+        "CE               PM      PORT                                       FAULT     ", 
+        "NAME   PRG NAME  NAME    NAME    MAC ADDRESS        ROLE     STATE  STATE     ", 
+        "------------------------------------------------------------------------------", 
+        "vsbc1  prg_mgt0  mgt0    mgt0    fa:16:3e:c0:b0:91  noRole   up     restored  ", 
+        "vsbc1  prg_pkt0  pkt0_p  pkt0_p  fa:16:3e:6:d:78    active   up     restored  ", 
+        "vsbc1  prg_pkt0  pkt0_s  pkt0_s  fa:16:3e:68:16:f5  standby  up     restored  ", 
+        "vsbc1  prg_pkt1  pkt1_p  pkt1_p  fa:16:3e:25:1e:85  active   up     restored  ", 
+        "vsbc1  prg_pkt1  pkt1_s  pkt1_s  fa:16:3e:36:b1:b3  standby  up     restored  ", 
+        "[ok][2020-02-14 05:48:51]", 
+        "admin@vsbc1-192.168.20.43> "
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:19:19 +0530 (0:00:00.125)       0:15:51.329 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/test_port_switchover.yml for localhost
+Friday 14 February 2020  16:19:19 +0530 (0:00:00.148)       0:15:51.478 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:19:19 +0530 (0:00:00.464)       0:15:51.943 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:19:20 +0530 (0:00:00.088)       0:15:52.031 ******* 
+
+TASK [To check port switchover time] ****************************************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:19:21 +0530 (0:00:01.507)       0:15:53.539 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "switchover time for sync : ", 
+        "0.005"
+    ]
+}
+Friday 14 February 2020  16:19:21 +0530 (0:00:00.097)       0:15:53.636 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:19:22 +0530 (0:00:00.424)       0:15:54.061 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:19:22 +0530 (0:00:00.098)       0:15:54.160 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/rebuild_standby.yml for localhost
+Friday 14 February 2020  16:19:22 +0530 (0:00:00.149)       0:15:54.309 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:19:22 +0530 (0:00:00.530)       0:15:54.840 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:19:22 +0530 (0:00:00.090)       0:15:54.930 ******* 
+
+TASK [Rebuilding the standby instance] **************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:20:54 +0530 (0:01:31.922)       0:17:26.853 ******* 
+
+TASK [Wait until the  instance pings] ***************************************************************************************************
+ok: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:22:22 +0530 (0:01:27.377)       0:18:54.230 ******* 
+
+TASK [add instances to inventory] *******************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:22:22 +0530 (0:00:00.104)       0:18:54.335 ******* 
+
+TASK [Checking the Management node  is pingable or not] *********************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:22:24 +0530 (0:00:02.503)       0:18:56.838 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.224.58 (10.34.224.58) 56(84) bytes of data.', u'64 bytes from 10.34.224.58: icmp_seq=1 ttl=61 time=8.08 ms', u'64 bytes from 10.34.224.58: icmp_seq=2 ttl=61 time=6.89 ms', u'', u'--- 10.34.224.58 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1001ms', u'rtt min/avg/max/mdev = 6.896/7.490/8.085/0.600 ms']) => {
+    "msg": [
+        "PING 10.34.224.58 (10.34.224.58) 56(84) bytes of data.", 
+        "64 bytes from 10.34.224.58: icmp_seq=1 ttl=61 time=8.08 ms", 
+        "64 bytes from 10.34.224.58: icmp_seq=2 ttl=61 time=6.89 ms", 
+        "", 
+        "--- 10.34.224.58 ping statistics ---", 
+        "2 packets transmitted, 2 received, 0% packet loss, time 1001ms", 
+        "rtt min/avg/max/mdev = 6.896/7.490/8.085/0.600 ms"
+    ]
+}
+ok: [localhost] => (item=[u'PING 10.34.224.75 (10.34.224.75) 56(84) bytes of data.', u'64 bytes from 10.34.224.75: icmp_seq=1 ttl=61 time=10.7 ms', u'64 bytes from 10.34.224.75: icmp_seq=2 ttl=61 time=6.69 ms', u'', u'--- 10.34.224.75 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1001ms', u'rtt min/avg/max/mdev = 6.691/8.705/10.720/2.016 ms']) => {
+    "msg": [
+        "PING 10.34.224.75 (10.34.224.75) 56(84) bytes of data.", 
+        "64 bytes from 10.34.224.75: icmp_seq=1 ttl=61 time=10.7 ms", 
+        "64 bytes from 10.34.224.75: icmp_seq=2 ttl=61 time=6.69 ms", 
+        "", 
+        "--- 10.34.224.75 ping statistics ---", 
+        "2 packets transmitted, 2 received, 0% packet loss, time 1001ms", 
+        "rtt min/avg/max/mdev = 6.691/8.705/10.720/2.016 ms"
+    ]
+}
+Friday 14 February 2020  16:22:24 +0530 (0:00:00.136)       0:18:56.974 ******* 
+
+TASK [wait for 30 seconds] **************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:22:55 +0530 (0:00:30.258)       0:19:27.233 ******* 
+
+TASK [checking if any core file generated, fails task if generated .] *******************************************************************
+changed: [localhost -> 10.34.224.75]
+Friday 14 February 2020  16:22:57 +0530 (0:00:01.952)       0:19:29.185 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "0"
+    ]
+}
+Friday 14 February 2020  16:22:57 +0530 (0:00:00.094)       0:19:29.279 ******* 
+
+TASK [Moving the files from localhost to both nodes] ************************************************************************************
+changed: [localhost -> 10.34.224.75]
+Friday 14 February 2020  16:22:58 +0530 (0:00:00.876)       0:19:30.156 ******* 
+
+TASK [waiting for service to become available] ******************************************************************************************
+changed: [localhost -> 10.34.224.75]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:26:23 +0530 (0:03:25.851)       0:22:56.007 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/active_standby_sync.yml for localhost
+Friday 14 February 2020  16:26:24 +0530 (0:00:00.086)       0:22:56.093 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:26:24 +0530 (0:00:00.770)       0:22:56.863 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:26:24 +0530 (0:00:00.079)       0:22:56.943 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:26:25 +0530 (0:00:00.419)       0:22:57.362 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:26:25 +0530 (0:00:00.108)       0:22:57.470 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:26:25 +0530 (0:00:00.501)       0:22:57.972 ******* 
+
+TASK [Waiting for ISBC active and standby to make a cluster] ****************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:26:29 +0530 (0:00:03.356)       0:23:01.329 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "Both the  servers are in Sync"
+    ]
+}
+Friday 14 February 2020  16:26:29 +0530 (0:00:00.087)       0:23:01.416 ******* 
+
+TASK [sleep for 30 seconds and continue with play] **************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:26:59 +0530 (0:00:30.307)       0:23:31.724 ******* 
+
+TASK [Sync status after active and standby spawned successfully] ************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:27:05 +0530 (0:00:05.758)       0:23:37.483 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "a.stdout_lines": [
+        "===================================================", 
+        "SERVER:          vsbc1", 
+        "OS:              V07.00.00-R000", 
+        "EMA:             V08.00.00-R000", 
+        "SBC:             V08.00.00-R000", 
+        "SBC Type:        isbc", 
+        "Management mode: distributed", 
+        "Build Number:    4", 
+        "===================================================", 
+        "Installed host role:   active", 
+        "Current   host role:   active", 
+        "===================================================", 
+        "", 
+        "===================================================", 
+        "SERVER:          vsbc1", 
+        "OS:              V08.00.00-A011", 
+        "EMA:             V09.00.00-A011", 
+        "SBC:             V09.00.00-A011", 
+        "SBC Type:        isbc", 
+        "HA mode:         Nto1", 
+        "Build Number:    7155", 
+        "===================================================", 
+        "Installed host role:   standby", 
+        "Current   host role:   standby", 
+        "==================================================="
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:27:05 +0530 (0:00:00.095)       0:23:37.579 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/license_push_after_standby_rebuild.yml for localhost
+Friday 14 February 2020  16:27:05 +0530 (0:00:00.147)       0:23:37.726 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:27:06 +0530 (0:00:00.519)       0:23:38.245 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:27:06 +0530 (0:00:00.077)       0:23:38.323 ******* 
+
+TASK [pushing license in standby node after upgrade] ************************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:27:14 +0530 (0:00:07.930)       0:23:46.253 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "result": {
+        "changed": true, 
+        "failed": false, 
+        "failed_when_result": false, 
+        "rc": 0, 
+        "stderr": "/home/satykumar/.ansible/tmp/ansible-tmp-1581677826.34-221882333431661/license_push_cloud1.sh: line 10: setenv: command not found\nWarning: Permanently added '[10.34.224.75]:2024' (ECDSA) to the list of known hosts.\r\n######################\n#\n This system is restricted to authorized users only.\n Unauthorized access or access attempts to this system\n or services are prohibited. All user activity is logged.\n Evidence of unauthorized use collected during monitoring\n may be provided to appropriate personnel for\n administrative, criminal or other adverse action.\n#\n######################\n\nWe trust you have received the usual lecture from the local System\nAdministrator. It usually boils down to these three things:\n\n    #1) Respect the privacy of others.\n    #2) Think before you type.\n    #3) With great power comes great responsibility.\n\nsudo: no tty present and no askpass program specified\n", 
+        "stderr_lines": [
+            "/home/satykumar/.ansible/tmp/ansible-tmp-1581677826.34-221882333431661/license_push_cloud1.sh: line 10: setenv: command not found", 
+            "Warning: Permanently added '[10.34.224.75]:2024' (ECDSA) to the list of known hosts.", 
+            "######################", 
+            "#", 
+            " This system is restricted to authorized users only.", 
+            " Unauthorized access or access attempts to this system", 
+            " or services are prohibited. All user activity is logged.", 
+            " Evidence of unauthorized use collected during monitoring", 
+            " may be provided to appropriate personnel for", 
+            " administrative, criminal or other adverse action.", 
+            "#", 
+            "######################", 
+            "", 
+            "We trust you have received the usual lecture from the local System", 
+            "Administrator. It usually boils down to these three things:", 
+            "", 
+            "    #1) Respect the privacy of others.", 
+            "    #2) Think before you type.", 
+            "    #3) With great power comes great responsibility.", 
+            "", 
+            "sudo: no tty present and no askpass program specified"
+        ], 
+        "stdout": "Wrote create license default data to file sample_lic\ngetHostId: Connecting to host 10.34.224.75\ngetHostId: hostid: B56E18B2-F5FB-49FB-BFEE-891686111EBD retrieved\nHostid1 = B56E18B2-F5FB-49FB-BFEE-891686111EBD Hostid2 \nConnecting to host10.34.224.75 for scp\nFile /home/Administrator//sonusLicense.xml copied to host 10.34.224.75\nTo install the license on the target host host 10.34.224.75, use the following command: /opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator//sonusLicense.xml\n", 
+        "stdout_lines": [
+            "Wrote create license default data to file sample_lic", 
+            "getHostId: Connecting to host 10.34.224.75", 
+            "getHostId: hostid: B56E18B2-F5FB-49FB-BFEE-891686111EBD retrieved", 
+            "Hostid1 = B56E18B2-F5FB-49FB-BFEE-891686111EBD Hostid2 ", 
+            "Connecting to host10.34.224.75 for scp", 
+            "File /home/Administrator//sonusLicense.xml copied to host 10.34.224.75", 
+            "To install the license on the target host host 10.34.224.75, use the following command: /opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator//sonusLicense.xml"
+        ]
+    }
+}
+Friday 14 February 2020  16:27:14 +0530 (0:00:00.129)       0:23:46.383 ******* 
+
+TASK [License pushed on boxes] **********************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:27:19 +0530 (0:00:05.050)       0:23:51.433 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'    <usageLimit>10000</usageLimit>', u'    <inUse>0</inUse>']) => {
+    "msg": [
+        "    <usageLimit>10000</usageLimit>", 
+        "    <inUse>0</inUse>"
+    ]
+}
+ok: [localhost] => (item=[u'    <usageLimit>0</usageLimit>', u'    <inUse>0</inUse>']) => {
+    "msg": [
+        "    <usageLimit>0</usageLimit>", 
+        "    <inUse>0</inUse>"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:27:19 +0530 (0:00:00.147)       0:23:51.581 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/configuration_push_after_standby_rebuild.yml for localhost
+Friday 14 February 2020  16:27:19 +0530 (0:00:00.125)       0:23:51.706 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:27:20 +0530 (0:00:00.437)       0:23:52.144 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:27:20 +0530 (0:00:00.141)       0:23:52.286 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+changed: [localhost -> 10.34.224.75]
+Friday 14 February 2020  16:27:22 +0530 (0:00:02.626)       0:23:54.912 ******* 
+
+TASK [To run configuration in standby node after upgrade] *******************************************************************************
+changed: [localhost -> 10.34.224.75]
+Friday 14 February 2020  16:27:34 +0530 (0:00:11.772)       0:24:06.685 ******* 
+
+TASK [check call status after rebuilding standby] ***************************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:27:35 +0530 (0:00:00.595)       0:24:07.280 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "callCountStatus all {", 
+        "    callAttempts                0;", 
+        "    callCompletions             0;", 
+        "    activeCalls                 50;", 
+        "    stableCalls                 50;", 
+        "    callUpdates                 0;", 
+        "    activeCallsNonUser          0;", 
+        "    stableCallsNonUser          0;", 
+        "    totalCalls                  50;", 
+        "    totalCallsNonUser           0;", 
+        "    totalCallsEmergEstablishing 0;", 
+        "    totalCallsEmergStable       0;", 
+        "}"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:27:35 +0530 (0:00:00.079)       0:24:07.360 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/rebuild_active.yml for localhost
+Friday 14 February 2020  16:27:35 +0530 (0:00:00.103)       0:24:07.464 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:27:35 +0530 (0:00:00.447)       0:24:07.911 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:27:35 +0530 (0:00:00.065)       0:24:07.976 ******* 
+
+TASK [Rebuilding the active instance] ***************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:29:12 +0530 (0:01:36.701)       0:25:44.677 ******* 
+
+TASK [Wait until the  instance pings] ***************************************************************************************************
+ok: [localhost] => (item=10.34.224.58)
+Friday 14 February 2020  16:30:13 +0530 (0:01:00.668)       0:26:45.346 ******* 
+
+TASK [add instances to inventory] *******************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:30:13 +0530 (0:00:00.160)       0:26:45.506 ******* 
+
+TASK [Checking the Management node  is pingable or not] *********************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:30:16 +0530 (0:00:02.541)       0:26:48.047 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.224.58 (10.34.224.58) 56(84) bytes of data.', u'64 bytes from 10.34.224.58: icmp_seq=1 ttl=61 time=5.71 ms', u'64 bytes from 10.34.224.58: icmp_seq=2 ttl=61 time=11.9 ms', u'', u'--- 10.34.224.58 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1001ms', u'rtt min/avg/max/mdev = 5.711/8.839/11.967/3.128 ms']) => {
+    "msg": [
+        "PING 10.34.224.58 (10.34.224.58) 56(84) bytes of data.", 
+        "64 bytes from 10.34.224.58: icmp_seq=1 ttl=61 time=5.71 ms", 
+        "64 bytes from 10.34.224.58: icmp_seq=2 ttl=61 time=11.9 ms", 
+        "", 
+        "--- 10.34.224.58 ping statistics ---", 
+        "2 packets transmitted, 2 received, 0% packet loss, time 1001ms", 
+        "rtt min/avg/max/mdev = 5.711/8.839/11.967/3.128 ms"
+    ]
+}
+ok: [localhost] => (item=[u'PING 10.34.224.75 (10.34.224.75) 56(84) bytes of data.', u'64 bytes from 10.34.224.75: icmp_seq=1 ttl=61 time=7.19 ms', u'64 bytes from 10.34.224.75: icmp_seq=2 ttl=61 time=7.32 ms', u'', u'--- 10.34.224.75 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 7.198/7.262/7.326/0.064 ms']) => {
+    "msg": [
+        "PING 10.34.224.75 (10.34.224.75) 56(84) bytes of data.", 
+        "64 bytes from 10.34.224.75: icmp_seq=1 ttl=61 time=7.19 ms", 
+        "64 bytes from 10.34.224.75: icmp_seq=2 ttl=61 time=7.32 ms", 
+        "", 
+        "--- 10.34.224.75 ping statistics ---", 
+        "2 packets transmitted, 2 received, 0% packet loss, time 1000ms", 
+        "rtt min/avg/max/mdev = 7.198/7.262/7.326/0.064 ms"
+    ]
+}
+Friday 14 February 2020  16:30:16 +0530 (0:00:00.097)       0:26:48.145 ******* 
+
+TASK [wait for 30 seconds] **************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:30:46 +0530 (0:00:30.326)       0:27:18.471 ******* 
+
+TASK [checking if any core file generated, fails task if generated .] *******************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:30:48 +0530 (0:00:02.070)       0:27:20.542 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "0"
+    ]
+}
+Friday 14 February 2020  16:30:48 +0530 (0:00:00.123)       0:27:20.665 ******* 
+
+TASK [Moving the files from localhost to both nodes] ************************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:30:49 +0530 (0:00:01.018)       0:27:21.684 ******* 
+
+TASK [waiting for service to become available] ******************************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:34:03 +0530 (0:03:13.614)       0:30:35.299 ******* 
+
+TASK [checking sync status] *************************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:34:09 +0530 (0:00:05.854)       0:30:41.153 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'    <status>unprotectedRunningStandby</status>', u'    <status>unprotectedRunningStandby</status>']) => {
+    "msg": [
+        "    <status>unprotectedRunningStandby</status>", 
+        "    <status>unprotectedRunningStandby</status>"
+    ]
+}
+ok: [localhost] => (item=[u'    <status>syncCompleted</status>', u'    <status>syncCompleted</status>']) => {
+    "msg": [
+        "    <status>syncCompleted</status>", 
+        "    <status>syncCompleted</status>"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:34:09 +0530 (0:00:00.107)       0:30:41.261 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/active_standby_sync_after_rebuild.yml for localhost
+Friday 14 February 2020  16:34:09 +0530 (0:00:00.116)       0:30:41.378 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:34:09 +0530 (0:00:00.467)       0:30:41.845 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:34:09 +0530 (0:00:00.082)       0:30:41.928 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:34:10 +0530 (0:00:00.417)       0:30:42.345 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:34:10 +0530 (0:00:00.063)       0:30:42.409 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:34:11 +0530 (0:00:00.683)       0:30:43.092 ******* 
+
+TASK [Waiting for ISBC active and standby to make a cluster] ****************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:34:13 +0530 (0:00:02.556)       0:30:45.649 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "Both the  servers are in Sync"
+    ]
+}
+Friday 14 February 2020  16:34:13 +0530 (0:00:00.098)       0:30:45.747 ******* 
+
+TASK [sleep for 30 seconds and continue with play] **************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:34:44 +0530 (0:00:30.632)       0:31:16.380 ******* 
+
+TASK [Sync status after active and standby spawned successfully] ************************************************************************
+changed: [localhost -> 10.34.224.75]
+Friday 14 February 2020  16:34:54 +0530 (0:00:10.008)       0:31:26.389 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "a.stdout_lines": [
+        "===================================================", 
+        "SERVER:          vsbc1", 
+        "OS:              V08.00.00-A011", 
+        "EMA:             V09.00.00-A011", 
+        "SBC:             V09.00.00-A011", 
+        "SBC Type:        isbc", 
+        "HA mode:         Nto1", 
+        "Build Number:    7155", 
+        "===================================================", 
+        "Installed host role:   standby", 
+        "Current   host role:   active", 
+        "===================================================", 
+        "", 
+        "===================================================", 
+        "SERVER:          vsbc1", 
+        "OS:              V08.00.00-A011", 
+        "EMA:             V09.00.00-A011", 
+        "SBC:             V09.00.00-A011", 
+        "SBC Type:        isbc", 
+        "HA mode:         Nto1", 
+        "Build Number:    7155", 
+        "===================================================", 
+        "Installed host role:   active", 
+        "Current   host role:   standby", 
+        "==================================================="
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:34:54 +0530 (0:00:00.120)       0:31:26.510 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/license_push_after_active_rebuild.yml for localhost
+Friday 14 February 2020  16:34:54 +0530 (0:00:00.146)       0:31:26.656 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:34:55 +0530 (0:00:00.450)       0:31:27.107 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:34:55 +0530 (0:00:00.138)       0:31:27.246 ******* 
+
+TASK [pushing license in active node after rebuilding it .] *****************************************************************************
+changed: [localhost]
+Friday 14 February 2020  16:35:02 +0530 (0:00:07.616)       0:31:34.862 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "result": {
+        "changed": true, 
+        "failed": false, 
+        "failed_when_result": false, 
+        "rc": 0, 
+        "stderr": "/home/satykumar/.ansible/tmp/ansible-tmp-1581678295.26-115933041606681/license_push_cloud1.sh: line 5: setenv: command not found\nWarning: Permanently added '[10.34.224.58]:2024' (ECDSA) to the list of known hosts.\r\n######################\n#\n This system is restricted to authorized users only.\n Unauthorized access or access attempts to this system\n or services are prohibited. All user activity is logged.\n Evidence of unauthorized use collected during monitoring\n may be provided to appropriate personnel for\n administrative, criminal or other adverse action.\n#\n######################\n\nWe trust you have received the usual lecture from the local System\nAdministrator. It usually boils down to these three things:\n\n    #1) Respect the privacy of others.\n    #2) Think before you type.\n    #3) With great power comes great responsibility.\n\nsudo: no tty present and no askpass program specified\n", 
+        "stderr_lines": [
+            "/home/satykumar/.ansible/tmp/ansible-tmp-1581678295.26-115933041606681/license_push_cloud1.sh: line 5: setenv: command not found", 
+            "Warning: Permanently added '[10.34.224.58]:2024' (ECDSA) to the list of known hosts.", 
+            "######################", 
+            "#", 
+            " This system is restricted to authorized users only.", 
+            " Unauthorized access or access attempts to this system", 
+            " or services are prohibited. All user activity is logged.", 
+            " Evidence of unauthorized use collected during monitoring", 
+            " may be provided to appropriate personnel for", 
+            " administrative, criminal or other adverse action.", 
+            "#", 
+            "######################", 
+            "", 
+            "We trust you have received the usual lecture from the local System", 
+            "Administrator. It usually boils down to these three things:", 
+            "", 
+            "    #1) Respect the privacy of others.", 
+            "    #2) Think before you type.", 
+            "    #3) With great power comes great responsibility.", 
+            "", 
+            "sudo: no tty present and no askpass program specified"
+        ], 
+        "stdout": "Wrote create license default data to file sample_lic\ngetHostId: Connecting to host 10.34.224.58\ngetHostId: hostid: 03302A36-1AA5-484F-8299-C570A5CBD66F retrieved\nHostid1 = 03302A36-1AA5-484F-8299-C570A5CBD66F Hostid2 \nConnecting to host10.34.224.58 for scp\nFile /home/Administrator//sonusLicense.xml copied to host 10.34.224.58\nTo install the license on the target host host 10.34.224.58, use the following command: /opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator//sonusLicense.xml\n", 
+        "stdout_lines": [
+            "Wrote create license default data to file sample_lic", 
+            "getHostId: Connecting to host 10.34.224.58", 
+            "getHostId: hostid: 03302A36-1AA5-484F-8299-C570A5CBD66F retrieved", 
+            "Hostid1 = 03302A36-1AA5-484F-8299-C570A5CBD66F Hostid2 ", 
+            "Connecting to host10.34.224.58 for scp", 
+            "File /home/Administrator//sonusLicense.xml copied to host 10.34.224.58", 
+            "To install the license on the target host host 10.34.224.58, use the following command: /opt/sonus/sbx/bin/licenseFileTool install b1 /home/Administrator//sonusLicense.xml"
+        ]
+    }
+}
+Friday 14 February 2020  16:35:02 +0530 (0:00:00.094)       0:31:34.957 ******* 
+
+TASK [License pushed on boxes] **********************************************************************************************************
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_ACTIVE', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'ACTIVE', u'template': u'ISBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.58', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+changed: [localhost] => (item={u'name': u'ISBC_DISTRIBUTED_STANDBY', u'base_build': u'sbc-V08.00.00R000_R000_4', u'security_group': u'ansible', u'role': u'STANDBY', u'template': u'ISBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml', u'present_or_absent': u'present', u'flavor': u'ISBC4VCPU', u'mgt0ipaddress': u'10.34.224.75', u'upgraded_build': u'jenkinsbuild-sbc-V09.00.00A011-connexip-os_08.00.00-A011_7155_amd64'})
+Friday 14 February 2020  16:35:06 +0530 (0:00:03.448)       0:31:38.405 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'    <usageLimit>0</usageLimit>', u'    <inUse>0</inUse>']) => {
+    "msg": [
+        "    <usageLimit>0</usageLimit>", 
+        "    <inUse>0</inUse>"
+    ]
+}
+ok: [localhost] => (item=[u'    <usageLimit>0</usageLimit>', u'    <inUse>0</inUse>']) => {
+    "msg": [
+        "    <usageLimit>0</usageLimit>", 
+        "    <inUse>0</inUse>"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:35:06 +0530 (0:00:00.171)       0:31:38.576 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/configuration_push_after_active_rebuild.yml for localhost
+Friday 14 February 2020  16:35:06 +0530 (0:00:00.139)       0:31:38.716 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:35:07 +0530 (0:00:00.497)       0:31:39.214 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:35:07 +0530 (0:00:00.079)       0:31:39.293 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:35:09 +0530 (0:00:02.457)       0:31:41.751 ******* 
+
+TASK [To run configuration in active  node after upgrade] *******************************************************************************
+changed: [localhost -> 10.34.224.58]
+Friday 14 February 2020  16:35:18 +0530 (0:00:08.908)       0:31:50.659 ******* 
+
+TASK [check call status after rebuilding active] ****************************************************************************************
+changed: [localhost -> 10.34.224.75]
+Friday 14 February 2020  16:35:19 +0530 (0:00:00.953)       0:31:51.613 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => {
+    "b.stdout_lines": [
+        "callCountStatus all {", 
+        "    callAttempts                0;", 
+        "    callCompletions             0;", 
+        "    activeCalls                 50;", 
+        "    stableCalls                 50;", 
+        "    callUpdates                 0;", 
+        "    activeCallsNonUser          0;", 
+        "    stableCallsNonUser          0;", 
+        "    totalCalls                  50;", 
+        "    totalCallsNonUser           0;", 
+        "    totalCallsEmergEstablishing 0;", 
+        "    totalCallsEmergStable       0;", 
+        "}"
+    ]
+}
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:35:19 +0530 (0:00:00.113)       0:31:51.727 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/switchover.yml for localhost
+Friday 14 February 2020  16:35:19 +0530 (0:00:00.117)       0:31:51.845 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:35:20 +0530 (0:00:00.463)       0:31:52.309 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:35:20 +0530 (0:00:00.072)       0:31:52.382 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+changed: [localhost -> 10.34.224.75]
+Friday 14 February 2020  16:35:21 +0530 (0:00:01.315)       0:31:53.697 ******* 
+
+TASK [Server switchover after both servers rebuilded] ***********************************************************************************
+changed: [localhost -> 10.34.224.75]
+
+PLAY [localhost] ************************************************************************************************************************
+Friday 14 February 2020  16:35:33 +0530 (0:00:12.120)       0:32:05.818 ******* 
+included: /home/satykumar/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/roles/LSWU1/tasks/active_standby_sync.yml for localhost
+Friday 14 February 2020  16:35:33 +0530 (0:00:00.127)       0:32:05.945 ******* 
+
+TASK [Management IP] ********************************************************************************************************************
+changed: [localhost] => (item=10.34.224.58)
+changed: [localhost] => (item=10.34.224.75)
+Friday 14 February 2020  16:35:34 +0530 (0:00:00.527)       0:32:06.473 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:35:34 +0530 (0:00:00.111)       0:32:06.584 ******* 
+
+TASK [name] *****************************************************************************************************************************
+changed: [localhost] => (item=ISBC_DISTRIBUTED_ACTIVE)
+changed: [localhost] => (item=ISBC_DISTRIBUTED_STANDBY)
+Friday 14 February 2020  16:35:35 +0530 (0:00:00.479)       0:32:07.064 ******* 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:35:35 +0530 (0:00:00.112)       0:32:07.176 ******* 
+
+TASK [Moving the files from localhost to active node] ***********************************************************************************
+ok: [localhost]
+Friday 14 February 2020  16:35:35 +0530 (0:00:00.493)       0:32:07.670 ******* 

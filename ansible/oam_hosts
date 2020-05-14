@@ -1,0 +1,44 @@
+localhost ansible_connection=local
+
+[server:children]
+oam
+ssbc
+msbc
+tsbc
+
+[server:vars]
+ansible_user=linuxadmin
+ansible_port=2024
+ansible_password=sonus
+ansible_become=True
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_private_key_file=/home/ansible/cloud_ats.key
+ansible_ssh_common_args=' -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+
+[oam]
+active_oam_ssbc ansible_host=10.34.194.65   
+standby_oam_ssbc ansible_host=10.34.194.66 
+active_oam_msbc ansible_host=10.34.194.61
+standby_oam_msbc ansible_host=10.34.194.62
+active_oam_tsbc ansible_host=10.34.194.23
+standby_oam_tsbc ansible_host=10.34.194.25
+
+[ssbc]
+active_ssbc ansible_host=10.34.194.82  
+standby_ssbc ansible_host=10.34.194.83
+  
+[msbc]
+active1_msbc ansible_host=10.34.194.84
+active2_msbc ansible_host=10.34.194.85
+standby_msbc  ansible_host=10.34.194.86
+
+[tsbc]
+active1_tsbc ansible_host=10.34.194.30
+active2_tsbc ansible_host=10.34.194.47
+standby_tsbc ansible_host=10.34.194.46
+
+[bats2]
+bats14 ansible_host=10.54.81.66 ansible_user=satykumar ansible_port=22 ansible_ssh_pass=Welcome123  ansible_ssh_private_key_file=/home/ansible/.ssh/id_rsa
+
+
+

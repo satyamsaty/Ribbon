@@ -1,0 +1,462 @@
+---
+- name:
+  ignore_errors: False
+  gather_facts: False
+  hosts: localhost
+  tasks:
+     - include_vars:
+         file: LSWU2/vars/main.yml
+  tags:
+  - local
+
+#- name: 
+#  ignore_errors: True
+#  gather_facts: False
+#  hosts: localhost
+#  tasks:
+#     - include_vars:
+#         file: LSWU2/vars/main.yml
+#     - include_tasks: "LSWU2/tasks/{{ outer_item }}"
+#       loop:
+##         - isbc.yml
+#         - license.yml
+#         - active_standby_configuration.yml
+#         - call_script.yml
+#         - switchover_processkill.yml
+#         - active_standby_sync_after_rebuild.yml
+#         - test_system_switchover.yml
+#         - switchback_processkill.yml
+#         - active_standby_sync.yml
+#         - test_system_switchback.yml
+#         - switchover_port.yml
+#         - test_port_switchover.yml
+#         - switchback_port.yml
+#         - test_port_switchover.yml
+#         - rebuild_standby.yml
+#         - active_standby_sync.yml
+#         - rebuild_active.yml
+#         - active_standby_sync_after_rebuild.yml
+#         - switchover.yml
+#         - active_standby_sync.yml
+#         - call_count.yml
+#         - switchover_processkill.yml
+#         - active_standby_sync_after_rebuild.yml
+#         - test_system_switchover.yml
+#         - switchback_processkill.yml
+#         - active_standby_sync.yml
+#         - test_system_switchback.yml
+#         - switchover_port.yml
+#         - test_port_switchover.yml
+#         - switchback_port.yml
+#         - test_port_switchover.yml
+#         - call_count.yml
+#         - call_processkill.yml
+#       no_log: "{{ no_logging }}" 
+#       loop_control:
+#            loop_var: outer_item
+#       no_log: True
+#  tags:
+#  - var_localhost
+#  - launch
+#  - license
+#  - configuration
+#  - call
+#  - process_kill_active
+#  - sync_after_process_kill_active
+#  - box_switchover_time_call_check
+#  - process_kill_standby
+#  - sync_after_process_kill_standby
+#  - box_switchback_time_call_check
+#  - port_switchover
+#  - port_switchover_time_call_check
+#  - port_switchback
+#  - port_switchback_time_call_check
+#  - rebuild_standby
+#  - sync_standby_rebuild
+#  - rebuild_active
+#  - sync_active_rebuild
+#  - server_switchover
+#  - sync_server_switchover
+#  - call_count_switchover
+#  - process_kill_active_rebuild
+#  - sync_after_process_kill_active_rebuild
+#  - box_switchover_time_rebuild_call_check
+#  - process_kill_standby_rebuild
+#  - sync_after_process_kill_standby_rebuilded
+#  - box_switchback_time_rebuilded_call_check
+#  - port_switchover_rebuilded
+#  - port_switchovertime_rebuilded_call_check
+#  - port_switchback_rebuilded
+#  - port_switchbacktime_rebuilded_call_check
+#  - call_final
+#  - kill_call
+
+
+
+- name:
+  ignore_errors: False
+  gather_facts: False
+  hosts: localhost
+  tasks:
+     - include_vars:
+         file: LSWU2/vars/main.yml
+     - include_tasks: "LSWU2/tasks/{{ outer_item }}"
+       loop:
+         - isbc.yml
+         - rebuild_standby.yml
+         - active_standby_sync.yml
+         - rebuild_active.yml
+         - active_standby_sync_after_rebuild.yml
+         - switchover.yml
+         - active_standby_sync.yml
+       loop_control:
+            loop_var: outer_item
+  tags:
+  - var
+  - launchbase_build
+  - rebuild_standby
+  - sync_standby_rebuild
+  - rebuild_active
+  - sync_active_rebuild
+  - server_switchover
+  - sync_server_switchover
+
+
+
+- name: 
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - name:
+      include_tasks: LSWU2/tasks/isbc.yml
+  tags:
+  - base_build
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: ADDING LICENSE IN BOTH ACTIVE AND STANDBY NODES  AS IT IS DISTRIBUTED
+      include_tasks: LSWU2/tasks/license.yml
+  tags:
+  - license
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: ADDING CONFIGURATION IN BOTH ACTIVE AND STANDBY NODES
+      include_tasks: LSWU2/tasks/active_standby_configuration.yml
+  tags:
+  - configuration
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: ADDING  CALL SCRIPT
+      include_tasks: LSWU2/tasks/call_script.yml
+  tags:
+  - call
+
+
+
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: KILLING CHM PROCESS ON ACTIVE BOX
+      include_tasks: LSWU2/tasks/switchover_processkill.yml
+  tags:
+   - process_kill_active 
+
+- name:
+  hosts: localhost
+  gather_facts: True
+  tasks:
+    - name: CHECKING SYNC STATUS AFTER KILLING CHM PROCESS ON ACTIVE BOX
+      include_tasks: LSWU2/tasks/active_standby_sync_after_rebuild.yml
+  tags:
+    - sync_after_process_kill_active_and_call_check 
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks: 
+    - name: CALCULATING SWITCHOVER TIME  
+      include_tasks: LSWU2/tasks/test_system_switchover.yml
+  tags:
+   - box_switchover_time
+
+
+
+
+
+
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks: 
+    - name: KILLING CHM PROCESS ON CURRENT ACTIVE  AND PERFORMING SWITCHBACK 
+      include_tasks: LSWU2/tasks/switchback_processkill.yml
+  tags:
+   - process_kill_standby
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CHECKING SYNC STATUS AFTER SWITCHBACK
+      include_tasks: LSWU2/tasks/active_standby_sync.yml
+  tags:
+   - sync_after_process_kill_standby_and_call_check
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CALCULATING SWITCHBACK TIME
+      include_tasks: LSWU2/tasks/test_system_switchback.yml
+  tags:
+   - box_switchback_time 
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+#  connection: network_cli
+  tasks:
+    - name: PORT SWITCHOVER AND CHECKING CALL
+      include_tasks: LSWU2/tasks/switchover_port.yml
+  tags:
+   - port_switchover
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks: 
+    - name: CALCULATING PORT SWITCHOVER TIME 
+      include_tasks: LSWU2/tasks/test_port_switchover.yml
+  tags:
+   - port_switchover_time
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: PORT SWITCHBACK AND CHECKING CALL
+      include_tasks: LSWU2/tasks/switchback_port.yml
+  tags:
+   - port_switchback
+
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CALCULATING PORT SWITCHBACK TIME
+      include_tasks: LSWU2/tasks/test_port_switchover.yml
+  tags:
+   - port_switchback_time
+
+
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: REBUILDING STANDBY
+      include_tasks: LSWU2/tasks/rebuild_standby.yml
+  tags:
+   - rebuild_standby
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CHECKING SYNC STATUS AFTER STANDBY GOT REBUILDED
+      include_tasks: LSWU2/tasks/active_standby_sync.yml
+  tags:
+   - sync_standby_rebuild
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: REBUILDING ACTIVE
+      include_tasks: LSWU2/tasks/rebuild_active.yml
+  tags:
+   - rebuild_active
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CHECKING SYNC STATUS AFTER  ACTIVE  GOT REBUILDED
+      include_tasks: LSWU2/tasks/active_standby_sync_after_rebuild.yml
+  tags:
+   - sync_active_rebuild
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: PERFORMING SWITCHOVER AFTER REBUILDING BOTH INSTANCES
+      include_tasks: LSWU2/tasks/switchover.yml
+  tags:
+   - server_switchover
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CHECKING SYNC STATUS AFTER PERFORMING SWITCHOVER
+      include_tasks: LSWU2/tasks/active_standby_sync.yml
+  tags:
+   - sync_server_switchover
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CHECKING CALL AFTER SWITCHOVER 
+      include_tasks: LSWU2/tasks/call_count.yml
+  tags:
+   - call_switchover
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: KILLING CHM PROCESS ON REBUILDED ACTIVE INSTANCE
+      include_tasks: LSWU2/tasks/switchover_processkill.yml
+  tags:
+   - process_kill_active_rebuild
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: SYNC STATUS AFTER KILLING CHM PROCESS ON REBUILDED ACTIVE INSTANCE
+      include_tasks: LSWU2/tasks/active_standby_sync_after_rebuild.yml
+  tags:
+   - sync_after_process_kill_active_rebuild
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: BOX SWITCHOVER TIME 
+      include_tasks: LSWU2/tasks/test_system_switchover.yml
+  tags:
+   -  box_switchover_time_rebuild
+
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: KILLING CHM PROCESS ON CURRENT ACTIVE ON REBUILDED INSTANCE 
+      include_tasks: LSWU2/tasks/switchback_processkill.yml
+  tags:
+   - process_kill_standby_rebuild
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: SYNC STATUS AFTER SWITCHBACK 
+      include_tasks: LSWU2/tasks/active_standby_sync.yml
+  tags:
+   - sync_after_process_kill_standby_rebuilded
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CALCULATING SWITCHBACK TIME
+      include_tasks: LSWU2/tasks/test_system_switchback.yml
+  tags:
+   - box_switchback_time_rebuilded
+
+
+
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: PORT SWITCHOVER AND CHECK CALL
+      include_tasks: LSWU2/tasks/switchover_port.yml
+  tags:
+   - port_switchover_rebuilded
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CALCULATING PORT SWITCHOVER TIME
+      include_tasks: LSWU2/tasks/test_port_switchover.yml
+  tags:
+   - port_switchovertime_rebuilded
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: PORT SWITCHOVER AND CHECK CALL
+      include_tasks: LSWU2/tasks/switchback_port.yml
+  tags:
+   - port_switchback_rebuilded
+
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CALCULATING PORT SWITCHOVER TIME
+      include_tasks: LSWU2/tasks/test_port_switchover.yml
+  tags:
+   - port_switchbacktime_rebuilded
+
+- name:
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: CHECKING FINAL CALL AFTER ALL OPERATIONS
+      include_tasks: LSWU2/tasks/call_count.yml
+  tags:
+   - call_final
+
+
+
+
+- name: 
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: FINALLY KILL UAS AND UAC PROCESS IF WANT TO STOP CALL 
+      include_tasks: LSWU2/tasks/call_processkill.yml
+  tags:
+   - kill_call
+

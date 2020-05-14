@@ -1,0 +1,121 @@
+---
+  - name: spawning the  active instance
+    os_stack:
+       name: "{{ stack_name_active }}"
+       tag: "{{ stack_name_active }}"
+       state: "{{ present_or_absent }}"
+       validate_certs: false
+       template: "{{ TEMPLATE_ACTIVE }}"
+       parameters:
+           flavor: "{{ ISBC_ACTIVE_FLAVOR }}"
+           image: "{{ ISBC_BASE_BUILD }}"
+           security_group: "{{ ISBC_ACTIVE_SG }}"
+           mgt0IPAddress: "{{ mgt0IPAddress_ACTIVE }}"
+    register: b
+  - debug: var=b.mgt0IPAddress
+
+  - name: Wait until the active instance pings
+    wait_for:
+       host: "{{ mgt0IPAddress_ACTIVE }}"
+       port: 2024
+       delay: 60
+       timeout: 120
+       state: started
+       msg: " Active Instance waiting to ping "
+       
+  - name: Checking the Mgmt IP of Active Node is pingable or not
+    shell: ping -c2 {{ mgt0IPAddress_ACTIVE }}
+    register: a
+  - debug: var=a.stdout_lines  
+  - name: wait for 30 seconds
+    wait_for:
+      timeout: 30
+
+  - name: Add a host alias that we reach through a tunnel (Ansible 2.0 and newer)
+    add_host:
+      hostname: '{{ new_ip }}'
+      ansible_host: '{{ inventory_hostname }}'
+      ansible_port: '{{ new_port }}'
+      groups: just_created
+    register: b
+  - debug: var=b.stdout_lines
+
+  - name: shout output
+    debug:
+      var: stack_create.stdout_lines
+
+
+  - name: show floating ip
+    debug:
+      var: stack_create.openstack.accessIPv4
+
+
+
+  - name: add hosts to inventory
+    add_host:
+        name: "{{ item['openstack']['human_id'] }}"
+        groups: "{{ item['item']['meta']['group'] }}"
+        ansible_host: "{{ item.openstack.accessIPv4 }}"
+    with_items: "{{ stack_create.results }}"
+
+  - name: ping 
+    hosts: just_created
+    ping:  
+ 
+#  - name: checking if any core file generated, fails task if generated .
+#    shell: 
+#      "ls -alrt | grep -w core|wc -l"
+#    args:
+#     chdir: /var/log/sonus/sbx/coredump/
+#    delegate_to: active-1
+#    register: b
+#    failed_when: '"0" not in b.stdout'
+#  - debug: var=b.stdout_lines
+#
+#
+#  
+#
+#  - block:
+#      - name: Moving the files from localhost to active node
+#        become: True
+#        copy:
+#          src: /home/ansible/timeout1.sh
+#          dest: /root/
+#          mode: '0777'
+#          force: yes
+#        delegate_to: active-1
+#
+#
+#
+#      - name: waiting for service to become available for active node
+#        shell: sh  timeout1.sh
+#        args:
+#         chdir: /root/
+#        delegate_to: active-1
+#        register: command_result
+#        failed_when: command_result.rc not in (0,255)
+#        when: a is succeeded
+#    rescue:
+#      - name: Active Instance didnot come up.
+#        debug: msg="There was an error in the block."
+#  
+#  - name: system_coredumplist
+#    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/system/coredumpSummary/vsbc1|grep -w "coredumpAndTraceCount"
+#    register: b
+#    delegate_to: bats14
+#  - debug: var=b.stdout_lines
+#  - name: To check installed software version
+#    shell:
+#          "/opt/sonus/sbx/scripts/swinfo.sh"
+#    delegate_to: active-1
+#    register: b
+#  - debug: var=b.stdout_lines
+#
+#  - name: checking sync status
+#    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/system/syncStatus/ | grep status
+#    register: b
+#  - debug: var=b.stdout_lines
+
+
+
+ 

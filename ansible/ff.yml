@@ -1,0 +1,14 @@
+- name: launch a compute instance
+  hosts: localhost
+  tasks:
+    - name: launch an instance
+      os_server:
+        name: vm1
+        state: present
+  #      cloud: mordred
+  #      region_name: ams01
+        image: centos_qcow2
+        flavor_ram: 4096
+        boot_from_volume: True
+        volume_size: 75
+

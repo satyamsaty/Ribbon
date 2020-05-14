@@ -1,0 +1,21 @@
+---
+- name: Gather facts about a previously created image named image1
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - validation.yml
+  tasks:
+    - name: To get the facts about image
+      os_server_facts:
+        auth: "{{ auth }}"
+        region_name: "{{ region_name }}"
+        interface: "{{ interface }}"
+#        image: centos_qcow2
+        server: SLBSBC9
+        validate_certs: false
+      register: openstack_image
+
+    - name: Show openstack facts
+      debug:
+        msg: "{{ openstack_image }}"

@@ -1,0 +1,16 @@
+---
+- name: create stack
+  hosts: localhost
+  ignore_errors: True
+  tasks:
+  - name: ISBC
+    os_stack:
+      name: ISBC_mukul
+      tag: stack
+      state: present
+      validate_certs: false
+      template: "Test1_ISBC_SRIOV1.yaml"
+      parameters:
+          flavor: ISBC4VCPU
+          image: cSBC_V08.00.00R000
+          security_group: SONUS

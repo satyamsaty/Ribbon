@@ -1,0 +1,17 @@
+---
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_STANDBY"
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+  - name: Rolling over logs
+    copy:
+      src: /home/ansible/oamrollover.sh
+      dest: /root/
+      mode: '0777'
+      force: yes
+
+  - name: Packet Port switchover and port switchback
+    shell: "expect /root/oamrollover.sh"
+    register: f
+#  - debug: var=f.stdout_lines
+

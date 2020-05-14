@@ -1,0 +1,14 @@
+---
+  - name: 
+    debug:
+      msg: "{{ item }}"
+    loop: "{{ tsbc_nodes }}"
+    register: stack
+  - name: 
+    debug:
+      msg: "{{ stack.results[0].item.mgt0ipaddress }}"
+
+  - set_fact:
+      tsbc_active1_mgt0ipaddress: "{{ stack.results[0].item.mgt0ipaddress }}"
+      tsbc_active2_mgt0ipaddress: "{{ stack.results[1].item.mgt0ipaddress }}"
+

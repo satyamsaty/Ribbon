@@ -1,0 +1,49 @@
+---
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key -P 2024 /home/ansible/call.sh root@{{ mgt0IPAddress_ACTIVE }}:/root
+#  - name: Call Count
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "expect /root/call.sh"
+#    register: f
+#  - debug: var=f.stdout_lines
+
+#  - name: Moving the files from localhost to active node
+#    become: True
+#    copy:
+#      src: /home/ansible/call.txt
+#      dest: /root/call.txt
+#      mode: '0777'
+#      force: yes
+#    delegate_to: active-1
+#  - name: checking call
+#    become: True
+#    shell: cat /root/call.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    delegate_to: active-1
+#    register: b
+#  - debug: var=b.stdout_lines
+
+#  - name: checking call count status
+#    shell: curl -kisu 'admin:admin' -X GET https://{{ mgt0IPAddress_ACTIVE }}/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'
+#    register: command_result
+#  - debug: var=command_result.stdout_lines
+
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+
+
+
+
+
+  - name: check call status 
+    shell: echo "show status global callCountStatus"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: b
+  - debug: var=b.stdout_lines  
+
+

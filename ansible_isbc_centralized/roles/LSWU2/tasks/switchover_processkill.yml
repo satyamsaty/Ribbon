@@ -1,0 +1,63 @@
+---
+
+
+  - include_tasks: inventory.yml
+  - include_tasks: delegate.yml
+
+
+#  - name: 
+#    command: "echo {{ item.name }}"
+#    register: res
+#    loop: "{{ isbc_centralized_nodes }}"
+#    loop_control:
+#       label: "{{ item.name }}"
+#  - debug:
+#      var: res
+#    no_log: True
+#
+#  - name: Add instances to inventory
+#    ignore_errors: yes
+#    add_host:
+#      name: "{{ item.name }}"
+#      groups: "isbc"
+#      ansible_host: "{{ item.mgt0ipaddress }}"
+#
+#    loop: "{{ isbc_centralized_nodes }}"
+#    no_log: True
+
+
+  - name: Oam rollover on assigned role active
+    ignore_errors: yes
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+       expect ">"
+       send "request oam eventLog typeAdmin system rolloverLogNow\n"
+
+       expect ">"
+       send "\n"
+
+       exit 0
+    args:
+        executable: /usr/bin/expect
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: oam
+    no_log: True
+
+
+
+
+  - name: Switchover by killing CHM process on Active Instance
+    ignore_errors: yes
+    shell: "ps -few | grep -i chm |grep -i sonusad | grep -v grep | awk '{print $2}'|xargs kill"
+    delegate_to: "{{ res.results[0].stdout }}"
+
+
+
+ 
+
+ 

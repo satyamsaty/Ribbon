@@ -1,0 +1,75 @@
+---
+  - include_tasks: inventory.yml
+  - include_tasks: delegate.yml
+
+#  - name: 
+#    command: "echo {{ item.mgt0ipaddress }}"
+#    register: result
+#    loop: "{{ isbc_centralized_nodes }}"
+#    loop_control:
+#       label: "{{ item.mgt0ipaddress }}"
+#  - debug:
+#      var: result
+#
+#  - name:
+#    command: "echo {{ item.name }}"
+#    register: res
+#    loop: "{{ isbc_centralized_nodes }}"
+#    loop_control:
+#       label: "{{ item.name }}"
+#
+
+  - name: Oam rollover on assigned role Active
+    ignore_errors: False
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+       expect ">"
+       send "request oam eventLog typeAdmin system rolloverLogNow\n"
+
+       expect ">"
+       send "\n"
+
+       exit 0
+    args:
+        executable: /usr/bin/expect
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: oam
+  - debug:
+        var: oam.stdout_lines
+
+
+
+
+
+  - name: port switchback
+    ignore_errors: False
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+        send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+        expect ">"
+        send "request system ethernetPort packetAdmin vsbc1 pkt0 switchover\n";
+        expect ">"
+        send "yes\n";
+        expect ">"
+        send "show table system ethernetPort portMonitorStatus\n";
+        expect ">"
+
+       send "\n"
+
+       exit 0
+    args:
+      executable: /usr/bin/expect
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: port_switchback
+  - debug:
+        var: port_switchback.stdout_lines
+

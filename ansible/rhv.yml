@@ -1,0 +1,15 @@
+---
+- name: create VM
+  hosts: localhost
+  ignore_errors: True
+  tasks:
+  - name: Basic create example from image
+  rhevm:
+    server: rhevm01
+    user: '{{ rhev.admin.name }}'
+    password: '{{ rhev.admin.pass }}'
+    name: demo
+    cluster: centos
+    image: centos7_x64
+    state: present
+    validate_certs: false

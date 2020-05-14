@@ -1,0 +1,15 @@
+---
+- name: create stack
+  hosts: localhost
+  gather_facts: false
+  ignore_errors: false
+  tasks:
+  - name: To copy the config file to remote box
+    shell: ssh mugupta@10.54.81.66 "export MARLIN_ROOT=/ats/tools/SbcLicenseJar/marlin ; setenv MARLIN_ROOT /ats/tools/SbcLicenseJar/marlin ; java -jar /ats/tools/SbcLicenseJar/orca/runTransform.jar -o -r /home/Administrator 10.34.224.111 sonusLicense.xml /opt/sonus/sbx/tailf/var/confd/cdb 10.34.224.111 10.34.224.112"
+  - name: cleardb in active mode
+    shell: ssh -o  "stricthostkeychecking no" -p 2024  -i /home/ansible/cloud_ats.key root@10.34.224.111 "cd /opt/sonus/sbx/scripts && ./clearDBs.sh 1"
+  - name: cleardb in standby mode
+    shell: ssh -o  "stricthostkeychecking no" -p 2024  -i /home/ansible/cloud_ats.key root@10.34.224.112 "cd /opt/sonus/sbx/scripts && ./clearDBs.sh 2"
+  - name: switchover active/standby
+    shell: request system admin vsbcSystem switchover
+     

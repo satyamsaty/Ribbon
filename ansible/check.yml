@@ -1,0 +1,20 @@
+---
+- name: checking validation after deployment of ISBC
+  hosts: localhost
+  gather_facts: false
+  ignore_errors: false
+  tasks:
+  - name: To check Mgmt IP is pingable or not
+    command: ping -c2 10.34.224.111
+    register: p
+  - debug: var=p.stdout_lines
+  - name: Check the SBC service and node is running in active or standby role 
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.111 "egrep 'SBC service is now running|Node is running in ' /var/log/sonus/lca/lca.log"
+    register: b
+  - debug: var=b.stdout_lines
+  - name: To check installed software version
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.111 "sh /opt/sonus/sbx/scripts/swinfo.sh"
+    register: s
+  - debug: var=s.stdout_lines
+
+ 

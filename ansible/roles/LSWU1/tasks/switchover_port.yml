@@ -1,0 +1,61 @@
+---
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_STANDBY"
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+#  - name: 
+ #   shell: scp -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key -P 2024 /home/ansible/port_switchover.sh root@{{ mgt0IPAddress_ACTIVE }}:/root
+ #   delegate_to: localhost
+
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+
+  - name: Moving the files from localhost to active node
+    copy:
+      src: "{{ PortSwitchover_Path }}"
+      dest: /root/
+      mode: '0777'
+      force: yes
+    delegate_to: "{{ res.results[0].stdout }}"
+
+  - name: Packet Port switchover 
+    shell: "expect /root/port_switchover.sh"
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: f
+  - debug: var=f.stdout_lines
+
+
+
+  - name: checking call count status
+    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'
+    loop: "{{ isbc_distributed_nodes }}"
+    when: item.role == 'ACTIVE'
+    register: b
+  - debug:
+      msg: "{{ item }}"
+    loop: "{{ b.results }}"
+#    delegate_to: localhost
+
+
+#  - name: 
+#    copy:
+#      src: /home/ansible/call.txt
+#      dest: /root/call.txt
+#      mode: '0777'
+#      force: yes
+#
+#
+#
+#  - name: checking call
+#    shell: cat /root/call.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    register: b
+#  - debug: var=b.stdout_lines
+  
+

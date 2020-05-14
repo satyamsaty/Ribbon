@@ -1,0 +1,79 @@
+---
+
+  - include_tasks: inventory_ssbc.yml
+
+
+
+  - name: Running the call(uas)
+    ignore_errors: True
+    shell: " {{ uas_script_passthrough }} -bg "
+    register: uas
+
+    failed_when: uas.rc not in (0,99)
+  - debug:
+      var: uas.stdout_lines
+
+  - name: UAS failed
+    fail:
+      msg: UAS didnot run
+    when: uas.rc not in (0,99)
+
+  - name: Running the call(uac)
+    ignore_errors: True
+    shell: " {{ uac_script_passthrough }} -bg "
+    register: uac
+
+    failed_when: uac.rc not in (0,99)
+
+  - name: UAC failed
+    fail:
+      msg: UAC didnot run
+    when: uac.rc not in (0,99)
+
+#  - name: wait for call to get completed
+#    wait_for:
+#      timeout: 60
+
+  - name: Call count Status
+    ignore_errors: True
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+       expect ">"
+       send "show status global callCountStatus\n"
+
+       expect ">"
+       send "\n"
+
+       exit 0
+    args:
+        executable: /usr/bin/expect
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['ssbc'][0] }}"
+
+    register: call_count
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ call_count.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+
+  - name: Call failed
+    fail:
+     msg: Stable calls 0
+    when:  item.rc != 0 
+    loop: "{{ call_count.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+
+
+
+

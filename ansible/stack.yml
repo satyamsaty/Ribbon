@@ -1,0 +1,11 @@
+- hosts: localhost
+  tasks:
+  - name: Test Script
+    expect:
+      command: sc.sh
+      responses:
+        enter one: 'one'
+        enter two: 'two'
+        enter three: 'three'
+        enter password: 'pass'
+      echo: yes

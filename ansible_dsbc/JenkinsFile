@@ -1,0 +1,100 @@
+pipeline {
+         agent {
+                label 'bats12_gsx'
+         }
+
+         stages {
+                stage('Checkout') {
+                        steps {
+                                script {
+                                        println "Checkout latest code"
+                                        sh '''#!/bin/bash -x
+                                        hostname
+                                        PERL5LIB=/home/jenkinsbuild/ats_repos/lib/perl:/ats/lib/perl
+                                        export PERL5LIB
+                                        cd /home/jenkinsbuild/ats_repos/lib/perl/SonusQA
+                                        svn up
+                                        cd /home/jenkinsbuild/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/
+                                        svn co svn+ssh://masterats.sonusnet.com/srv/svn/ats/test/branches/QATEST/SBX5000/V09_00_00/ansible_dsbc
+                                        '''
+                                }
+                        }
+                }
+
+                stage('AnsibleAutomation') {
+                        steps {
+                                script {
+                                        println "Download latest qcow2 file"
+                                        sh '''#!/bin/bash -x
+                                        consoleLog=$BUILD_URL'consoleFull'
+                                        echo $consoleLog
+                                        mkdir -p $HOME/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/QCOW2
+                                        cd $HOME/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible/QCOW2
+                                        rm -rf *.qcow2
+                                        #qcowImageName=$(curl -k -s https://artifact1.eng.sonusnet.com/artifactory/sbx-generic-prod-westford/main/production/lastSuccessfulBuild/ | grep qcow2 | awk -F'"' '{ print $2 }')
+                                        qcowImageName=$(curl -k -s https://artifact2.eng.sonusnet.com:8443/artifactory/sbx-generic-prod-westford/main/production/lastSuccessfulBuild/ | grep qcow2 | awk -F'"' '{ print $2 }')
+                                        if [ "x$qcowImageName" == "x" ]; then
+                                                echo "`date` :  Not able to get the qcow2 image details"
+                                                exit 1
+                                        fi
+                                        #md5sum_arti=$(curl -k -s -I https://artifact1.eng.sonusnet.com:8443/artifactory/sbx-generic-prod-westford/main/production/lastSuccessfulBuild/$qcowImageName | grep X-Checksum-Md5: | awk '{print $2}')
+										 #md5sum_arti=$(curl -k -s -I https://artifact2.eng.sonusnet.com:8443/artifactory/sbx-generic-prod-westford/v08_01_0x/production/lastSuccessfulBuild/$qcowImageName | grep X-Checksum-Md5: | awk '{print $2}')
+                                        #md5sum_arti=$(echo $md5sum_arti | tr -d '\r')
+                                        curl -k -o $qcowImageName https://artifact2.eng.sonusnet.com/artifactory/sbx-generic-prod-westford/main/production/lastSuccessfulBuild/$qcowImageName
+                                        #curl -k -o $qcowImageName https://artifact2.eng.sonusnet.com:8443/artifactory/sbx-generic-prod-westford/v08_01_0x/production/lastSuccessfulBuild/$qcowImageName
+                                        #md5sum_server=$(md5sum $qcowImageName | awk '{print $1}')
+                                        #if [ "$md5sum_arti" = "$md5sum_server" ]; then
+                                        #      echo "md5sum matches"
+                                        #else
+                                        #        echo "md5sum doesn't match...exiting"
+                                        #        exit 1
+                                        #fi
+                                        #qcowImageName="sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2"
+                                        #export VARIANT=$(echo $qcowImageName | awk -F'_' '{print $3}')
+                                        #export TESTED_RELEASE=$(echo $RELEASE | cut -c 1-9)
+                                        #export BUILD=$(echo "${RELEASE: -4}")
+                                        #export BUILD_VERSION=$TESTED_RELEASE$BUILD
+                                        #cp -f ../testsuiteList.pl ../testsuiteList_JenUpdated.pl
+                                        #sed -i -e "s/<REPLACE_WITH_QCOW2>/$qcowImageName/g" ../testsuiteList_JenUpdated.pl
+                                        #sed -i -e "s/<REPLACE_USER>/jenkinsbuild/g" ../testsuiteList_JenUpdated.pl
+                                        #sed -i -e "s/<REPLACE_WITH_TESTED_RELEASE>/$TESTED_RELEASE/g" ../testsuiteList_JenUpdated.pl
+                                        #sed -i -e "s/SBX_V08.01.00R000/$BUILD_VERSION/g" ../testsuiteList_JenUpdated.pl
+                                        qcow1=$qcowImageName
+                                        qcowImageName=$(echo $qcowImageName | sed 's/.qcow2//g')
+                                        qcowImageName="jenkinsbuild-$qcowImageName"
+                                        echo $qcowImageName
+										
+										source "$HOME/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible_dsbc/roles/queensrc.sh"
+										#for image in $( openstack image list  -c ID -f value --property jenkins=jenkins_sbc_$JOB_BASE_NAME )
+                                        #do
+										#image_id=${image%% *}
+                                        #openstack image delete $image_id
+                                        #done
+                                        
+                                        # Upload latest image
+                                        openstack --insecure image show "$qcowImageName" && echo "Image exists - skipping upload" || openstack --insecure  image create  --public --file "$qcow1" --disk-format qcow2 --tag jenkins --property jenkins=jenkins "$qcowImageName"
+                                        if [ $? -ne 0 ]; then
+                                                exit 1
+                                        fi
+						
+                                        println "Running tests"
+                                        cd $HOME/ats_repos/lib/perl/QATEST/SBX5000/V09_00_00/ansible_dsbc/roles/LSWU3/vars/
+										cp -f main.yml main_Jenkins.yml
+										sed -i -e "s/TARGET_BUILD/$qcowImageName/g" main_Jenkins.yml
+										
+										cd ../../
+										ansible-playbook -i inventory-dsbc LSWU3.yml 
+										
+                                        #cd $HOME/ats_user/logs/SBX5000_DSBC/$(echo $TESTED_RELEASE)/$(echo $BUILD_VERSION)/DSBC_SANITY/
+                                        #cp $(ls -t *jenkins.xml | head -1) $WORKSPACE/
+                                        #Delete all logs except latest 5.
+                                        #cd $HOME/ats_user/logs/SBX5000_DSBC/$(echo $TESTED_RELEASE)/$(echo $BUILD_VERSION)/DSBC_SANITY/
+                                        #tail -n +4 | xargs rm -rf
+                                        '''
+                                }
+
+                        }
+                }
+         }
+}
+

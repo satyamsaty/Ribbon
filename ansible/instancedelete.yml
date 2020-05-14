@@ -1,0 +1,11 @@
+---
+- name: delete instance
+  hosts: localhost
+  gather_facts: true
+  ignore_errors: false
+  tasks:
+     - name: delete instance
+       os_server:
+        name: vm1
+        validate_certs: false
+        state: absent

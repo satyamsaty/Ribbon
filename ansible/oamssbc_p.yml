@@ -1,0 +1,20 @@
+---
+- name: create stack
+  hosts: localhost
+  ignore_errors: True
+  tasks:
+  - name: ISBC
+    os_stack:
+       name: "{{ item.name }}"
+       tag: stack
+       state: present
+       validate_certs: false
+       template: "{{ item.template }}"
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+    with_items:
+       - { name: oam_ss, template: oam1_template.yml }
+#       - { name: ISBC_standby, template: Test_standby_ISBC_SRIOV_1.yaml }
+    

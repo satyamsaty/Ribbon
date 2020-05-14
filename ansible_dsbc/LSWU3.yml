@@ -1,0 +1,482 @@
+---
+- name: 
+  ignore_errors: True
+  gather_facts: False
+  hosts: localhost
+  tasks:
+    - name:
+      include_vars:
+        file: LSWU3/vars/main.yml
+      no_log: True
+
+- name:
+  ignore_errors: True
+  gather_facts: False
+  hosts: bats2
+  tasks:
+    - name:
+      include_vars:
+        file: LSWU3/vars/main.yml
+      no_log: True
+
+- name: SPAWNING OAM INSTANCES
+  gather_facts: False
+  ignore_errors: True
+  hosts: localhost
+  tasks:
+    - name:
+      include_tasks: LSWU3/tasks/oam.yml
+
+
+
+#- name: CHECKING INVENTORY
+#  gather_facts: True
+#  ignore_errors: True
+#  hosts: OAM_ACTIVE_SSBC
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_inventory.yml
+
+
+#- name: CHECKING INVENTORY
+#  gather_facts: True
+#  ignore_errors: True
+#  hosts: OAM_STANDBY_SSBC
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_inventory.yml
+#
+
+
+#- name: SPAWNING SSBC Instances
+#  gather_facts: False
+#  ignore_errors: True
+#  hosts: localhost
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/ssbc.yml
+
+
+
+#- name: SPAWNING MSBC Instances
+#  gather_facts: False
+#  ignore_errors: True
+#  hosts: localhost
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/msbc.yml
+#
+#
+#
+#- name: SPAWNING TSBC Instances
+#  gather_facts: False
+#  ignore_errors: True
+#  hosts: localhost
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/tsbc.yml
+#
+
+
+
+#- name: CHECKING SYNC STATUS OF ACTIVE INSTANCE
+#  gather_facts: True
+#  ignore_errors: True
+#  hosts: bats2
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/active_swinfo.yml
+
+
+#- name: SPAWNING STANDBY INSTANCE
+#  gather_facts: True
+#  ignore_errors: True
+#  hosts: localhost
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/standby.yml
+
+#- name: CHECKING SYNC STATUS OF STANDBY INSTANCE
+#  gather_facts: False
+#  ignore_errors: True
+#  hosts: bats2
+#  tasks:
+#    - name:     
+#      include_tasks: LSWU3/tasks/standy_swinfo.yml
+#
+#- name: CHECKING SYNC STATUS AFTER BOTH INSTANCES ARE LAUNCHED
+#  gather_facts: False
+#  ignore_errors: True
+#  hosts: bats2
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/active_standby_sync.yml
+#
+#
+#
+#
+#- name:
+#  hosts: bats2
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: ADD LICENSE IN BOTH ACTIVE AND STANDBY AS IT IS DISTRIBUTED
+#      include_tasks: LSWU3/tasks/license.yml
+#
+#
+#- name:
+#  hosts: active
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: ADD CONFIGURATION IN BOTH ACTIVE AND STANDBY 
+#      include_tasks: LSWU3/tasks/active_standby_configuration.yml
+#
+#- name:
+#  hosts: localhost
+#  gather_facts: True
+#  ignore_errors: True
+#  tasks:
+#    - name: INCLUDING CALL SCRIPT
+#      include_tasks: LSWU3/tasks/call_script.yml
+#
+#- name: 
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_rollover.yml
+
+
+#- name: 
+#  hosts: standby
+#  ignore_errors: True
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_rollover.yml
+#
+#
+#
+#
+#
+#
+#- name: 
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name: KILLING CHM PROCESS ON ACTIVE BOX
+#      include_tasks: LSWU3/tasks/switchover_processkill.yml
+#
+#- name: 
+#  hosts: bats2
+#  ignore_errors: True
+#  tasks:
+#    - name: CHECKING SYNC STATUS AFTER KILLING CHM PROCESS ON ACTIVE BOX
+#      include_tasks: LSWU3/tasks/active_standby_sync_after_rebuild.yml
+#
+#
+#- name: 
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks: 
+#    - name: CALCULATING BOX SWITCHOVER TIME  
+#      include_tasks: LSWU3/tasks/test_system_switchover.yml
+#
+#
+#- name:
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_rollover.yml
+#
+#
+#- name:
+#  hosts: standby
+#  ignore_errors: True
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_rollover.yml
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#- name: 
+#  hosts: standby
+#  ignore_errors: True
+#  tasks: 
+#    - name: KILLING CHM PROCESS AND PERFORMING SWITCHBACK 
+#      include_tasks: LSWU3/tasks/switchback_processkill.yml
+#
+#
+#- name:
+#  hosts: bats2
+#  ignore_errors: True
+#  tasks:
+#    - name: CHECKING SYNC STATUS AFTER SWITCHBACK
+#      include_tasks: LSWU3/tasks/active_standby_sync.yml
+#
+#
+#- name: 
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks:
+#    - name: CALCULATING SWITCHBACK TIME
+#      include_tasks: LSWU3/tasks/test_system_switchback.yml
+#
+#
+#
+#
+#- name: rolling over oam logs
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_rollover.yml
+#
+#
+#
+#
+#
+#
+#
+#- name: 
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name: PORT SWITCHOVER AND CALL CHECK
+#      include_tasks: LSWU3/tasks/switchover_port.yml
+#
+#- name: 
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks: 
+#    - name: CALCULATING PORT SWITCHOVER TIME 
+#      include_tasks: LSWU3/tasks/test_port_switchover.yml
+#
+#
+#- name: 
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_rollover.yml
+#
+#
+#
+#- name: 
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name: PORT SWITCHBACK AND CHECKING CALL
+#      include_tasks: LSWU3/tasks/switchback_port.yml
+#
+#
+#
+#- name: 
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks:
+#    - name: CALCULATING PORT SWITCHBACK TIME
+#      include_tasks: LSWU3/tasks/test_port_switchover.yml
+#
+#
+#
+#
+#- name: 
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks:
+#    - name: REBUILDING STANDBY
+#      include_tasks: LSWU3/tasks/rebuild_standby.yml
+#
+#
+#- name:
+#  hosts: bats2
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: check sync status after standby got rebuilded
+#      include_tasks: LSWU3/tasks/active_standby_sync.yml
+#
+#- name:
+#  hosts: bats2
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: LICENSE PUSH AFTER REBUILDING STANDBY AS IT IS ISBC DISTRIBUTED 
+#      include_tasks: LSWU3/tasks/license_push_after_standby_rebuild.yml
+#
+#
+#- name:
+#  hosts: standby
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: ADD CONFIGURATION AND CHECK CALL AFTER REBUILDING STANDBY
+#      include_tasks: LSWU3/tasks/configuration_push_after_standby_rebuild.yml
+#
+#- name: 
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks:
+#    - name: REBUILDING ACTIVE
+#      include_tasks: LSWU3/tasks/rebuild_active.yml
+#
+#
+#- name:
+#  hosts: bats2
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: CHECKING SYNC STATUS AFTER REBUILDING ACTIVE 
+#      include_tasks: LSWU3/tasks/active_standby_sync_after_rebuild.yml
+#
+#- name:
+#  hosts: bats2
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: LICENSE PUSH AFTER ACTIVE GOT REBUILDED
+#      include_tasks: LSWU3/tasks/license_push_after_active_rebuild.yml
+#
+#
+#- name:
+#  hosts: active
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: ADD CONFIGURATION IN REBUILDED ACTIVE AND CALL CHECK 
+#      include_tasks: LSWU3/tasks/configuration_push_after_active_rebuild.yml
+#
+#- name:
+#  hosts: standby
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: PERFORM SWITCHOVER AFTER REBUILDING BOTH INSTANCES
+#      include_tasks: LSWU3/tasks/switchover.yml
+#
+#
+#- name:
+#  hosts: bats2
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: CHECKING SYNC STATUS AFTER PERFORMING SWITCHOVER
+#      include_tasks: LSWU3/tasks/active_standby_sync.yml
+#
+#- name:
+#  hosts: standby
+#  gather_facts: False
+#  ignore_errors: True
+#  tasks:
+#    - name: CHECK CALL AFTER SWITCHOVER 
+#      include_tasks: LSWU3/tasks/call_count.yml
+#
+#
+#- name: 
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name: KILLING CHM PROCESS ON REBUILDED ACTIVE INSTANCE
+#      include_tasks: LSWU3/tasks/switchover_processkill.yml
+#
+#- name:
+#  hosts: bats2
+#  ignore_errors: True
+#  tasks:
+#    - name: SYNC STATUS AFTER KILLING CHM PROCESS ON REBUILDED ACTIVE INSTANCE
+#      include_tasks: LSWU3/tasks/active_standby_sync_after_rebuild.yml
+#
+#
+#- name: 
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks:
+#    - name: BOX SWITCHOVER TIME 
+#      include_tasks: LSWU3/tasks/test_system_switchover.yml
+#
+#
+#
+#- name: 
+#  hosts: standby
+#  ignore_errors: True
+#  tasks:
+#    - name: KILLING CHM PROCESS ON CURRENT ACTIVE ON REBUILDED INSTANCE 
+#      include_tasks: LSWU3/tasks/switchback_processkill.yml
+#
+#
+#- name:
+#  hosts: bats2
+#  ignore_errors: True
+#  tasks:
+#    - name: SYNC STATUS AFTER SWITCHBACK 
+#      include_tasks: LSWU3/tasks/active_standby_sync.yml
+#
+#
+#- name:
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks:
+#    - name: CALCULATING SWITCHBACK TIME
+#      include_tasks: LSWU3/tasks/test_system_switchback.yml
+#
+#
+#
+#
+#- name: rolling over oam logs
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name:
+#      include_tasks: LSWU3/tasks/oam_rollover.yml
+#
+#
+#
+#
+#- name: 
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name: PORT SWITCHOVER AND CHECK CALL
+#      include_tasks: LSWU3/tasks/switchover_port.yml
+#
+#- name: 
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks:
+#    - name: CALCULATING PORT SWITCHOVER TIME
+#      include_tasks: LSWU3/tasks/test_port_switchover.yml
+#
+#
+#- name:
+#  hosts: active
+#  ignore_errors: True
+#  tasks:
+#    - name: PORT SWITCHOVER AND CHECK CALL
+#      include_tasks: LSWU3/tasks/switchback_port.yml
+#
+#- name:
+#  hosts: localhost
+#  ignore_errors: True
+#  tasks:
+#    - name: CALCULATING PORT SWITCHOVER TIME
+#      include_tasks: LSWU3/tasks/test_port_switchover.yml
+#
+#
+#
+#
+#- name: 
+#  hosts: bats2
+#  ignore_errors: True
+#  tasks:
+#    - name: FINALLY KILL UAS AND UAC PROCESS IF WANT TO STOP CALL 
+#      include_tasks: LSWU3/tasks/call_processkill.yml
+#

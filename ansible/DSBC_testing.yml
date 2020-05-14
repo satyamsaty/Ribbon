@@ -1,0 +1,80 @@
+---
+- name: create stack
+  hosts: localhost
+  ignore_errors: True
+  tasks:
+  - name: DSBC
+    os_stack:
+       name: SSBC 
+       tag: stack
+       state: present
+       validate_certs: false
+       template: Test_ssbc.yml
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+  - name: Waiting for Mgmt IP to comeup
+    wait_for: timeout=320
+  - name: Checking the Mgmt IP is pingable or not
+    shell: ping -c2 10.34.224.120
+    register: p
+  - debug: var=p.stdout_lines
+  - name: To do SSH, login as a root,check the SBC service and node is running in active or standby role
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.120 "egrep 'SBC service is now running|Node is running in ' /var/log/sonus/lca/lca.log"
+    register: q
+  - debug: var=q.stdout_lines
+  - name: To check installed software version
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.120 "sh /opt/sonus/sbx/scripts/swinfo.sh"
+    register: r
+  - debug: var=r.stdout_lines
+  - name: SSBC is completed successfully , now spwanning MSBC 
+    os_stack:
+       name: MSBC
+       tag: stack
+       state: present
+       validate_certs: false
+       template: Test_msbc.yml
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+  - name: Waiting for Mgmt IP to comeup
+    wait_for: timeout=320
+  - name: Checking the Mgmt IP is pingable or not
+    shell: ping -c2 10.34.224.121
+    register: s
+  - debug: var=s.stdout_lines
+  - name: To do SSH, login as a root,check the SBC service and node is running in active or standby role
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.121 "egrep 'SBC service is now running|Node is running in ' /var/log/sonus/lca/lca.log"
+    register: t
+  - debug: var=t.stdout_lines
+  - name: To check installed software version
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.121 "sh /opt/sonus/sbx/scripts/swinfo.sh"
+    register: u
+  - debug: var=u.stdout_lines
+  - name: MSBC and SSBC is completed successfully , now deploying TSBC
+    os_stack:
+       name: TSBC
+       tag: stack
+       state: present
+       validate_certs: false
+       template: Test_tsbc.yml
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+  - name: Waiting for Mgmt IP to comeup
+    wait_for: timeout=320
+  - name: Checking the Mgmt IP is pingable or not
+    shell: ping -c2 10.34.224.122
+    register: v
+  - debug: var=v.stdout_lines
+  - name: To do SSH, login as a root,check the SBC service and node is running in active or standby role
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.122 "egrep 'SBC service is now running|Node is running in ' /var/log/sonus/lca/lca.log"
+    register: w
+  - debug: var=w.stdout_lines
+  - name: To check installed software version
+    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i /home/ansible/cloud_ats.key root@10.34.224.122 "sh /opt/sonus/sbx/scripts/swinfo.sh"
+    register: x
+  - debug: var=x.stdout_lines

@@ -1,0 +1,66 @@
+  - name:
+    command: "echo {{ item.mgt0ipaddress }}"
+    register: result
+    loop: "{{ ssbc_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+    no_log: True
+
+
+  - name:
+    command: "echo {{ item.mgt0ipaddress }}"
+    register: result_m
+    loop: "{{ msbc_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+    no_log: True
+
+
+
+  - name:
+    command: "echo {{ item.mgt0ipaddress }}"
+    register: result_t
+    loop: "{{ tsbc_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+    no_log: True
+
+
+
+
+
+#  - name:
+#    command: "echo {{ item.mgt0ipaddress_standby }}"
+#    register: result
+#    loop: "{{ oam_nodes }}"
+#    loop_control:
+#       label: "{{ item.mgt0ipaddress_standby }}"
+##  - debug:
+##      var: result.results[2].stdout
+#    no_log: True
+#
+#
+#
+#  - name:
+#    command: "echo {{ item.name }}-1"
+#    register: active
+#    loop: "{{ oam_nodes }}"
+#    loop_control:
+#       label: "{{ item.name }}"
+##  - debug:
+##      var: active.results[0].stdout
+#    no_log: True
+#
+#
+#
+#  - name:
+#    command: "echo {{ item.name }}-2"
+#    register: stanbdy
+#    loop: "{{ oam_nodes }}"
+#    loop_control:
+#       label: "{{ item.name }}"
+##  - debug:
+##      var: standby.results[2].stdout
+#    no_log: True
+#
+#

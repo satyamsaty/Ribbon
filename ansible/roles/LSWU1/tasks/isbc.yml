@@ -1,0 +1,228 @@
+---
+#  - name: Install dependent packages before running playbook
+#    pip:
+#     name: shade==1.32.0
+#     state: forcereinstall
+
+  - name: Spawning the instances
+    register: stack_create
+    os_stack:
+       name: "{{ item.name }}"
+       tag: "{{ item.name }}"  
+       state: "{{ item.present_or_absent }}"
+       validate_certs: false
+       template: "{{ item.template }}"
+       parameters:
+           flavor: "{{ item.flavor }}"
+           image: "{{ item.base_build }}"
+           security_group: "{{ item.security_group }}"
+           mgt0IPAddress: "{{ item.mgt0ipaddress }}"
+           sbc_ceRole: "{{ item.role }}"
+    #loop: "{{ groups['isbc'] }}"
+    loop: "{{ isbc_distributed_nodes }}"
+    #when: item.mgt0ipaddress == 'ISBC_DISTRIBUTED_STANDBY'
+    loop_control:
+       pause: 20
+    fail: 
+     msg: "Instances didnot come up"
+    when: results is failed 
+       
+  - name: Wait until the  instance pings
+    wait_for:
+       host: "{{ item.mgt0ipaddress }}"
+       port: 2024
+       delay: 60
+       timeout: 120
+       state: started
+       msg: "  Instance waiting to ping "
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+
+#  - name: Wait 300 seconds for port 2024 to become open and contain "OpenSSH"
+#    wait_for:
+#      port: 2024
+#      host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+#      search_regex: OpenSSH
+#      delay: 10
+#    vars:
+#      ansible_connection: local
+
+  - name: Add instances to inventory
+    add_host:
+      name: "{{ item.name }}"
+      groups: "isbc"
+      ansible_host: "{{ item.mgt0ipaddress }}"
+    loop: "{{ isbc_distributed_nodes }}"
+
+#  - name: add instances to inventory
+#    add_host:
+#      name: "{{ item.role }}-1"
+#      groups: "isbc"
+#      ansible_host: "{{ item.mgt0ipaddress }}"
+#    loop: "{{ isbc_distributed_nodes }}"
+
+    
+  
+
+       
+  - name: Checking the Management IP  is pingable or not
+    shell: ping -c2 {{ item.mgt0ipaddress }}
+    register: a
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ a.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+ 
+  - name: 
+    wait_for:
+      timeout: 30
+ 
+##  - name: checking if any core file generated, fails task if generated .
+##    shell: 
+##      "ls -alrt | grep -w core|wc -l"
+##    args:
+##     chdir: /var/log/sonus/sbx/coredump/
+##    delegate_to: active-1
+##    register: b
+##    failed_when: '"0" not in b.stdout'
+##  - debug: var=b.stdout_lines
+#
+#
+#
+#
+  - name: Checking if any core file generated, fails task if generated 
+    shell:
+      "ls -alrt | grep -w core|wc -l"
+    args:
+     chdir: /var/log/sonus/sbx/coredump/
+    delegate_to: "{{item}}"
+
+    loop: "{{groups['isbc']}}"
+
+
+    register: b
+    failed_when: '"0" not in b.stdout'
+
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ b.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+
+
+
+
+  - block:
+      - name: Moving the file timeout1.sh from localhost to both nodes
+ 
+        copy:
+          src: "{{ TimeOutScript_Path }}"
+          dest: /root/
+          mode: '0777'
+          force: yes
+        delegate_to: "{{item}}"
+ 
+        loop: "{{groups['isbc']}}"
+        loop_control:
+            label: "{{ item }}"
+
+
+
+
+
+      - name: Waiting for service to become available
+        shell: sh  timeout1.sh
+        args:
+         chdir: /root/
+ 
+        delegate_to: "{{item}}"
+        loop: "{{groups['isbc']}}"
+        loop_control:
+          label: "{{ item }}"
+
+        register: command_result
+        failed_when: command_result.rc not in (0,255)
+        when: a is succeeded
+    rescue:
+      - name: Instances  didnot come up.
+        debug: msg="There was an error in the block."
+
+   
+
+
+  - name: Checking sync status
+    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/syncStatus/ | grep status
+    register: b
+    loop: "{{ isbc_distributed_nodes }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ b.results }}"
+    loop_control:
+      label: "{{ item.stdout_lines }}"
+
+#
+#    
+#
+#
+#
+##  - name: checking sync status
+##    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_STANDBY}}/api/operational/system/syncStatus/ | grep status
+##    register: c
+##  - debug: var=c.stdout_lines
+#
+#
+#
+#  
+#
+##  - block:
+##      - name: Moving the files from localhost to active node
+##        become: True
+##        copy:
+##          src: /home/ansible/timeout1.sh
+##          dest: /root/
+##          mode: '0777'
+##          force: yes
+##        delegate_to: active-1
+##
+##
+##
+##      - name: waiting for service to become available for active node
+##        shell: sh  timeout1.sh
+##        args:
+##         chdir: /root/
+##        delegate_to: active-1
+##        register: command_result
+##        failed_when: command_result.rc not in (0,255)
+##        when: a is succeeded
+##    rescue:
+##      - name: Active Instance didnot come up.
+##        debug: msg="There was an error in the block."
+##  
+##  - name: system_coredumplist
+##    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/system/coredumpSummary/vsbc1|grep -w "coredumpAndTraceCount"
+##    register: b
+##    delegate_to: bats14
+##  - debug: var=b.stdout_lines
+##  - name: To check installed software version
+##    shell:
+##          "/opt/sonus/sbx/scripts/swinfo.sh"
+##    delegate_to: active-1
+##    register: b
+##  - debug: var=b.stdout_lines
+##
+##  - name: checking sync status
+##    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/system/syncStatus/ | grep status
+##    register: b
+##  - debug: var=b.stdout_lines
+##
+#
+#
+# 

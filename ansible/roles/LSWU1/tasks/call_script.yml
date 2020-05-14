@@ -1,0 +1,85 @@
+---
+#  - name: Running the call(uas)
+#    shell: ssh -p 22 -o  "stricthostkeychecking no" satykumar@10.54.81.66 "/ats/bin/sipp -sn uas -i 10.54.81.66 -p 14088 -m 50 -bg"
+#    delegate_to: localhost
+#    register: command_result
+#    failed_when: command_result.rc not in (0,99)
+#  - name: Running the call(uac)
+#    shell: ssh -p 22 -o  "stricthostkeychecking no" satykumar@10.54.81.66 "/ats/bin/sipp -sn uac -i 10.54.81.66 -p 14333 {{ pkt0IPAddress_ACTIVE }} -s 9966896446 -m 50 -d 120m -r 1 -rp 1000 -bg "
+#    delegate_to: localhost
+#    register: command_result
+#    failed_when: command_result.rc not in (0,99)
+#  - name: wait for 1 minute
+#    wait_for:
+#       timeout: 60 
+
+
+  - name: Running the call(uas)
+    shell: " {{ uas_script }} -bg "
+#    delegate_to: bats14
+#    args:
+#      chdir: /home/satykumar/
+#      executable: /bin/bash 
+    register: command_result
+  
+    failed_when: command_result.rc not in (0,99)
+  - debug: var=command_result.stdout_lines
+  - name: Running the call(uac)
+    shell: " {{ uac_script }} -bg "
+#    delegate_to: bats14
+    #args:
+    #  chdir: /home/satykumar/
+    #  executable: /bin/bash
+    register: result
+    
+    failed_when: command_result.rc not in (0,99) 
+  - debug: var=result.stdout_lines
+#  - name: Moving the files from localhost to active node
+##    become: True
+#    copy:
+#      src: 
+#      dest: /root/call.sh
+#      mode: '0777'
+#    delegate_to: active-1
+#  - name: To check call count status
+#    become: True
+#    shell: expect /root/call.sh
+#    delegate_to: active-1
+#    register: b
+#  - debug: var=b.stdout_lines
+#  - name: Moving the files from localhost to active node
+#    copy:
+#      src: /home/ansible/call.txt
+#      dest: /root/call.txt
+#      mode: '0777'
+#      force: yes
+#    delegate_to: active-1
+#  - name: checking call
+#    shell: cat /root/call.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    delegate_to: active-1
+#    register: b
+#  - debug: var=b.stdout_lines
+  - name: wait for call to get completed
+    wait_for:
+      timeout: 60
+
+  - name: checking call count status
+    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/global/callCountStatus | grep -wE '(activeCalls|stableCalls)'
+    loop: "{{ isbc_distributed_nodes }}"
+    when: item.role == 'ACTIVE'
+#    delegate_to: localhost
+    register: b
+  - debug:
+      msg: "{{ item }}"
+    loop: "{{ b.results }}"
+#    delegate_to: localhost
+#    loop_control:
+#      label: "{{ item.stdout_lines }}"
+
+#  - debug: var=b.stdout_lines
+     
+
+
+  
+
+

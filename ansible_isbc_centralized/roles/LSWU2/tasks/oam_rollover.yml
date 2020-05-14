@@ -1,0 +1,46 @@
+---
+
+
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_centralized_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+
+  - name: Moving oamrollover.sh from localhost to both nodes
+    copy:
+      src: "{{ RollOver_Path }}"
+      dest: /root/
+      mode: '0777'
+      force: yes
+    delegate_to: "{{ res.results[0].stdout }}"
+
+ #   loop: "{{groups['isbc']}}"
+ #   loop_control:
+ #         label: "{{ item }}"
+
+  - name: Rolling OAM log on active box
+  #  become: True
+    shell: "expect oamrollover.sh"
+    args:
+      chdir: /root/
+    delegate_to: "{{ res.results[0].stdout }}"
+#    loop: "{{groups['isbc']}}"
+#    loop_control:
+#        label: "{{ item }}"
+
+    register: f
+  - debug:
+      var: f.stdout_lines
+#    loop: "{{ f.results }}"
+#    loop_control:
+#       label: "{{ item.stdout_lines }}"
+    no_log: True
+    
+
+#  - debug: var=f.stdout_lines
+

@@ -1,0 +1,62 @@
+---
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+#    register: b
+#    failed_when: b.rc not in (0,255)
+##  - name: 
+# #   shell: scp -o  "stricthostkeychecking no" -i /home/ansible/cloud_ats.key -P 2024 /home/ansible/port_switchover.sh root@{{ mgt0IPAddress_ACTIVE }}:/root
+# #   delegate_to: localhost
+#  - name: Moving the files from localhost to active node
+#    copy:
+#      src: /home/ansible/port_switchback.sh
+#      dest: /root/
+#      mode: '0777'
+#      force: yes
+#
+#  - name: Packet Port switchover and port switchback 
+#    shell: "expect /root/port_switchback.sh"
+#    register: f
+#  - debug: var=f.stdout_lines
+#
+#  - name: 
+#    copy:
+#      src: /home/ansible/call.txt
+#      dest: /root/call.txt
+#      mode: '0777'
+#      force: yes
+#
+#
+#
+#  - name: checking call
+#    shell: cat /root/call.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    register: b
+#  - debug: var=b.stdout_lines
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+
+  - name: Moving the files from localhost to active node
+    copy:
+      src: "{{ PortSwitchback_Path }}"
+#      src: port_switchback.sh 
+      dest: /root/
+      mode: '0777'
+      force: yes
+    delegate_to: "{{ res.results[0].stdout }}"
+
+  - name: Packet Port switchback
+    shell: "expect /root/port_switchback.sh"
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: f
+  - debug: var=f.stdout_lines
+
+
+
+  
+

@@ -1,0 +1,16 @@
+  - name: Adding SSBC  instances to ssbc group.
+    add_host:
+      name: "{{ item.name }}"
+      groups: "ssbc"
+      ansible_host: "{{ item.mgt0ipaddress }}"
+    loop: "{{ ssbc_nodes }}"
+#    register: inventory_ssbc
+#  - debug: 
+#      var: inventory_ssbc
+
+
+#  - name: inventory_hostname for group oam-1
+#    debug:
+#      msg: "{{ item }}"
+#    loop: "{{ groups['ssbc'] }}"
+

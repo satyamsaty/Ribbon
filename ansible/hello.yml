@@ -1,0 +1,9 @@
+---
+- name: print to stdout
+  hosts: localhost
+  command: echo "hello"
+  register: hello
+
+- debug: msg="{{ hello.stdout }}"
+
+- debug: msg="{{ hello.stderr }}"

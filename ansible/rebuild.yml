@@ -1,0 +1,14 @@
+---
+- name: create stack
+  hosts: localhost
+  gather_facts: true
+  ignore_errors: false
+  tasks:
+  - name: Rebuild the standby node
+    os_stack:
+        action: rebuild
+        server: ISBC_test_new
+        verify: no
+        image: sbc-V08.02__5717
+        timeout: 200
+

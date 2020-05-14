@@ -1,0 +1,21 @@
+---
+- name: create stack
+  hosts: localhost
+  ignore_errors: True
+  tasks:
+  - name: ISBC
+    os_stack:
+       name: "{{ item.name }}"
+       tag: stack
+       state: present
+       validate_certs: false
+       template: "{{ item.template }}"
+       parameters:
+           flavor: OAM-RAKUTEN
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+    with_items:
+       - { name: msbco_active1, template: msbco_active1.yml }
+#       - { name: msbco_active2, template: msbco_active2.yml }
+       - { name: msbco_standby, template: msbco_standby.yml }
+    

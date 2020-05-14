@@ -1,0 +1,27 @@
+---
+- name: create stack
+  hosts: localhost
+  ignore_errors: True
+#  register: stack_create
+  tasks:
+  - name: ISBC
+    os_stack:
+       name: ISBC_mukul
+       tag: stack
+       state: present
+       validate_certs: false
+       template: "Test1_ISBC_SRIOV.yaml"
+       parameters:
+           flavor: ISBC4VCPU
+           image: cSBC_V08.00.00R000
+           security_group: SONUS
+
+#        bmc_flavor: m1.medium
+#        bmc_image: CentOS
+#        key_name: default
+#        private_net: "{{ private_net_param }}"
+#        node_count: 2
+#        name: undercloud
+#       image: CentOS
+#        my_flavor: m1.large
+#        external_net: "{{ external_net_param }}"

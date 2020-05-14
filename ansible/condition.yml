@@ -1,0 +1,13 @@
+---
+- name: checking condition and fail module
+  hosts: localhost
+  vars:
+    test1: 'SBC service is now running'
+  tasks:
+  - debug:
+      msg: "SBC service is now running"
+    when: test1=="SBC service is now running" or test1==a
+#    shell: echo "no. is not in list"
+#    register: a
+#  - debug: vars=a.stdout_lines
+

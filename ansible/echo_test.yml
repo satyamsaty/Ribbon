@@ -1,0 +1,17 @@
+---
+- name: Hello World!
+  hosts: localhost
+  become: yes
+  tasks:
+  - name: Hello World!
+    shell: "{{ item }}"
+    register: a
+  - debug: var=a.stdout_lines
+    with_items:
+      - echo "fine"
+      - echo "up"
+#  - debug:
+#       msg:
+#         - hostname is {{ hostnames }}
+#         - mountpoint is {{ mountpoint }}
+#        - Disk size to add {{ size }}

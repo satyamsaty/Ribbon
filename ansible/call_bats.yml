@@ -1,0 +1,11 @@
+---
+- name: create stack
+  hosts: localhost
+  gather_facts: true
+  ignore_errors: true
+  tasks:
+  - name: Running the call(uas)
+    shell: ssh -p 22 -o  "stricthostkeychecking no" satykumar@10.54.81.66 "/ats/bin/sipp -sn uas -i 10.54.81.66 -p 4086"
+  - name: Running the call(uac)
+    shell: ssh -p 22 -o  "stricthostkeychecking no" satykumar@10.54.81.66 "/ats/bin/sipp -sn uac -i 10.54.81.66 -p 5858 10.34.226.111 -s 9966896446 -m 1 -d 2000"
+

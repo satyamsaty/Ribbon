@@ -1,0 +1,17 @@
+---
+ 
+- name: Example playbook to find the details of folder related to virtual machine
+  hosts: localhost
+  tasks:
+    - name: Get folder path for virtual machine
+      vmware_guest_find:
+   
+	validate_certs: false
+	hostname: 127.0.0.1
+	username: administrator@vsphere.local
+	password: Sonus@1@#
+	name: SMSBC-1
+	datacenter: datacenter_01
+	register: folder_details
+    - debug: msg=”{{ folder_details }}”
+

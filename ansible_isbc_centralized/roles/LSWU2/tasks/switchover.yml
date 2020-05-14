@@ -1,0 +1,31 @@
+---
+
+  - include_tasks: inventory.yml
+  - include_tasks: delegate.yml
+
+
+  - name: Performing Server Switchover
+    ignore_errors: No
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+       expect ">"
+       send "request system admin vsbcSystem switchover\n"
+
+       expect ">"
+       send "yes\n"
+       expect ">"
+       send "\n"
+
+       exit 0
+    args:
+        executable: /usr/bin/expect
+    delegate_to: "{{ res.results[1].stdout }}"
+    register: switchover
+  - debug:
+        var: switchover.stdout_lines
+

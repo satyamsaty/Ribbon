@@ -1,0 +1,7 @@
+---
+# Main file which is calling all tasks .All tasks should be in the same directory .
+  - name: Authenticate to the cloud and retrieve the service catalog
+    ignore_errors: True
+    os_auth:
+      cloud: elt-ext
+      validate_certs: no

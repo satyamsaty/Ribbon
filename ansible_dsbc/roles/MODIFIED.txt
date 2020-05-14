@@ -1,0 +1,268 @@
+
+PLAY [localhost] ************************************************************************************************************************
+Thursday 02 April 2020  06:04:50 +0530 (0:00:00.042)       0:00:00.042 ******** 
+
+TASK [include_vars] *********************************************************************************************************************
+ok: [localhost]
+
+PLAY [localhost] ************************************************************************************************************************
+Thursday 02 April 2020  06:04:50 +0530 (0:00:00.066)       0:00:00.109 ******** 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/oam.yml for localhost
+Thursday 02 April 2020  06:04:50 +0530 (0:00:00.162)       0:00:00.272 ******** 
+
+TASK [Spawning 1:1 OAM instances for SSBC , MSBC and TSBC .] ****************************************************************************
+changed: [localhost] => (item=OAM_SSBC_ANSIBLE)
+changed: [localhost] => (item=OAM_MSBC_ANSIBLE)
+changed: [localhost] => (item=OAM_TSBC_ANSIBLE)
+Thursday 02 April 2020  06:07:00 +0530 (0:02:10.022)       0:02:10.295 ******** 
+Thursday 02 April 2020  06:07:00 +0530 (0:00:00.177)       0:02:10.472 ******** 
+
+TASK [Waiting  till the active OAM instances ping] **************************************************************************************
+ok: [localhost] => (item=10.34.194.65)
+ok: [localhost] => (item=10.34.194.61)
+ok: [localhost] => (item=10.34.194.23)
+Thursday 02 April 2020  06:10:01 +0530 (0:03:01.048)       0:05:11.520 ******** 
+
+TASK [Waiting till  the standby OAM   instances ping] ***********************************************************************************
+ok: [localhost] => (item=10.34.194.66)
+ok: [localhost] => (item=10.34.194.62)
+ok: [localhost] => (item=10.34.194.25)
+Thursday 02 April 2020  06:13:02 +0530 (0:03:00.983)       0:08:12.504 ******** 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/inventory_oam.yml for localhost
+Thursday 02 April 2020  06:13:02 +0530 (0:00:00.082)       0:08:12.587 ******** 
+
+TASK [Adding  active OAM instances to oam_1 group.] *************************************************************************************
+changed: [localhost] => (item=None)
+changed: [localhost] => (item=None)
+changed: [localhost] => (item=None)
+changed: [localhost]
+Thursday 02 April 2020  06:13:02 +0530 (0:00:00.128)       0:08:12.716 ******** 
+
+TASK [Adding standby OAM instances to oam_2 group.] *************************************************************************************
+changed: [localhost] => (item=None)
+changed: [localhost] => (item=None)
+changed: [localhost] => (item=None)
+changed: [localhost]
+Thursday 02 April 2020  06:13:03 +0530 (0:00:00.117)       0:08:12.833 ******** 
+
+TASK [Checking the Management  IP of Active OAM  instances  is pinging.] ****************************************************************
+changed: [localhost] => (item=10.34.194.65)
+changed: [localhost] => (item=10.34.194.61)
+changed: [localhost] => (item=10.34.194.23)
+Thursday 02 April 2020  06:13:07 +0530 (0:00:04.055)       0:08:16.889 ******** 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.194.65 (10.34.194.65) 56(84) bytes of data.', u'64 bytes from 10.34.194.65: icmp_seq=1 ttl=61 time=15.1 ms', u'64 bytes from 10.34.194.65: icmp_seq=2 ttl=61 time=18.6 ms', u'', u'--- 10.34.194.65 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 999ms', u'rtt min/avg/max/mdev = 15.160/16.896/18.632/1.736 ms']) => 
+  msg:
+  - PING 10.34.194.65 (10.34.194.65) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.65: icmp_seq=1 ttl=61 time=15.1 ms'
+  - '64 bytes from 10.34.194.65: icmp_seq=2 ttl=61 time=18.6 ms'
+  - ''
+  - '--- 10.34.194.65 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 999ms
+  - rtt min/avg/max/mdev = 15.160/16.896/18.632/1.736 ms
+ok: [localhost] => (item=[u'PING 10.34.194.61 (10.34.194.61) 56(84) bytes of data.', u'64 bytes from 10.34.194.61: icmp_seq=1 ttl=61 time=2.12 ms', u'64 bytes from 10.34.194.61: icmp_seq=2 ttl=61 time=5.07 ms', u'', u'--- 10.34.194.61 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1001ms', u'rtt min/avg/max/mdev = 2.127/3.603/5.079/1.476 ms']) => 
+  msg:
+  - PING 10.34.194.61 (10.34.194.61) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.61: icmp_seq=1 ttl=61 time=2.12 ms'
+  - '64 bytes from 10.34.194.61: icmp_seq=2 ttl=61 time=5.07 ms'
+  - ''
+  - '--- 10.34.194.61 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+  - rtt min/avg/max/mdev = 2.127/3.603/5.079/1.476 ms
+ok: [localhost] => (item=[u'PING 10.34.194.23 (10.34.194.23) 56(84) bytes of data.', u'64 bytes from 10.34.194.23: icmp_seq=1 ttl=61 time=1.57 ms', u'64 bytes from 10.34.194.23: icmp_seq=2 ttl=61 time=0.980 ms', u'', u'--- 10.34.194.23 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 0.980/1.276/1.572/0.296 ms']) => 
+  msg:
+  - PING 10.34.194.23 (10.34.194.23) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.23: icmp_seq=1 ttl=61 time=1.57 ms'
+  - '64 bytes from 10.34.194.23: icmp_seq=2 ttl=61 time=0.980 ms'
+  - ''
+  - '--- 10.34.194.23 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1000ms
+  - rtt min/avg/max/mdev = 0.980/1.276/1.572/0.296 ms
+Thursday 02 April 2020  06:13:07 +0530 (0:00:00.140)       0:08:17.029 ******** 
+
+TASK [Checking the Management  IP of Standby OAM  instances is pinging.] ****************************************************************
+changed: [localhost] => (item=10.34.194.66)
+changed: [localhost] => (item=10.34.194.62)
+changed: [localhost] => (item=10.34.194.25)
+Thursday 02 April 2020  06:13:11 +0530 (0:00:03.739)       0:08:20.769 ******** 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'PING 10.34.194.66 (10.34.194.66) 56(84) bytes of data.', u'64 bytes from 10.34.194.66: icmp_seq=1 ttl=61 time=3.32 ms', u'64 bytes from 10.34.194.66: icmp_seq=2 ttl=61 time=10.9 ms', u'', u'--- 10.34.194.66 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 999ms', u'rtt min/avg/max/mdev = 3.326/7.160/10.994/3.834 ms']) => 
+  msg:
+  - PING 10.34.194.66 (10.34.194.66) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.66: icmp_seq=1 ttl=61 time=3.32 ms'
+  - '64 bytes from 10.34.194.66: icmp_seq=2 ttl=61 time=10.9 ms'
+  - ''
+  - '--- 10.34.194.66 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 999ms
+  - rtt min/avg/max/mdev = 3.326/7.160/10.994/3.834 ms
+ok: [localhost] => (item=[u'PING 10.34.194.62 (10.34.194.62) 56(84) bytes of data.', u'64 bytes from 10.34.194.62: icmp_seq=1 ttl=61 time=21.2 ms', u'64 bytes from 10.34.194.62: icmp_seq=2 ttl=61 time=5.66 ms', u'', u'--- 10.34.194.62 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 999ms', u'rtt min/avg/max/mdev = 5.663/13.455/21.247/7.792 ms']) => 
+  msg:
+  - PING 10.34.194.62 (10.34.194.62) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.62: icmp_seq=1 ttl=61 time=21.2 ms'
+  - '64 bytes from 10.34.194.62: icmp_seq=2 ttl=61 time=5.66 ms'
+  - ''
+  - '--- 10.34.194.62 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 999ms
+  - rtt min/avg/max/mdev = 5.663/13.455/21.247/7.792 ms
+ok: [localhost] => (item=[u'PING 10.34.194.25 (10.34.194.25) 56(84) bytes of data.', u'64 bytes from 10.34.194.25: icmp_seq=1 ttl=61 time=6.11 ms', u'64 bytes from 10.34.194.25: icmp_seq=2 ttl=61 time=5.85 ms', u'', u'--- 10.34.194.25 ping statistics ---', u'2 packets transmitted, 2 received, 0% packet loss, time 1000ms', u'rtt min/avg/max/mdev = 5.858/5.988/6.119/0.151 ms']) => 
+  msg:
+  - PING 10.34.194.25 (10.34.194.25) 56(84) bytes of data.
+  - '64 bytes from 10.34.194.25: icmp_seq=1 ttl=61 time=6.11 ms'
+  - '64 bytes from 10.34.194.25: icmp_seq=2 ttl=61 time=5.85 ms'
+  - ''
+  - '--- 10.34.194.25 ping statistics ---'
+  - 2 packets transmitted, 2 received, 0% packet loss, time 1000ms
+  - rtt min/avg/max/mdev = 5.858/5.988/6.119/0.151 ms
+Thursday 02 April 2020  06:13:11 +0530 (0:00:00.169)       0:08:20.939 ******** 
+
+TASK [Checking if any core file generated on active OAM instances.] *********************************************************************
+changed: [localhost -> 10.34.194.65] => (item=OAM_SSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.61] => (item=OAM_MSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.23] => (item=OAM_TSBC_ANSIBLE-1)
+Thursday 02 April 2020  06:13:17 +0530 (0:00:05.981)       0:08:26.921 ******** 
+
+TASK [Number of core dump files for active OAM instances .See msg .] ********************************************************************
+ok: [localhost] => (item=0) => 
+  msg: OAM_SSBC_ANSIBLE-1 has 0 core files
+ok: [localhost] => (item=0) => 
+  msg: OAM_MSBC_ANSIBLE-1 has 0 core files
+ok: [localhost] => (item=0) => 
+  msg: OAM_TSBC_ANSIBLE-1 has 0 core files
+Thursday 02 April 2020  06:13:17 +0530 (0:00:00.100)       0:08:27.021 ******** 
+Thursday 02 April 2020  06:13:17 +0530 (0:00:00.117)       0:08:27.139 ******** 
+
+TASK [checking if any core file generated on standby OAM instances .] *******************************************************************
+changed: [localhost -> 10.34.194.66] => (item=OAM_SSBC_ANSIBLE-2)
+changed: [localhost -> 10.34.194.62] => (item=OAM_MSBC_ANSIBLE-2)
+changed: [localhost -> 10.34.194.25] => (item=OAM_TSBC_ANSIBLE-2)
+Thursday 02 April 2020  06:13:23 +0530 (0:00:05.834)       0:08:32.973 ******** 
+
+TASK [Number of core dump files for standby OAM instances .See msg .] *******************************************************************
+ok: [localhost] => (item=[u'0']) => 
+  msg: OAM_SSBC_ANSIBLE-2 has 0 core files
+ok: [localhost] => (item=[u'0']) => 
+  msg: OAM_MSBC_ANSIBLE-2 has 0 core files
+ok: [localhost] => (item=[u'0']) => 
+  msg: OAM_TSBC_ANSIBLE-2 has 0 core files
+Thursday 02 April 2020  06:13:23 +0530 (0:00:00.079)       0:08:33.053 ******** 
+Thursday 02 April 2020  06:13:23 +0530 (0:00:00.095)       0:08:33.148 ******** 
+
+TASK [Waiting for OAM application to come up for active instances.] *********************************************************************
+changed: [localhost -> 10.34.194.65] => (item=OAM_SSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.61] => (item=OAM_MSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.23] => (item=OAM_TSBC_ANSIBLE-1)
+Thursday 02 April 2020  06:13:24 +0530 (0:00:01.100)       0:08:34.249 ******** 
+Thursday 02 April 2020  06:13:24 +0530 (0:00:00.109)       0:08:34.358 ******** 
+
+TASK [Waiting for OAM application to come up for standby instances.] ********************************************************************
+changed: [localhost -> 10.34.194.65] => (item=OAM_SSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.61] => (item=OAM_MSBC_ANSIBLE-1)
+changed: [localhost -> 10.34.194.23] => (item=OAM_TSBC_ANSIBLE-1)
+Thursday 02 April 2020  06:13:25 +0530 (0:00:00.901)       0:08:35.260 ******** 
+Thursday 02 April 2020  06:13:25 +0530 (0:00:00.095)       0:08:35.356 ******** 
+
+TASK [wait_for] *************************************************************************************************************************
+ok: [localhost]
+Thursday 02 April 2020  06:14:25 +0530 (0:01:00.277)       0:09:35.634 ******** 
+
+TASK [checking sync status for active OAM instances.See msg.] ***************************************************************************
+changed: [localhost] => (item=10.34.194.65)
+changed: [localhost] => (item=10.34.194.61)
+changed: [localhost] => (item=10.34.194.23)
+Thursday 02 April 2020  06:14:31 +0530 (0:00:05.128)       0:09:40.762 ******** 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => (item=[u'    <status>syncCompleted</status>', u'    <status>syncCompleted</status>']) => 
+  msg:
+  - '    <status>syncCompleted</status>'
+  - '    <status>syncCompleted</status>'
+ok: [localhost] => (item=[u'    <status>syncCompleted</status>', u'    <status>syncCompleted</status>']) => 
+  msg:
+  - '    <status>syncCompleted</status>'
+  - '    <status>syncCompleted</status>'
+ok: [localhost] => (item=[u'    <status>unprotected</status>', u'    <status>unprotected</status>']) => 
+  msg:
+  - '    <status>unprotected</status>'
+  - '    <status>unprotected</status>'
+Thursday 02 April 2020  06:14:31 +0530 (0:00:00.082)       0:09:40.844 ******** 
+
+TASK [Services are not in sync for OAM instances] ***************************************************************************************
+failed: [localhost] (item=[u'    <status>unprotected</status>', u'    <status>unprotected</status>']) => changed=false 
+  ansible_loop_var: item
+  item:
+    ansible_loop_var: item
+    changed: true
+    cmd: curl -kisu 'admin:admin' -X GET https://10.34.194.23/api/operational/system/syncStatus/ | grep status
+    delta: '0:00:01.836006'
+    end: '2020-04-02 06:14:30.994616'
+    failed: false
+    invocation:
+      module_args:
+        _raw_params: curl -kisu 'admin:admin' -X GET https://10.34.194.23/api/operational/system/syncStatus/ | grep status
+        _uses_shell: true
+        argv: null
+        chdir: null
+        creates: null
+        executable: null
+        removes: null
+        stdin: null
+        stdin_add_newline: true
+        strip_empty_ends: true
+        warn: false
+    item:
+      OAM_UPGRADED_BUILD: sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2
+      base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+      flavor: ANSIBLE
+      mgt0ipaddress_active: 10.34.194.23
+      mgt0ipaddress_standby: 10.34.194.25
+      name: OAM_TSBC_ANSIBLE
+      present_or_absent: present
+      security_group: sbccoresvt-sg
+      template: OAM_TSBC_PROVIDER.yml
+    rc: 0
+    start: '2020-04-02 06:14:29.158610'
+    stderr: ''
+    stderr_lines: []
+    stdout: |2-
+          <status>unprotected</status>
+          <status>unprotected</status>
+    stdout_lines:
+    - '    <status>unprotected</status>'
+    - '    <status>unprotected</status>'
+  msg: 'services are not in sync for {''stderr_lines'': [], ''ansible_loop_var'': u''item'', u''end'': u''2020-04-02 06:14:30.994616'', ''failed'': False, u''stdout'': u''    <status>unprotected</status>\n    <status>unprotected</status>'', u''changed'': True, u''rc'': 0, ''item'': {u''name'': u''OAM_TSBC_ANSIBLE'', u''mgt0ipaddress_active'': u''10.34.194.23'', u''base_build'': u''sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2'', u''present_or_absent'': u''present'', u''template'': u''OAM_TSBC_PROVIDER.yml'', u''security_group'': u''sbccoresvt-sg'', u''flavor'': u''ANSIBLE'', u''mgt0ipaddress_standby'': u''10.34.194.25'', u''OAM_UPGRADED_BUILD'': u''sbc-V08.02.00R000-connexip-os_07.02.00-R000_4_amd64.qcow2''}, u''cmd'': u"curl -kisu ''admin:admin'' -X GET https://10.34.194.23/api/operational/system/syncStatus/ | grep status", u''stderr'': u'''', u''delta'': u''0:00:01.836006'', u''invocation'': {u''module_args'': {u''creates'': None, u''executable'': None, u''_uses_shell'': True,
+    u''strip_empty_ends'': True, u''_raw_params'': u"curl -kisu ''admin:admin'' -X GET https://10.34.194.23/api/operational/system/syncStatus/ | grep status", u''removes'': None, u''argv'': None, u''warn'': False, u''chdir'': None, u''stdin_add_newline'': True, u''stdin'': None}}, ''stdout_lines'': [u''    <status>unprotected</status>'', u''    <status>unprotected</status>''], u''start'': u''2020-04-02 06:14:29.158610''}'
+
+PLAY RECAP ******************************************************************************************************************************
+localhost                  : ok=21   changed=10   unreachable=0    failed=1    skipped=5    rescued=0    ignored=0   
+
+Thursday 02 April 2020  06:14:31 +0530 (0:00:00.108)       0:09:40.953 ******** 
+=============================================================================== 
+Waiting  till the active OAM instances ping ------------------------------------------------------------------------------------ 181.05s
+Waiting till  the standby OAM   instances ping --------------------------------------------------------------------------------- 180.98s
+Spawning 1:1 OAM instances for SSBC , MSBC and TSBC . -------------------------------------------------------------------------- 130.02s
+wait_for ------------------------------------------------------------------------------------------------------------------------ 60.28s
+Checking if any core file generated on active OAM instances. --------------------------------------------------------------------- 5.98s
+checking if any core file generated on standby OAM instances . ------------------------------------------------------------------- 5.83s
+checking sync status for active OAM instances.See msg. --------------------------------------------------------------------------- 5.13s
+Checking the Management  IP of Active OAM  instances  is pinging. ---------------------------------------------------------------- 4.06s
+Checking the Management  IP of Standby OAM  instances is pinging. ---------------------------------------------------------------- 3.74s
+Waiting for OAM application to come up for active instances. --------------------------------------------------------------------- 1.10s
+Waiting for OAM application to come up for standby instances. -------------------------------------------------------------------- 0.90s
+OAM  instance Failed to spawn.Please see msg which stack got failed . ------------------------------------------------------------ 0.18s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.17s
+include_tasks -------------------------------------------------------------------------------------------------------------------- 0.16s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.14s
+Adding  active OAM instances to oam_1 group. ------------------------------------------------------------------------------------- 0.13s
+Failed as core dump  file exists  in active OAM instance . See msg for more explanation . ---------------------------------------- 0.12s
+Adding standby OAM instances to oam_2 group. ------------------------------------------------------------------------------------- 0.12s
+Services are not in sync for OAM instances --------------------------------------------------------------------------------------- 0.11s
+OAM application didnot come up for active instances .See msg for the specific instance. ------------------------------------------ 0.11s
+Number of core dump files for active OAM instances .See msg . -------------------------------------------------------------------- 0.10s
+Failed as core dump  file exists  in standby OAM instance . See msg for more explanation . --------------------------------------- 0.10s
+OAM application didnot come up for standby instances .See msg for the specific instance. ----------------------------------------- 0.10s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.08s
+include -------------------------------------------------------------------------------------------------------------------------- 0.08s
+Number of core dump files for standby OAM instances .See msg . ------------------------------------------------------------------- 0.08s
+include_vars --------------------------------------------------------------------------------------------------------------------- 0.07s

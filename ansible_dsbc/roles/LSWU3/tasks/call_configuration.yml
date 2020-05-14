@@ -1,0 +1,89 @@
+---
+
+
+  - include_tasks: delegate.yml
+  - include_tasks: inventory_oam.yml
+    no_log: True
+
+
+  - name: 
+    run_once: True
+    copy:
+     src: "{{ Configuration_File_Path_SSBC }}"
+     dest: /root/SBCCONFIG_EXTPSX.txt
+     mode: '0777'
+     force: yes
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['oam_1'][0] }}"
+
+
+  - name: To run configuration in active SSBC OAM
+    ignore_errors: yes
+    shell: cat /root/SBCCONFIG_EXTPSX.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    register: configuration
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['oam_1'][0] }}"
+#  - debug:
+#      var: configuration
+
+
+  - name: Configuration is not pushed properly for SSBC
+    fail:
+      msg: "Configuration is not pushed successfully for SSBC"
+    when: "'error' in item.stdout"
+    loop: "{{ configuration.results }}"
+
+
+  - name: 
+    run_once: True
+    copy:
+     src: "{{ Configuration_File_Path_MSBC }}"
+     dest: /root/SBCCONFIG_EXTPSX.txt
+     mode: '0777'
+     force: yes
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['oam_1'][1] }}"
+
+
+  - name: To run configuration in active MSBC OAM
+    ignore_errors: yes
+    shell: cat /root/SBCCONFIG_EXTPSX.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    register: configuration
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['oam_1'][1] }}"
+
+
+  - name: Configuration is not pushed properly for MSBC
+    fail:
+      msg: "Configuration is not pushed successfully for MSBC"
+    when: "'error' in item.stdout"
+    loop: "{{ configuration.results }}"
+
+
+  - name: 
+    run_once: True
+    copy:
+     src: "{{ Configuration_File_Path_TSBC }}"
+     dest: /root/SBCCONFIG_EXTPSX.txt
+     mode: '0777'
+     force: yes
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['oam_1'][2] }}"
+
+
+  - name: To run configuration in active TSBC OAM
+    ignore_errors: yes
+    shell: cat /root/SBCCONFIG_EXTPSX.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+    register: configuration
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['oam_1'][2] }}"
+
+
+  - name: Configuration is not pushed properly for TSBC
+    fail:
+      msg: "Configuration is not pushed successfully for TSBC"
+    when: "'error' in item.stdout"
+    loop: "{{ configuration.results }}"
+
+
+

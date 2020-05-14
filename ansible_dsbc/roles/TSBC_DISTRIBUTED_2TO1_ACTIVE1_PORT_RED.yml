@@ -1,0 +1,1442 @@
+heat_template_version: 2016-10-14
+description: Template to setup and deploy a Standalone and HA Active and Standby vSBC compute instances
+
+##################################################################################################
+# IMPORTANT NOTE to configure second management port 'mgt1': 
+# 
+#  1. By Default, configuration of second management port is commented out in this template.
+# 
+#  2. To enable configuration of second management port 'mgt1', search for the following tag and follow the instructions with the tag:
+#     Tag to search : 'MGT1_EDIT'
+#
+#  3. Add the entries for second management port 'mgt1' in metadata section of each instance corressponding to the entries 
+#     that are already there for 'mgt0' interface.
+#
+#     For example:
+#      In metadata section: add the IF metadata related data for second management port like:
+#
+#        IF0: { "Port":  "Mgt1",
+#               "DHCP":  { get_param: isDhcpEnabledOnMgt1},
+#               "GWV4":  { get_param: mgt1Gateway }, 
+#               "IPV4":  { list_join: ['/', [ { get_attr: [mgt1_port1, fixed_ips, 0, ip_address] }, { get_param: mgt1SubnetPrefix}]] },
+#               "FIPV4": { get_attr: [mgt1_floating_ip1, floating_ip_address] } 
+#             }
+#
+#
+# NOTE: Please read the below instructions before using this template,
+#       it may need some edits depending on the usecase(s).
+#       This template assumes ALL the interfaces are non-DHCP and with the instructions in-line
+#       it can be tailored to make some interfaces use DHCP and/or SR-IOV.
+#
+# 1. By Default, DHCP is disabled on all the interfaces
+#
+# 2. To Enable/Disable DHCP or SR-IOV on any interface, search for '<interfaceName> EDIT:'
+#    and follow instructions there
+#
+#    E.g. To Enable DHCP on Packet Port 0 (pkt0):
+#         Search for: 'pkt0 EDIT:' (without quotes)
+#         (Replace pkt0 with mgt0, ha0 or pkt1 as applicable)
+#
+#    Sample code segment:
+#        # pkt0 EDIT: Below line:
+#        #   DHCP enable:  comment
+#        #   DHCP disable: uncomment
+#        - ip_address: { get_param: pkt0IPAddress}
+#
+#        # pkt0 EDIT: Below line:
+#        #   DHCP enable:  uncomment
+#        #   DHCP disable: comment
+#        #- subnet: { get_param: private_subnet_pkt0}
+#
+#      # pkt0 EDIT: Below line:
+#      #   SR-IOV support:    uncomment
+#      #   No SR-IOV support: comment
+#      #binding:vnic_type: direct
+#
+# 3. Please make sure there are no tabs introduced while editing the templates.
+#
+# 4. Sample Environment content to be sourced with this template:
+#
+#    parameters:
+#
+#      # System Settings
+#      image:           myImage
+#      flavor:          cloudSBC.lite
+#      security_group:  vSBC_security_group
+#
+#      # External Network Settings
+#      mgt0_ext_network: ext_net
+#      mgt1_ext_network: ext_net
+#      pkt0_ext_network: ext_net
+#      pkt1_ext_network: ext_net
+#
+#      # Private Network Settings
+#      private_network_mgt0: mgt0
+#      private_network_mgt1: mgt1
+#      private_network_ha:   ha0
+#      private_network_pkt0: pkt0
+#      private_network_pkt1: pkt1
+#
+#      # Private Subnet Settings
+#      private_subnet_mgt0: mgt0_subnet
+#      private_subnet_mgt1: mgt1_subnet
+#      private_subnet_ha:   ha0_subnet
+#      private_subnet_pkt0: pkt0_subnet
+#      private_subnet_pkt1: pkt1_subnet
+#
+# 5. This template has all the metadata fields filled for V4 version of IP
+#    address. If IPv6 address is required to be used for a particular port,
+#    then the changes required are as shown below.
+#
+#    In the metadata section of the server, search for the port that
+#    you wish to provide IPV6 address and replace:
+#    a) "IPV4" with "IPV6"
+#    b) "GWV4" with "GWV6"
+#
+#    *** Note: HA0 port accepts ONLY IPV4 address.
+#
+#
+# IMPORTANT NOTE to be able to login with ssh keys or password. 
+# 
+# From 7.1 onwards users have to give ssh keys or passwords in the heat template to login into CLI or linux shell.
+# Since use of ssh keys is more secured hence it is a mandatory field now in the heat template.
+#
+# Users can use ssh-keygen command to generate keys. This command generates two files id_rsa and id_rsa.pub
+# in /home/<user>/.ssh directory. The content of id_rsa.pub file will be the input value for the keys in this
+# heat template. Optionally keys can also be protected using a passphrase. For more options on ssh-keygen please do man ssh-keygen.
+# 
+# Passwords are optional fields. Please note that the password input is not a plain text password. It is a hash of
+# the password. The hash password can be generated using the command mkpasswd --method=SHA-512 --rounds=4096.
+# For more options on mkpasswd please do man mkpasswd.     
+#
+##################################################################################################
+
+parameter_groups:
+- label: System Settings
+  description: System Level Settings
+  parameters:
+  - image
+  - flavor
+  - security_group
+  - sbc_system_name
+  - personality
+  - sbc_ceMode
+  - ha_mode
+
+- label: mgt0 DHCP Settings
+  description: DHCP Settings for Management Port 0
+  parameters:
+  - isDhcpEnabledOnMgt0
+  - mgt0IPAddress
+  - mgt0SubnetPrefix
+  - mgt0Gateway
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+#- label: mgt1 DHCP Settings
+  #description: DHCP Settings for Management Port 1
+  #parameters:
+  #- isDhcpEnabledOnMgt1
+  #- mgt1IPAddress
+  #- mgt1SubnetPrefix
+  #- mgt1Gateway
+
+- label: ha0 DHCP Settings
+  description: DHCP Settings for High Availability Port
+  parameters:
+  - isDhcpEnabledOnHa0
+  - ha0IPAddress
+  - ha0SubnetPrefix
+  - ha0Gateway
+
+- label: pkt0 DHCP Settings
+  description: DHCP Settings for Packet Port 0
+  parameters:
+  - isDhcpEnabledOnPkt0
+  - pkt0IPAddress
+  - pkt0SubnetPrefix
+  - pkt0Gateway
+  - vlanIdPkt0
+
+- label: pkt1 DHCP Settings
+  description: DHCP Settings for Packet Port 1
+  parameters:
+  - isDhcpEnabledOnPkt1
+  - pkt1IPAddress
+  - pkt1SubnetPrefix
+  - pkt1Gateway
+  - vlanIdPkt1
+
+- label: External Network Settings
+  description: External Network Settings
+  parameters:
+  # - mgt0_ext_network
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #- mgt1_ext_network
+  # - pkt0_ext_network
+  # - pkt1_ext_network
+  - floating_ip_count_mgt0
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #- floating_ip_count_mgt1
+  - floating_ip_count_pkt0
+  - floating_ip_count_pkt1
+
+- label: Enable Reverse NAT
+  description: Enable reverse nat for ports
+  parameters:
+  - reverse_nat_pkt0
+  - reverse_nat_pkt1
+
+- label: Private Network Settings
+  description: External Network Settings
+  parameters:
+  - private_network_mgt0
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #- private_network_mgt1
+  - private_network_ha
+  - private_network_pkt0
+  - private_network_pkt1
+  - provider_network_pkt0S
+  - provider_network_pkt1S
+
+- label: Private Subnet Settings
+  description: Subnet Settings
+  parameters:
+  - private_subnet_mgt0
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #- private_subnet_mgt1
+  - private_subnet_ha
+  - private_subnet_pkt0
+  - private_subnet_pkt1
+
+- label: Instance Specific Settings
+  description: Instance Specific Settings
+  parameters:
+  - sbc_ceName
+  - sbc_ceRole
+  - sbc_rgIp
+
+- label: EMS Settings
+  description: EMS Settings
+  parameters:
+  - ems_user_name
+  - ems_password
+  - ems_ip_1
+  - ems_ip_2
+  - cluster_id
+  - download_config
+
+- label: OAM Settings
+  description: OAM Settings
+  parameters:
+  - oam_ip_1
+  - oam_ip_2
+
+- label: GPU Settings
+  description: GPU Settings
+  parameters:
+  - is_gpu_available
+  - g711_percent
+  - amrwb_percent
+  - amr_percent
+  - evrc_percent
+  - evrcb_percent
+  - g729_percent
+  - g722_percent
+  - g723_percent
+  - g726_percent
+  - g7221_percent
+  - ilbc_percent
+  - opus_percent
+  - silk_8_percent
+  - silk_16_percent
+  - evs_percent
+  - t38_percent
+  - g7112g711_percent
+  #- tone_percent
+
+# - label: SBC Login Credentials
+  # description: SBC Login input - ssh key or password
+  # parameters:
+  # - adminSshKey
+  # - linuxAdminSshKey
+  # - adminPassword
+  # - linuxAdminPassword
+
+parameters:
+
+############################
+# System Level Settings
+############################
+
+  image:
+    type: string
+    label: Image Name
+    description: Image to be used for launching the instance(s)
+    default: cSBC_sbc-V08.01.00R000_9 
+ #   constraints:
+ #     - custom_constraint: 'glance.image'
+
+  flavor:
+    type: string
+    label: Flavor
+    description: Flavor to be used for instance(s)
+    default: LSWU_TSBC
+ #   constraints:
+ #     - custom_constraint: 'nova.flavor'
+
+  security_group:
+    type: string
+    label: Security Group
+    default: sbccoresvt-sg
+    description: Security group of instance(s)
+
+  sbc_system_name:
+    type: string
+    label: SBC System Name
+    description: SBC system name
+    default: TSBC
+    constraints:
+      - length: { min: 0, max: 26 }
+        description: "Enter valid system name. Length of this string should be less than 26"
+      - allowed_pattern: "^[A-Za-z]{1}[-A-Za-z0-9]*[A-Za-z0-9]{1}$"
+        description: "Enter valid system name. Regex: ^[A-Za-z]{1}[-A-Za-z0-9]*[A-Za-z0-9]{1}$ "
+  
+  personality:
+    type: string
+    label: SBC Personality Type
+    description: Configures SBC instance to be Signaling,Media or Integrated node.
+    default: msbc
+    constraints:
+      - allowed_values: [msbc,isbc,mrfp]
+
+  ha_mode:
+    type: string
+    label: SBC HA Mode
+    description: SBC HA Mode, 1 to 1 or N to 1
+    default: Nto1
+    constraints:
+        - allowed_values: [1to1, Nto1]
+
+############################
+# External Network Settings
+############################
+
+  # mgt0_ext_network:
+    # type: string
+    # label: Management Port 0 Public Network Name or ID
+    # description: Public network with floating IP addresses for mgt0 (used only if "Floating IP Count" is non-zero for mgt0).
+    # constraints:
+      # - custom_constraint: 'neutron.network'
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #mgt1_ext_network:
+  #  type: string
+  #  label: Management Port 1 Public Network Name or ID
+  #  description: Public network with floating IP addresses for mgt1 (used only if "Floating IP Count" is non-zero for mgt1).
+  #  constraints:
+  #    - custom_constraint: 'neutron.network'
+
+  # pkt0_ext_network:
+    # type: string
+    # label: Packet Port 0 Public Network Name or ID
+    # description: Public network with floating IP addresses for pkt0  (used only if "Floating IP Count" is non-zero for pkt0).
+    # constraints:
+      # - custom_constraint: 'neutron.network'
+
+  # pkt1_ext_network:
+    # type: string
+    # label: Packet Port 1 Public Network Name or ID
+    # description: Public network with floating IP addresses for pkt1 (used only if "Floating IP Count" is non-zero for pkt1).
+    # constraints:
+      # - custom_constraint: 'neutron.network'
+
+#############################
+# Setting up the count values
+#############################
+
+  floating_ip_count_mgt0:
+    type: number
+    label: Number of Floating IPs on mgt0
+    description: Number of public IPs on mgt0.
+    default: 0
+    constraints:
+      - range: { min: 0, max: 1 }
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #floating_ip_count_mgt1:
+  #  type: number
+  #  label: Number of Floating IPs on mgt1
+  #  description: Number of public IPs on mgt1.
+  #  default: 0
+  #  constraints:
+  #    - range: { min: 0, max: 1 }
+
+  floating_ip_count_pkt0:
+    type: number
+    label: Number of Floating IPs on pkt0
+    description: Number of public IPs on pkt0.
+    default: 0
+    constraints:
+      - range: { min: 0, max: 1 }
+
+  floating_ip_count_pkt1:
+    type: number
+    label: Number of Floating IPs on pkt1
+    description: Number of public IPs on pkt1.
+    default: 0
+    constraints:
+      - range: { min: 0, max: 1 }
+
+#################################################
+# Enable/Disable Reverse NAT feature on the ports
+#################################################
+
+  reverse_nat_pkt0:
+    type: string
+    label: Reverse NAT on pkt0
+    description: Enable/Disable reverse NAT on pkt0.
+    default: True
+    constraints:
+      - allowed_values: [True,False]
+
+  reverse_nat_pkt1:
+    type: string
+    label: Reverse NAT on pkt1
+    description: Enable/Disable reverse NAT on pkt1.
+    default: True
+    constraints:
+      - allowed_values: [True,False]
+
+############################
+# Private Network Settings
+############################
+
+  private_network_mgt0:
+    type: string
+    label: Management Port 0 Private Network Name or ID
+    description: Name/ID of private network for mgt0.
+    default: PR_MGMT
+  #  constraints:
+  #    - custom_constraint: 'neutron.network'
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #private_network_mgt1:
+  #  type: string
+  #  label: Management Port 1 Private Network Name or ID
+  #  description: Name/ID of private network for mgt1.
+  #  constraints:
+  #    - custom_constraint: 'neutron.network'
+
+  private_network_ha:
+    type: string
+    label: HA Port Private Network Name or ID
+    description: Name/ID of private network for ha0.
+    default: PR_HA
+#    constraints:
+ #     - custom_constraint: 'neutron.network'
+
+  private_network_pkt0:
+    type: string
+    label: Packet Port 0 Private Network Name or ID
+    description: Name/ID of private network for pkt0.
+    default: eea7d35e-0ef5-4be6-8c5b-22a3eb6c020c
+#    constraints:
+#      - custom_constraint: 'neutron.network'
+
+  private_network_pkt1:
+    type: string
+    label: Packet Port 1 Private Network Name or ID
+    description: Name/ID of private network for pkt1.
+    default: eea7d35e-0ef5-4be6-8c5b-22a3eb6c020c
+ #   constraints:
+ #     - custom_constraint: 'neutron.network'
+ 
+ 
+ 
+  provider_network_pkt0S:
+    type: string
+    label: Packet Port 0 Network Name or ID
+    description: Name/ID of private network for pkt0.
+    default: 67a55492-ec7a-47f1-bfb0-e964616045ab
+
+  provider_network_pkt1S:
+    type: string
+    label: Packet Port 1 Network Name or ID
+    description: Name/ID of private network for pkt1.
+    default: 67a55492-ec7a-47f1-bfb0-e964616045ab
+
+############################
+# Private Subnet Settings
+############################
+
+  private_subnet_mgt0:
+    type: string
+    label: Management Port 0 Private Subnet Name or ID
+    description: Name/ID of private subnet for mgt0.
+    default: 5123d24b-3ce4-4e21-b21d-739862274590
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #private_subnet_mgt1:
+  #  type: string
+  #  label: Management Port 1 Private Subnet Name or ID
+  #  description: Name/ID of private subnet for mgt1.
+
+  private_subnet_ha:
+    type: string
+    label: HA Port Private Subnet Name or ID
+    description: Name/ID of private subnet for ha0.
+    default: a3f7e8f5-3ed4-4c59-9762-d33f417aebdf
+
+  private_subnet_pkt0:
+    type: string
+    label: Packet Port 0 Private Subnet Name or ID
+    description: Name/ID of private subnet for pkt0.
+    default: d50befc4-4a9d-48f8-9dc5-fbd506b66e17
+
+  private_subnet_pkt1:
+    type: string
+    label: Packet Port 1 Private Subnet Name or ID
+    description: Name/ID of private subnet for pkt1.
+    default: ef56c933-1603-48e6-ba3d-9099ef4ce8aa
+
+###########################################################
+# VLAN ID PKT interfaces
+# Keeping it a string value instead of integer, as we need
+# to support None value
+###########################################################
+
+  vlanIdPkt0:
+    type: string
+    label: Packet Port 0 VLAN ID
+    description: Packet Port 0 VLAN ID
+    default : 610
+
+  vlanIdPkt1:
+    type: string
+    label: Packet Port 1 VLAN ID
+    description: Packet Port 1 VLAN ID
+    default : 611
+
+############################
+# Instance Specific Settings
+############################
+  sbc_ceName:
+    type: string
+    label: SBC Instance Name
+    description: SBC Instance name.
+    default: "vsbc1"
+    constraints:
+      - length: { min: 0, max: 63 }
+        description: "Enter valid active instance name. Length of this string should be less than 63"
+      - allowed_pattern: "^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$"
+        description: "Enter valid active instance name. Regex: ^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$ "
+
+  sbc_ceRole:
+    type: string
+    label: SBC Configured CE Role
+    description: SBC Configured CE Role.
+    default: "ACTIVE"
+    constraints:
+      - length: { min: 0, max: 8 }
+        description: "Enter valid instance role. Role can be ACTIVE or STANDBY"
+      - allowed_pattern: "^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$"
+        description: "Enter valid instance role. Regex: ^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$ "
+      - allowed_values: [ACTIVE,STANDBY]
+
+  sbc_ceMode:
+    type: string
+    label: SBC Configured CE Mode
+    description: SBC Configured CE Mode.
+    default: "sbc"
+    constraints:
+      - length: { min: 0, max: 8 }
+        description: "Enter valid instance mode. Role can be sbc or oam"
+      - allowed_pattern: "^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$"
+        description: "Enter valid instance role. Regex: ^[A-Za-z]{1}[-A-Za-z0-9.]*[A-Za-z0-9]{1}$ "
+      - allowed_values: [sbc,oam]
+
+  sbc_rgIp:
+    type: string
+    label: HA port IP address of one of the members of SBC Redundancy Group(RG). (Note - Provide 169.254.88.1 for the first node of RG)
+    description: SBC RG is formed by communicating over the provided IP. When adding 3rd or subsequent instance to RG, can provide HA IP of any of the instances that are up and running.
+    default: "169.254.88.1"
+    constraints:
+      - length: { min: 0, max: 63 }
+        description: "Enter valid IP."
+      - allowed_pattern: "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"
+        description: "Enter valid cluster IP. Regex: ^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"
+
+################
+# EMS Settings
+################
+  ems_user_name:
+    type: string
+    label: EMS User Name
+    description: User name for registering with EMS
+    default: "restuser"
+
+  ems_password:
+    type: string
+    label: EMS Password
+    description: EMS registration password
+    hidden: true
+    default: "sonus123"
+
+  ems_ip_1:
+    type: string
+    label: EMS IP 1
+    description: EMS IP Address 1 - e.g. 10.52.13.40 (No quotes required)
+    default: "10.54.8.108"
+
+  ems_ip_2:
+    type: string
+    label: EMS IP 2
+    description: EMS IP Address 2 - e.g. 51.12.30.24 (No quotes required)
+    default: "None"
+
+  cluster_id:
+    type: string
+    label: Cluster ID
+    description: Cluster/VNF ID value from EMS Cluster Mgmt.
+    default: "ansibletsbc"
+
+  download_config:
+    type: string
+    label: Download Configuration from EMS
+    description: Download Configuration from EMS
+    default: True
+    constraints:
+      - allowed_values: [True,False]
+
+################
+# OAM Settings
+################
+  oam_ip_1:
+    type: string
+    label: OAM IP 1
+    description: OAM IP Address 1 - e.g. 10.52.13.40 (No quotes required). Enter the HA IP of the active OAM node.
+    default: "10.34.195.23"
+
+  oam_ip_2:
+    type: string
+    label: OAM IP 2
+    description: OAM IP Address 2 - e.g. 10.52.13.40 (No quotes required). Enter the HA IP of the standby OAM node.
+    default: "10.34.195.25"
+
+##################################
+# IP address of the Non-DHCP ports
+##################################
+  mgt0IPAddress:
+    type: string
+    label: Management Port 0 IP Address
+    description: IP address for mgt0 port
+    default : 10.34.194.29
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #mgt1IPAddress:
+  #  type: string
+  #  label: Management Port 1 IP Address
+  #  description: IP address for mgt1 port
+  #  default : None
+
+  ha0IPAddress:
+    type: string
+    label: High Availability Port IP Address
+    description: IP address for ha0 port
+    default : 10.34.195.77
+
+  pkt0IPAddress:
+    type: string
+    label: Packet Port 0 IP Address
+    description: IP address for pkt0 port
+    default : 10.34.210.31 
+
+  pkt1IPAddress:
+    type: string
+    label: Packet Port 1 IP Address
+    description: IP address for pkt1 port
+    default : 10.34.211.31 
+
+####################################
+# Netmask for each Non-DHCP networks
+####################################
+  mgt0SubnetPrefix:
+    type: string
+    label: Management Port 0 Subnet Prefix
+    description: Subnet Prefix for mgt0 port
+    default : 24
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #mgt1SubnetPrefix:
+  #  type: string
+  #  label: Management Port 1 Subnet Prefix
+  #  description: Subnet Prefix for mgt1 port
+  #  default : None
+
+  ha0SubnetPrefix:
+    type: string
+    label: High Availability Port Subnet Prefix
+    description: Subnet Prefix for ha0 port
+    default : 24
+
+  pkt0SubnetPrefix:
+    type: string
+    label: Packet Port 0 Subnet Prefix
+    description: Subnet Prefix for pkt0 port
+    default : 24
+
+  pkt1SubnetPrefix:
+    type: string
+    label: Packet Port 1 Subnet Prefix
+    description: Subnet Prefix for pkt1 port
+    default : 24
+
+###############################
+# Non DHCP Network's gateway IP
+###############################
+
+  mgt0Gateway:
+    type: string
+    label: Management Port 0 Gateway IP
+    description: Gateway IP Address for mgt0 port
+    default : 10.34.194.1
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #mgt1Gateway:
+  #  type: string
+  #  label: Management Port 1 Gateway IP
+  #  description: Gateway IP Address for mgt1 port
+  #  default : None
+
+  ha0Gateway:
+    type: string
+    label: High Availability Port Gateway IP
+    description: Gateway IP Address for ha0 port
+    default : 10.34.195.1
+
+  pkt0Gateway:
+    type: string
+    label: Packet Port 0 Gateway IP
+    description: Gateway IP Address for pkt0 port
+    default : 10.34.210.1
+
+  pkt1Gateway:
+    type: string
+    label: Packet Port 1 Gateway IP
+    description: Gateway IP Address for pkt1 port 
+    default : 10.34.211.1
+
+###############################
+# DHCP flags
+###############################
+
+  isDhcpEnabledOnMgt0:
+    type: string
+    label: Is DHCP enabled on Mgt0 Subnet?
+    description: Is DHCP enabled on Mgt0 Subnet?
+    default : False
+    constraints:
+      - allowed_values: [True,False]
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #isDhcpEnabledOnMgt1:
+  #  type: string
+  #  label: Is DHCP enabled on Mgt1 Subnet?
+  #  description: Is DHCP enabled on Mgt1 Subnet?
+  #  default : False
+  #  constraints:
+  #    - allowed_values: [True,False]
+
+  isDhcpEnabledOnHa0:
+    type: string
+    label: Is DHCP enabled on Ha0 Subnet?
+    description: Is DHCP enabled on Ha0 Subnet?
+    default : False
+    constraints:
+      - allowed_values: [True,False]
+
+  isDhcpEnabledOnPkt0:
+    type: string
+    label: Is DHCP enabled on Pkt0 Subnet?
+    description: Is DHCP enabled on Pkt0 Subnet?
+    default : False
+    constraints:
+      - allowed_values: [True,False]
+
+  isDhcpEnabledOnPkt1:
+    type: string
+    label: Is DHCP enabled on Pkt1 Subnet?
+    description: Is DHCP enabled on Pkt1 Subnet?
+    default : False
+    constraints:
+      - allowed_values: [True,False]
+
+############################
+# GPU Settings
+############################
+  is_gpu_available:
+    type: string
+    label: Use GPU for transcoding. Flavor should contain GPU PCI alias.
+    description: Use GPU for transcoding. Activate Standard GPU profile. Flavor should contain GPU PCI alias.
+    default: false
+    constraints:
+      - allowed_values: [false,true]
+
+  g711_percent:
+    type: string
+    label: G711 codec percent - In GPU profile.
+    description: G711 codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "G711 : Enter a value between 0 and 100"
+
+  amrwb_percent:
+    type: string
+    label: AMRWB codec percent - In GPU profile.
+    description: AMRWB codec will be provisioned on CPU if GPU is M60, and on CPU and GPU if GPU associated is V100.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "AMRWB : Enter a value between 0 and 100"
+
+  amr_percent:
+    type: string
+    label: AMR codec percent - In GPU profile.
+    description: AMR codec will be provisioned on CPU if GPU is M60, and on CPU and GPU if GPU associated is V100.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "AMR : Enter a value between 0 and 100"
+
+  evrc_percent:
+    type: string
+    label: EVRC codec percent - In GPU profile.
+    description: EVRC codec will be provisioned on CPU if GPU is M60, and on CPU and GPU if GPU associated is V100.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "EVRC : Enter a value between 0 and 100"
+
+  evrcb_percent:
+    type: string
+    label: EVRCB codec percent - In GPU profile.
+    description: EVRCB codec will be provisioned on CPU if GPU is M60, and on CPU and GPU if GPU associated is V100.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "EVRCB : Enter a value between 0 and 100"
+
+  g729_percent:
+    type: string
+    label: G729 codec percent - In GPU profile.
+    description: G729 codec will be provisioned on GPU and CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "G729 : Enter a value between 0 and 100"
+
+  g722_percent:
+    type: string
+    label: G722 codec percent - In GPU profile.
+    description: G722 codec will be provisioned on GPU and CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "G722 : Enter a value between 0 and 100"
+
+  g723_percent:
+    type: string
+    label: G723 codec percent - In GPU profile.
+    description: G723 codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "G723 : Enter a value between 0 and 100"
+
+  g726_percent:
+    type: string
+    label: G726 codec percent - In GPU profile.
+    description: G726 codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "G726 : Enter a value between 0 and 100"
+
+  g7221_percent:
+    type: string
+    label: G7221 codec percent - In GPU profile.
+    description: G7221 codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "G7221 : Enter a value between 0 and 100"
+
+  ilbc_percent:
+    type: string
+    label: ILBC codec percent - In GPU profile.
+    description: ILBC codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "ILBC : Enter a value between 0 and 100"
+
+  opus_percent:
+    type: string
+    label: OPUS codec percent - In GPU profile.
+    description: OPUS codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "OPUS : Enter a value between 0 and 100"
+
+  silk_8_percent:
+    type: string
+    label: SILK NB codec percent - In GPU profile.
+    description: SILK NB codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "SILK NB : Enter a value between 0 and 100"
+
+  silk_16_percent:
+    type: string
+    label: SILK WB codec percent - In GPU profile.
+    description: SILK WB codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "SILK WB : Enter a value between 0 and 100"
+
+  evs_percent:
+    type: string
+    label: EVS codec percent - In GPU profile.
+    description: EVS codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "EVS: Enter a value between 0 and 100"
+
+  t38_percent:
+    type: string
+    label: T38 codec percent - In GPU profile.
+    description: T38 codec will be provisioned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "T38 : Enter a value between 0 and 100"
+
+  g7112g711_percent:
+    type: string
+    label: G7112G711 codec percent - In GPU profile.
+    description: G7112G711 codec will be provisoned on CPU.
+    default: "0"
+    constraints:
+      - allowed_pattern: "^(?=.)(([0-9]{1,3})(\\.([0-9]{0,2}))?)$"
+        description: "G7112G711 : Enter a value between 0 and 100"
+
+  # CURRENTLY NOT SUPPORTED IN 8.1 SBC
+  #tone_percent:
+  #  type: number
+  #  label: Tone sessions percent - In GPU profile.
+  #  description: Tone sessions will be provisioned on CPU.
+  #  default: 0
+  #  constraints:
+  #    - range: { min: 0, max: 100 }
+
+###############################
+# SBC login credentials
+###############################
+  # adminSshKey:
+    # type: string
+    # label: adminSshKey
+    # description: public key to login to SBC CLI as admin user
+
+  # linuxAdminSshKey:
+    # type: string
+    # label: linuxAdminSshKey
+    # description: public key to login to SBC shell as linuxadmin user
+
+  # adminPassword:
+    # type: string
+    # label: adminPasswordHash
+    # description: password hash to login to SBC CLI as admin user
+    # default : "*"
+
+  # linuxAdminPassword:
+    # type: string
+    # label: linuxAdminPasswordHash
+    # description: password hash to login to SBC shell as linuxadmin user
+    # default : "*"
+
+# Resource definitions for all openstack objects to be configured during
+# template execution
+resources:
+
+  validate_g711_percentage:
+    type: OS::Heat::TestResource
+    properties:
+      action_wait_secs:
+        create: 2
+        update: 2
+      fail:
+        yaql:
+          expression: ((float($.data.c1)) = 100)
+          data:
+            c1: { get_param: g711_percent }
+
+  validate_total_percentage_greater_than_100:
+    type: OS::Heat::TestResource
+    depends_on: validate_g711_percentage
+    properties:
+      action_wait_secs:
+        create: 2
+        update: 2
+      fail:
+        yaql:
+          expression: (((float($.data.c1) + float($.data.c2) + float($.data.c3) + float($.data.c4) + float($.data.c5) + float($.data.c6) + float($.data.c7) + float($.data.c8) + float($.data.c9) + float($.data.c10) + float($.data.c11) + float($.data.c12) + float($.data.c13) + float($.data.c14) + float($.data.c15) + float($.data.c16) + float($.data.c17)) > 100))
+          data:
+            c1: { get_param: g711_percent }
+            c2: { get_param: amrwb_percent }
+            c3: { get_param: amr_percent }
+            c4: { get_param: evrc_percent }
+            c5: { get_param: evrcb_percent }
+            c6: { get_param: g729_percent }
+            c7: { get_param: g722_percent }
+            c8: { get_param: g723_percent }
+            c9: { get_param: g726_percent }
+            c10: { get_param: g7221_percent }
+            c11: { get_param: ilbc_percent }
+            c12: { get_param: opus_percent }
+            c13: { get_param: silk_8_percent }
+            c14: { get_param: silk_16_percent }
+            c15: { get_param: evs_percent }
+            c16: { get_param: t38_percent }
+            c17: { get_param: g7112g711_percent }
+
+  # Create active vSBC instance
+  vSBC_ACTIVE:
+    type: OS::Nova::Server
+    depends_on: validate_total_percentage_greater_than_100
+    properties:
+      name: { get_param: "OS::stack_name" }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      config_drive: True
+      availability_zone: LCM
+      #personality: 
+        #"baseConfig.cli": {get_file: "RIBBON_BASE_CONFIG.cli"}
+        #"baseConfig.cli": {get_file: "http://10.11.12.13/sbcCliFiles/RIBBON_BASE_CONFIG.cli"}
+
+      # Attach previously created network ports to the instance
+      networks:
+        - port: { get_resource: mgt0_port1 }
+        - port: { get_resource: ha0_port1 }
+        - port: { get_resource: pkt0_port1 }
+        - port: { get_resource: pkt1_port1 }
+        # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+        #- port: { get_resource: mgt1_port1 }
+        - port: { get_resource: pkt0S_port1 }
+        - port: { get_resource: pkt1S_port1 }     
+
+      # Publish the assigned floating IP addresses with appended subnet mask to the openstack metadata service.
+      # Subnet prefix for floating ips not used - hard coded to 32 for consistencey.
+      metadata:
+        IF0: { "Port":  "Mgt0",
+               "DHCP":  { get_param: isDhcpEnabledOnMgt0},
+               "GWV4":  { get_param: mgt0Gateway }, 
+               "IPV4":  { list_join: ['/', [ { get_attr: [mgt0_port1, fixed_ips, 0, ip_address] }, { get_param: mgt0SubnetPrefix}]] },
+               "FIPV4": { get_attr: [mgt0_floating_ip1, floating_ip_address] } 
+             }
+             
+
+        IF1: { "Port": "Ha0",
+               "DHCP": { get_param: isDhcpEnabledOnHa0},
+               "GWV4": { get_param: ha0Gateway },  
+               "IPV4": { list_join: ['/', [ { get_attr: [ha0_port1, fixed_ips, 0, ip_address] }, { get_param: ha0SubnetPrefix}]] }
+             }
+
+        IF2: { "Port":"Pkt0",
+               "DHCP": { get_param: isDhcpEnabledOnPkt0},
+               "GWV4": { get_param: pkt0Gateway }, 
+               "IPV4": { list_join: ['/', [ { get_attr: [pkt0_port1, fixed_ips, 0, ip_address] }, { get_param: pkt0SubnetPrefix}]] },
+               "RNat": { get_param: reverse_nat_pkt0 },
+               "VlanId": { get_param: vlanIdPkt0 },
+               "FIPV4":{ get_attr: [pkt0_floating_ip, floating_ip_address] }
+             }
+
+        IF3: { "Port":"Pkt1",
+               "DHCP": { get_param: isDhcpEnabledOnPkt1},
+               "GWV4": { get_param: pkt1Gateway },
+               "IPV4": { list_join: ['/', [ { get_attr: [pkt1_port1, fixed_ips, 0, ip_address] }, { get_param: pkt1SubnetPrefix}]] },
+               "RNat": { get_param: reverse_nat_pkt1 }, 
+               "VlanId": { get_param: vlanIdPkt1 },
+               "FIPV4":{ get_attr: [pkt1_floating_ip, floating_ip_address] } 
+             }
+
+        ClusterIp: { get_param: sbc_rgIp}
+
+      # Set the format to RAW to pass data directly as userdata set the floating and virtual IP counts
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+                #cloud-config
+                ### USER EDITABLE SECTION FOR SSH KEYS ###
+                users:
+                    - name: admin
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: admin
+                      lock_passwd: false
+                    - name: linuxadmin
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: sonus
+                      lock_passwd: false
+                    - name: root
+                      ssh-authorized-keys:
+                        - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4oGIi+0mRS9Q25ln5/gKe1mmR7cfVuFxRQONVbjq8y+JB0g2T49b1Bf8xRhyhkKgdbIbEWdcmboSpTegt6zM0rz6Yw/73c3NVy60CX47t55GCCFYXxt3uwgRlN/9KX1mETCYOSD5AZ7e9YXvbd6/hUKkK/o8Zrhch9ckR2nVSe0v1wob4MMhmC1e9LV5tvk6zAIdmTWOYcrg0Yd6yHRQbNjlVFpQ147TPGy12+tDytqEW+09DQZqvhuiwSyxk3lBlNJYfCT2VidsS2+MQYD+t2REc65vcq/EvXuyuwpvv/IIjX2BBMCG7fMXkGh0wnIPoHbUCNfq1Zr2JGqZ6D8GIQ==
+                      plain_text_passwd: sonus1                    
+                      lock_passwd: false
+                runcmd:
+                    - [ usermod, -p, '$6$io3njQos$gZtBJ4MazQeWC0beqQwRPUDZCQcKXhMr2B8QLWYGajchR2BtkyHPvBTCQj0LctHAFaYTwbsIsUkm12ta4IoLe/', linuxadmin ]
+                    - sed -i -e "/^AllowUsers/s/\slinuxadmin\(\s\|$\)/ /g" -e "/^AllowUsers/s/\sroot\(\s\|$\)/ /g" /etc/ssh/sshd_config
+                    - sed -i "/^AllowUsers/s/AllowUsers /AllowUsers root linuxadmin /" /etc/ssh/sshd_config
+                    - sed -i "/PasswordAuthentication no/s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
+                    - sed -i "/^PermitRootLogin/s/ no/ yes/" /etc/ssh/sshd_config
+                    - sed -i "s/allowSshAccess=n/allowSshAccess=y/" /opt/sonus/conf/sbx.conf
+
+                write_files:
+                -   content: |
+                        {
+                          "CEName"                   : "$ce_name",
+                          "CEMode"                   : "$ce_mode",
+                          "SystemName"               : "$system_name",
+                          "SbcPersonalityType"       : "$personality",
+                          "SbcHaMode"                : "$ha_mode",
+                          "EmsUsername"              : "$ems_user_name",
+                          "EmsPassword"              : "$ems_password",
+                          "EmsIP"                    : [ "$ems_ip_1", "$ems_ip_2" ],
+                          "EmsDownloadConfig"        : "$downloadConfig",
+                          "OamIP"                    : [ "$oam_ip_1", "$oam_ip_2" ],
+                          "Oam1Ip"                   : "$oam_ip_1",
+                          "Oam2Ip"                   : "$oam_ip_2",
+                          "CERole"                   : "$ce_role",
+                          "TemplateName"             : "heatRgNoDhcp-TSBC-sriov-template.yaml",
+                          "TemplateVersion"          : "V08.01.00R003",
+                          "EmsPrivateNodeParameters" : { 
+                                                         "cluster_id": "$cluster_id",
+                                                         "vnfc_id":    "$vnfc_id"
+                                                       },
+                          "TranscodeConfig"          : { 
+                                                         "gpu" : "$gpu_flag", 
+                                                         "callmix": {
+                                                                      "G711" : $g711_percent, 
+                                                                      "AMRWB": $amrwb_percent, 
+                                                                      "AMR"  : $amr_percent, 
+                                                                      "EVRC" : $evrc_percent, 
+                                                                      "EVRCB": $evrcb_percent,
+                                                                      "G729" : $g729_percent,
+                                                                      "G722" : $g722_percent,
+                                                                      "G723" : $g723_percent,
+                                                                      "G726" : $g726_percent,
+                                                                      "G7221": $g7221_percent,
+                                                                      "ILBC" : $ilbc_percent,
+                                                                      "OPUS" : $opus_percent,
+                                                                      "SILK_8"  : $silk_8_percent,
+                                                                      "SILK_16" : $silk_16_percent,
+                                                                      "EVS"  : $evs_percent,
+                                                                      "T38"  : $t38_percent,
+                                                                      "G7112G711" : $g7112g711_percent
+                                                                    },
+                                                         "tone": $tone_percent
+                                                       }
+                        }
+                    path: /opt/sonus/conf/userData.json
+
+          params:
+              $ce_name:            { get_param: sbc_ceName  }
+              $ce_mode:            { get_param: sbc_ceMode }
+              $system_name:        { get_param: sbc_system_name }
+              $personality:        { get_param: personality }
+              $ha_mode:            { get_param: ha_mode }
+              $ems_user_name:      { get_param: ems_user_name }
+              $ems_password:       { get_param: ems_password }
+              $ems_ip_1:           { get_param: ems_ip_1 }
+              $ems_ip_2:           { get_param: ems_ip_2 }
+              $cluster_id:         { get_param: cluster_id }
+              $downloadConfig:     { get_param: download_config }
+              $ce_role:            { get_param: sbc_ceRole }
+              $vnfc_id:            { list_join: ['-', [ { get_param: "OS::stack_name" }, { get_param: cluster_id }, '1']] }
+              $gpu_flag:           { get_param: is_gpu_available }
+              $g711_percent:       { get_param: g711_percent }
+              $amrwb_percent:      { get_param: amrwb_percent }
+              $amr_percent:        { get_param: amr_percent }
+              $evrc_percent:       { get_param: evrc_percent }
+              $evrcb_percent:      { get_param: evrcb_percent }
+              $g729_percent:       { get_param: g729_percent }
+              $g722_percent:       { get_param: g722_percent }
+              $g723_percent:       { get_param: g723_percent }
+              $g726_percent:       { get_param: g726_percent }
+              $g7221_percent:      { get_param: g7221_percent }
+              $ilbc_percent:       { get_param: ilbc_percent }
+              $opus_percent:       { get_param: opus_percent }
+              $silk_8_percent:     { get_param: silk_8_percent }
+              $silk_16_percent:    { get_param: silk_16_percent }
+              $evs_percent:        { get_param: evs_percent }
+              $t38_percent:        { get_param: t38_percent }
+              $g7112g711_percent:  { get_param: g7112g711_percent }
+              $tone_percent: 0
+              # $adminSshKey:        { get_param: adminSshKey }
+              # $linuxAdminSshKey:   { get_param: linuxAdminSshKey }
+              # $adminPassword:      { get_param: adminPassword }
+              # $linuxAdminPassword: { get_param: linuxAdminPassword }
+              # $adminPassword:      { get_param: adminPassword }
+              $oam_ip_1:           { get_param: oam_ip_1 }
+              $oam_ip_2:           { get_param: oam_ip_2 }
+
+
+  # Create the four required virtual nics (ports) to attach to virtual SBC instance 1
+
+  # Private Port Creation.
+
+  mgt0_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_mgt0 }
+      fixed_ips:
+        # mgt0 EDIT: Below line:
+        #   DHCP enable:  comment
+        #   DHCP disable: uncomment
+        - ip_address: { get_param: mgt0IPAddress}
+
+        # mgt0 EDIT: Below line:
+        #   DHCP enable:  uncomment
+        #   DHCP disable: comment
+        #- subnet: { get_param: private_subnet_mgt0 }
+
+      # mgt0 EDIT: Below line:
+      #   SR-IOV support:    uncomment
+      #   No SR-IOV support: comment
+      #binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #mgt1_port1:
+  #  type: OS::Neutron::Port
+  #  properties:
+  #    network: { get_param : private_network_mgt1 }
+  #    fixed_ips:
+  #      # mgt1 EDIT: Below line:
+  #      #   DHCP enable:  comment
+  #      #   DHCP disable: uncomment
+  #      - ip_address: { get_param: mgt1IPAddress}
+  #
+  #      # mgt1 EDIT: Below line:
+  #      #   DHCP enable:  uncomment
+  #      #   DHCP disable: comment
+  #      #- subnet: { get_param: private_subnet_mgt1 }
+  #
+  #    # mgt1 EDIT: Below line:
+  #    #   SR-IOV support:    uncomment
+  #    #   No SR-IOV support: comment
+  #    #binding:vnic_type: direct
+  #    security_groups:
+  #      - { get_param: security_group }
+
+  ha0_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_ha }
+      fixed_ips:
+        # ha0 EDIT: Below line:
+        #   DHCP enable:  comment
+        #   DHCP disable: uncomment
+        - ip_address: { get_param: ha0IPAddress}
+
+        # ha0 EDIT: Below line:
+        #   DHCP enable:  comment
+        #   DHCP disable: uncomment
+        #- subnet: { get_param: private_subnet_ha }
+
+      # ha0 EDIT: Below line:
+      #   SR-IOV support:    uncomment
+      #   No SR-IOV support: comment
+      #binding:vnic_type: direct
+
+  pkt0_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_pkt0 }
+      fixed_ips:
+        # pkt0 EDIT: Below line:
+        #   DHCP enable:  comment
+        #   DHCP disable: uncomment
+        - ip_address: { get_param: pkt0IPAddress}
+
+        # pkt0 EDIT: Below line:
+        #   DHCP enable:  uncomment
+        #   DHCP disable: comment
+        #- subnet: { get_param: private_subnet_pkt0}
+
+      # pkt0 EDIT: Below line:
+      #   SR-IOV support:    uncomment
+      #   No SR-IOV support: comment
+      binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }
+
+  pkt1_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : private_network_pkt1 }
+      fixed_ips:
+        # pkt1 EDIT: Below line:
+        #   DHCP enable:  comment
+        #   DHCP disable: uncomment
+        - ip_address: { get_param: pkt1IPAddress}
+
+        # pkt1 EDIT: Below line:
+        #   DHCP enable:  uncomment
+        #   DHCP disable: comment
+        #- subnet: { get_param: private_subnet_pkt1}
+
+      # pkt1 EDIT: Below line:
+      #   SR-IOV support:    uncomment
+      #   No SR-IOV support: comment
+      binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }
+
+
+  # Create and associate three floating IP addresses to the mgt0, pkt0 and pkt1 ports of instance 1
+
+  mgt0_floating_ip1:
+    type: "OS::Heat::ResourceGroup"
+    depends_on: mgt0_port1
+    properties:
+      count: { get_param: floating_ip_count_mgt0 }
+      resource_def:
+        type: OS::Neutron::FloatingIP
+        properties:
+ #         floating_network: { get_param: mgt0_ext_network }
+          port_id: { get_resource: mgt0_port1 }
+          #floating_ip_address: <Valid Floating IP address>
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #mgt1_floating_ip1:
+  #  type: "OS::Heat::ResourceGroup"
+  #  depends_on: mgt1_port1
+  #  properties:
+  #    count: { get_param: floating_ip_count_mgt1 }
+  #    resource_def:
+  #      type: OS::Neutron::FloatingIP
+  #      properties:
+  #        floating_network: { get_param: mgt1_ext_network }
+  #        port_id: { get_resource: mgt1_port1 }
+  #        #floating_ip_address: <Valid Floating IP address>
+
+  pkt0_floating_ip:
+    type: "OS::Heat::ResourceGroup"
+    depends_on: pkt0_port1
+    properties:
+      count: { get_param: floating_ip_count_pkt0 }
+      resource_def:
+        type: OS::Neutron::FloatingIP
+        properties:
+ #         floating_network: { get_param: pkt0_ext_network }
+          port_id: { get_resource: pkt0_port1}
+          #floating_ip_address: <Valid Floating IP address>
+
+
+  pkt1_floating_ip:
+    type: "OS::Heat::ResourceGroup"
+    depends_on: pkt1_port1
+    properties:
+      count: { get_param: floating_ip_count_pkt1 }
+      resource_def:
+        type: OS::Neutron::FloatingIP
+        properties:
+ #         floating_network: { get_param: pkt1_ext_network }
+          port_id: { get_resource: pkt1_port1}
+          #floating_ip_address: <Valid Floating IP address>
+          
+  pkt0S_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : provider_network_pkt0S }
+      fixed_ips:
+       
+      # pkt0 EDIT: Below line:
+      #   SR-IOV support:    uncomment
+      #   No SR-IOV support: comment
+      binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }        
+        
+  pkt1S_port1:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param : provider_network_pkt1S }
+      fixed_ips:
+       
+      # pkt1 EDIT: Below line:
+      #   SR-IOV support:    uncomment
+      #   No SR-IOV support: comment
+      binding:vnic_type: direct
+      security_groups:
+        - { get_param: security_group }        
+
+
+# output some stuff for debug
+outputs:
+
+  percentage_validation:
+    description: "
+        1. THE SUM OF ALL CODEC PERCENTAGE SHOULD ADD TO 100%
+        2. G711% CANNOT BE 100 %
+    "
+    value:
+      yaql:
+          expression: ((float($.data.c1) + float($.data.c2) + float($.data.c3) + float($.data.c4) + float($.data.c5) + float($.data.c6) + float($.data.c7) + float($.data.c8) + float($.data.c9) + float($.data.c10) + float($.data.c11) + float($.data.c12) + float($.data.c13) + float($.data.c14) + float($.data.c15) + float($.data.c16) + float($.data.c17)))
+          data:
+            c1: { get_param: g711_percent }
+            c2: { get_param: amrwb_percent }
+            c3: { get_param: amr_percent }
+            c4: { get_param: evrc_percent }
+            c5: { get_param: evrcb_percent }
+            c6: { get_param: g729_percent }
+            c7: { get_param: g722_percent }
+            c8: { get_param: g723_percent }
+            c9: { get_param: g726_percent }
+            c10: { get_param: g7221_percent }
+            c11: { get_param: ilbc_percent }
+            c12: { get_param: opus_percent }
+            c13: { get_param: silk_8_percent }
+            c14: { get_param: silk_16_percent }
+            c15: { get_param: evs_percent }
+            c16: { get_param: t38_percent }
+            c17: { get_param: g7112g711_percent }
+
+  instance_name:
+    description: Name of the instance
+    value: { get_attr: [vSBC_ACTIVE, name] }
+
+  mgt0_Public_ip:
+    description: mgt0 floating IP address for the instance
+    value: { get_attr: [mgt0_floating_ip1, floating_ip_address] }
+
+  # MGT1_EDIT: UNCOMMENT below lines to configure mgt1 interface
+  #mgt1_Public_ip:
+  #  description: mgt1 floating IP address for the instance
+  #  value: { get_attr: [mgt1_floating_ip1, floating_ip_address] }
+
+  pkt0_Public_ip:
+    description: Public IP address used for the pkt0 interfaces
+    value: { get_attr: [pkt0_floating_ip, floating_ip_address] }
+
+  pkt1_Public_ip:
+    description: Public IP address used for the pkt1 interfaces
+    value: { get_attr: [pkt1_floating_ip, floating_ip_address] }

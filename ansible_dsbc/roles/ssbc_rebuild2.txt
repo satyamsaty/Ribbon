@@ -1,0 +1,78 @@
+
+PLAY [localhost] ************************************************************************************************************************
+Monday 30 March 2020  00:27:20 +0530 (0:00:00.033)       0:00:00.033 ********** 
+
+TASK [include_vars] *********************************************************************************************************************
+ok: [localhost]
+
+PLAY [SPAWNING OAM INSTANCES] ***********************************************************************************************************
+
+PLAY [SPAWNING SSBC Instances] **********************************************************************************************************
+
+PLAY [SPAWNING MSBC Instances] **********************************************************************************************************
+
+PLAY [SPAWNING TSBC Instances] **********************************************************************************************************
+
+PLAY [Rebuilding OAM instances] *********************************************************************************************************
+
+PLAY [Rebuilding SSBC instances] ********************************************************************************************************
+Monday 30 March 2020  00:27:20 +0530 (0:00:00.089)       0:00:00.123 ********** 
+included: /home/satykumar/Distributed/roles/LSWU3/tasks/rebuild_standby_ssbc.yml for localhost
+Monday 30 March 2020  00:27:20 +0530 (0:00:00.155)       0:00:00.279 ********** 
+Monday 30 March 2020  00:27:20 +0530 (0:00:00.124)       0:00:00.404 ********** 
+
+TASK [debug] ****************************************************************************************************************************
+ok: [localhost] => 
+  stack_create.results:
+  - ansible_loop_var: item
+    changed: false
+    item:
+      base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+      flavor: ISBCAG10VCPU
+      mgt0ipaddress: 10.34.194.120
+      name: SSBC_ACTIVE_ANSIBLE
+      present_or_absent: present
+      role: ACTIVE
+      security_group: sbccoresvt-sg
+      template: SSBC_DISTRIBUTED_1TO1_ACTIVE_PORT_RED.yml
+    skip_reason: Conditional result was False
+    skipped: true
+  - ansible_loop_var: item
+    changed: false
+    item:
+      base_build: sbc-V08.01.00R001-connexip-os_07.01.01-R001_7_amd64.qcow2
+      flavor: ISBCAG10VCPU
+      mgt0ipaddress: 10.34.194.83
+      name: SSBC_STANDBY_ANSIBLE
+      present_or_absent: present
+      role: STANBDY
+      security_group: sbccoresvt-sg
+      template: SSBC_DISTRIBUTED_1TO1_STANDBY_PORT_RED.yml
+    skip_reason: Conditional result was False
+    skipped: true
+Monday 30 March 2020  00:27:20 +0530 (0:00:00.083)       0:00:00.487 ********** 
+
+TASK [Instance Failed to spawn] *********************************************************************************************************
+fatal: [localhost]: FAILED! => 
+  msg: |-
+    The conditional check 'stack_create.results[1].stack.status != "COMPLETE"' failed. The error was: error while evaluating conditional (stack_create.results[1].stack.status != "COMPLETE"): 'dict object' has no attribute 'stack'
+  
+    The error appears to be in '/home/satykumar/Distributed/roles/LSWU3/tasks/rebuild_standby_ssbc.yml': line 26, column 5, but may
+    be elsewhere in the file depending on the exact syntax problem.
+  
+    The offending line appears to be:
+  
+  
+      - name: Instance Failed to spawn
+        ^ here
+
+PLAY RECAP ******************************************************************************************************************************
+localhost                  : ok=3    changed=0    unreachable=0    failed=1    skipped=1    rescued=0    ignored=0   
+
+Monday 30 March 2020  00:27:20 +0530 (0:00:00.093)       0:00:00.581 ********** 
+=============================================================================== 
+include_tasks -------------------------------------------------------------------------------------------------------------------- 0.16s
+spawning the SSBC instances ------------------------------------------------------------------------------------------------------ 0.12s
+Instance Failed to spawn --------------------------------------------------------------------------------------------------------- 0.09s
+include_vars --------------------------------------------------------------------------------------------------------------------- 0.09s
+debug ---------------------------------------------------------------------------------------------------------------------------- 0.08s

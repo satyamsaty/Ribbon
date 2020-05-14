@@ -1,0 +1,38 @@
+#!/bin/bash
+
+echo \ntest printing value $1 \n\n\n\n
+pwd
+file=`ssh  -o  "StrictHostKeyChecking no" -p 2024 -i $HOME/ats_repos/lib/perl/SonusQA/cloud_ats.key root@$1 "ls -lrtha /var/log/sonus/sbx/evlog/*.SYS | tail -n 2 | head -1"`
+echo $file
+echo $1
+echo "\n\n\nFile value is $file\n\n\n"
+b=`echo $file | awk -F "evlog/" '{print $2}' | awk -F "SYS" '{print $1"SYS"}'`
+#echo "File is : $b"
+ pwd
+#a=` ssh -o   "StrictHostKeyChecking no" -p 2024 -i /home/ansible/cloud_ats.key root@$1 "cd /var/log/sonus/sbx/evlog ;cat $b| grep -w \".NRS: Got AMF deactivate command\" | awk -F\" \" '{ print \$3}' | tr -s \" \" | awk -F: '{print \$1}'" `
+a=` ssh -o   "StrictHostKeyChecking no" -p 2024 -i $HOME/ats_repos/lib/perl/SonusQA/cloud_ats.key root@$1 "cd /var/log/sonus/sbx/evlog ;cat $b| grep -w \".NRS: Got AMF deactivate command\"" `
+#echo " value is $a " 
+a=`echo $a | awk -F" " '{ print \$3}' | tr -s " " | awk -F: '{print \$1}'`
+#echo "\n\n\n\n A value is $a\n\n\n\n" 
+
+
+
+
+
+file=`ssh  -o  "StrictHostKeyChecking no" -p 2024 -i $HOME/ats_repos/lib/perl/SonusQA/cloud_ats.key root@$2 "ls -lrtha /var/log/sonus/sbx/evlog/*.SYS | tail -1"`
+#echo "\n\n\nFile value is $file\n\n\n"
+d=`echo $file | awk -F "evlog/" '{print $2}' | awk -F "SYS" '{print $1"SYS"}'`
+echo $file
+#echo "File is : $d"
+
+#a=` ssh -o   "StrictHostKeyChecking no" -p 2024 -i /home/ansible/cloud_ats.key root@$1 "cd /var/log/sonus/sbx/evlog ;cat $b| grep -w \".NRS: Got AMF deactivate command\" | awk -F\" \" '{ print \$3}' | tr -s \" \" | awk -F: '{print \$1}'" `
+c=` ssh -o   "StrictHostKeyChecking no" -p 2024 -i $HOME/ats_repos/lib/perl/SonusQA/cloud_ats.key root@$2 "cd /var/log/sonus/sbx/evlog ;cat $d| grep -w \".RTM: Switchover processing complete for all subsystems\"" `
+#echo "\n\n\nC value is $c\n\n\n"
+c=`echo $c | awk -F" " '{ print \$3}' | tr -s " " | awk -F: '{print \$1}'`
+#echo "  value is $c "
+
+
+
+echo "switchover time for sync : "
+awk -v a="$a" -v b="$c" 'BEGIN {printf "%.3f\n",(b-a)}'
+

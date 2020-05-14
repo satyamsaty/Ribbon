@@ -1,0 +1,31 @@
+---
+  - name: Performing Server Switchover after active SSBC got rebuilded.
+    ignore_errors: No
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+       expect ">"
+       send "request system admin vsbcSystem switchover\n"
+
+       expect ">"
+       send "yes\n"
+       expect ">"
+       send "\n"
+
+       exit 0
+    args:
+        executable: /usr/bin/expect
+    delegate_to: "{{ item }}"
+    with_items: "{{ groups['msbc'][2] }}"
+
+    register: switchover
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ switchover.results }}"
+  
+
+  - include: active_standby_sync_msbc.yml

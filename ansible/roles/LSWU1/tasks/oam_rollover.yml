@@ -1,0 +1,34 @@
+---
+  - name: Moving oamrollover.sh from localhost to both nodes
+    copy:
+      src: "{{ RollOver_Path }}"
+      dest: /root/
+      mode: '0777'
+      force: yes
+    delegate_to: "{{item}}"
+
+    loop: "{{groups['isbc']}}"
+    loop_control:
+          label: "{{ item }}"
+
+  - name: Rolling OAM logs on both nodes 
+  #  become: True
+    shell: "expect oamrollover.sh"
+    args:
+      chdir: /root/
+    delegate_to: "{{item}}"
+    loop: "{{groups['isbc']}}"
+    loop_control:
+        label: "{{ item }}"
+
+    register: f
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ f.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+    no_log: True
+    
+
+#  - debug: var=f.stdout_lines
+

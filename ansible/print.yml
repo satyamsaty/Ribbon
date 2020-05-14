@@ -1,0 +1,8 @@
+- name: print
+  hosts: localhost
+  tasks:
+     - name: simple print
+       shell: echo "hello mukul"
+       register: out
+
+     - debug: var=out.stdout_lines

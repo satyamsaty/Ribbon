@@ -1,0 +1,13 @@
+---
+# Main file which is calling all tasks .All tasks should be in the same directory .
+  - name: Authenticate to the cloud and retrieve the service catalog
+    os_auth:
+      cloud: sbc-core-queens
+      validate_certs: no
+
+#  - include: active.yml
+#  - include: standby.yml
+#  - include: license_configuration.yml
+#  - include: rebuild_standby.yml
+#  - include: rebuild_active.yml
+#  - include: switchover.yml

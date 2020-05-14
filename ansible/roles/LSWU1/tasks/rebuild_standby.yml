@@ -1,0 +1,196 @@
+---
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_STANDBY"
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+#  - name: Upgrading Standby Node by Rebuild method
+#    os_stack:
+#       name: "{{ stack_name_standby }}"
+#       tag: "{{ stack_name_standby }}"
+#       state: "{{ present_or_absent }}"
+#       validate_certs: false
+#       template: "{{ TEMPLATE_STANDBY }}"
+#       parameters:
+#           flavor: "{{ ISBC_STANDBY_FLAVOR }}"
+#           image: "{{  ISBC_UPGRADED_BUILD }}"
+#           security_group: "{{ ISBC_STANDBY_SG }}"
+#  - name: Waiting for Mgmt IP to comeup after upgrade in standby instance
+#    wait_for:
+#       host: "{{ mgt0IPAddress_STANDBY }}"
+#       port: 2024
+#       delay: 60
+#  - name: Checking the Mgmt IP is pingable or not in standby instance
+#    shell: ping -c2 {{ mgt0IPAddress_STANDBY }}
+#    register: g
+#  - debug: var=g.stdout_lines
+#  - name: checking if any core file generated
+#    shell: /home/ansible/core.sh {{ mgt0IPAddress_STANDBY }}
+#    register: b
+#    failed_when: b.stdout_lines | length > 0
+##  - name: system_coredumplist
+#    shell: curl -kisu 'admin:admin' -X GET https://{{mgt0IPAddress_ACTIVE}}/api/operational/system/coredumpList/ | grep  "No Content"
+#    register: b
+#  - debug: var=b.stdout_lines
+
+#  - name: waiting for service to become available for standby node
+#    shell: sh $HOME/timeout.sh {{ mgt0IPAddress_STANDBY }}
+#  - name: To check installed software version
+#    shell: ssh -o UserKnownHostsFile=/dev/null -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: h
+#  - debug: var=h.stdout_lines
+#  - name: Waiting for  active and standby to make a cluster
+#    wait_for: timeout=60
+#  - name: swinfo after standby instance got rebuilded 
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: i
+#  - debug: var=i.stdout_lines
+#  - name: to push license in standby node after upgrade
+#    shell: sh /home/ansible/license_push_cloud.sh null {{ mgt0IPAddress_STANDBY }}
+#    register: command_result
+#    delegate_to: bats14
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key -P 2024 $HOME/config.sh root@{{ mgt0IPAddress_STANDBY }}:/root
+#  - name: To run configuration in standby node
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "expect /root/config.sh"
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key -P 2024 $HOME/call.sh root@{{ mgt0IPAddress_ACTIVE }}:/root
+#  - name: Call Count after standby got rebuilded 
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "expect /root/call.sh"
+#    register: j
+#  - debug: var=j.stdout_lines
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+
+  - name: Rebuilding the standby instance
+    register: stack_create
+    os_stack:
+       name: "{{ item.name }}"
+       tag: "{{ item.name }}"
+       state: "{{ item.present_or_absent }}"
+       validate_certs: false
+       template: "{{ item.template }}"
+       parameters:
+           flavor: "{{ item.flavor }}"
+           image: "{{ item.upgraded_build }}"
+           security_group: "{{ item.security_group }}"
+           mgt0IPAddress: "{{ item.mgt0ipaddress }}"
+           sbc_ceRole: "{{ item.role }}"
+  
+    loop: "{{ isbc_distributed_nodes }}"
+    when: item.role == 'STANDBY'
+
+  - name: Wait until the  instance pings
+    wait_for:
+       host: "{{ item.mgt0ipaddress }}"
+       port: 2024
+       delay: 60
+       timeout: 120
+       state: started
+       msg: " Active Instance waiting to ping "
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+    when: item.role == 'STANDBY'
+
+  - name: add instances to inventory
+    add_host:
+      name: "{{ item.name }}"
+      groups: "isbc"
+      ansible_host: "{{ item.mgt0ipaddress }}"
+    loop: "{{ isbc_distributed_nodes }}"
+    when: item.role == 'STANDBY'
+
+
+  - name: Checking the Management node  is pingable or not
+    shell: ping -c2 {{ item.mgt0ipaddress }}
+    register: a
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+#    when: item.role == 'STANDBY'
+#  - debug:
+#       var:  a.stdout_lines
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ a.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+  - name: wait for 30 seconds
+    wait_for:
+      timeout: 30
+
+
+
+
+  - name: checking if any core file generated, fails task if generated .
+    shell:
+      "ls -alrt | grep -w core|wc -l"
+    args:
+     chdir: /var/log/sonus/sbx/coredump/
+    delegate_to: "{{ res.results[1].stdout }}"
+    register: b
+    failed_when: '"0" not in b.stdout'
+  - debug: var=b.stdout_lines
+  - block:
+      - name: Moving the files from localhost to both nodes
+
+        copy:
+          src: "{{ TimeOutScript_Path }}"
+          dest: /root/
+          mode: '0777'
+          force: yes
+        delegate_to: "{{ res.results[1].stdout }}"
+
+ #       loop: "{{groups['isbc']}}"
+ #       loop_control:
+ #           label: "{{ item }}"
+
+
+
+
+
+      - name: waiting for service to become available
+        shell: sh  timeout1.sh
+        args:
+         chdir: /root/
+
+        delegate_to: "{{ res.results[1].stdout }}"
+#        loop: "{{groups['isbc']}}"
+#        loop_control:
+#          label: "{{ item }}"
+
+        register: command_result
+        failed_when: command_result.rc not in (0,255,1)
+        when: a is succeeded
+    rescue:
+      - name: Active Instance didnot come up.
+        debug: msg="There was an error in the block."
+
+
+
+
+
+#  - name: checking sync status
+#    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/syncStatus/ | grep status
+#    register: b
+#    loop: "{{ isbc_distributed_nodes }}"
+#  - debug:
+#      msg: "{{ item.stdout_lines }}"
+#    loop: "{{ b.results }}"
+#    loop_control:
+#      label: "{{ item.stdout_lines }}"
+#
+
+
+
+
+

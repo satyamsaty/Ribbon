@@ -1,0 +1,84 @@
+---
+  - include_tasks: inventory.yml
+  - include_tasks: delegate.yml
+
+
+
+  - name: Moving the files from localhost to active node
+    ignore_errors: False
+    copy:
+      src: "{{ SyncStatus_Path }}"
+      dest: $HOME/sync_status_centralized.sh
+      mode: '0777'
+      force: yes
+    delegate_to: "{{ res.results[0].stdout }}"
+
+
+  - name: Waiting for ISBC active and standby to make a cluster
+    ignore_errors: yes
+    shell: $HOME/sync_status_centralized.sh {{ result.results[0].stdout }}
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: b
+    failed_when: b.rc not in (0,126)
+  - debug: var=b.stdout_lines
+  - name: sleep for 30 seconds and continue with play
+    wait_for:
+       timeout: 30
+
+
+
+  - name: Checking Sync Status
+    ignore_errors: yes
+    shell: |
+       set timeout 15
+       spawn bash
+
+
+       send "/opt/sonus/sbx/tailf/bin/confd_cli -uadmin\n"
+
+       expect ">"
+       send "show table system syncStatus\n"
+
+       expect ">"
+       send "\n"
+
+       exit 0
+    args:
+        executable: /usr/bin/expect
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: sync_status
+  - debug:
+        var: sync_status.stdout_lines
+
+
+
+
+
+  - name: Servers are not in Sync
+    fail:
+      msg: "Servers are not in sync"
+    when: '"syncCompleted" not in sync_status.stdout'
+
+  - name: Sync status after active and standby spawned successfully
+    ignore_errors: yes
+    shell: " /opt/sonus/sbx/scripts/swinfo.sh "
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: sync_status
+  - debug: 
+      var: sync_status.stdout_lines
+
+
+
+
+#  - name: check call status after rebuilding standby
+#    ignore_errors: False
+#    shell: echo "show status global callCountStatus"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    delegate_to: "{{ res.results[0].stdout }}"
+#    register: call_count
+#  - debug: 
+#      var: call_count.stdout_lines
+#
+
+ 
+  
+  

@@ -1,0 +1,23 @@
+
+
+  - name:
+    command: "echo {{ item.mgt0ipaddress }}"
+    register: result
+    loop: "{{ isbc_centralized_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug:
+      var: result
+    no_log: True
+
+
+  - name:
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_centralized_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+

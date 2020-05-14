@@ -1,0 +1,10 @@
+auth:
+    auth_url: https://10.34.224.10:13292
+    username: ribbon
+    password: ribbon1
+    project_name: admin
+    project_id: 8e6916d2ac7f49409fc58005850221fa
+    user_domain_name: default
+region_name: "regionOne"
+interface: public
+identity_api_version: 3 

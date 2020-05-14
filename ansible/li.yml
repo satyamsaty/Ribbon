@@ -1,0 +1,16 @@
+- name: Deploy on OpenStack
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Deploy an instance
+      os_server:
+      state: present
+      name: webserver
+      image: centos_qcow2
+      key_name: ansiblemaster
+      wait: yes
+      flavor: ansible_master
+      auto_floating_ip: yes
+      network: PR_MGMT
+      meta:
+        hostname: webserver.localdomain

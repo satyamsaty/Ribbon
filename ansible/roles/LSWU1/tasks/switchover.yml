@@ -1,0 +1,91 @@
+---
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+#    register: b
+#    failed_when: b.rc not in (0,255)
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+
+
+  - name: Moving the files from localhost to active node
+    copy:
+      src: "{{ ServerSwitchover_Path }}"
+      dest: /root/
+      mode: '0777'
+      force: yes
+    delegate_to: "{{ res.results[1].stdout }}"
+
+  - name: Server switchover after both servers rebuilded 
+    shell: "expect /root/switch.sh"
+    register: f
+    delegate_to: "{{ res.results[1].stdout }}"
+    
+#  - debug: var=f.stdout_lines
+
+#  - name:
+#    copy:
+#      src: "{{ CallCheck_Path }}"
+#      dest: /root/call.txt
+#      mode: '0777'
+#      force: yes
+#    delegate_to: "{{ res.results[0].stdout }}"
+#
+#
+#
+#  - name: checking call
+#    shell: cat /root/call.txt | /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    register: b
+#  - debug: var=b.stdout_lines
+#    delegate_to: "{{ res.results[0].stdout }}"
+
+
+
+#  - name: check call status after performing switchover
+#    shell: echo "show status global callCountStatus"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    delegate_to: "{{ res.results[0].stdout }}"
+#    register: b
+#  - debug: var=b.stdout_lines
+
+
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key -P 2024 $HOME/switch.sh root@{{ mgt0IPAddress_STANDBY }}:/root
+#  - name: Running system   switchover 
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "expect /root/switch.sh"
+#  - name:
+#    wait_for: timeout=5
+#  - name: waiting for service to come after switchover
+#    shell: sh /home/ansible/process.sh {{ mgt0IPAddress_ACTIVE }}
+#  - name:
+#    wait_for: timeout=120
+#  #  wait_for: timeout=300
+#  - name: checking sync status after final switch over
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: p
+#  - debug: var=p.stdout_lines
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key -P 2024 $HOME/call.sh root@{{ mgt0IPAddress_ACTIVE }}:/root
+#  - name: Waiting for sync to be completed
+#    wait_for: timeout=30
+#  - name: To check swinfo after rebuilding active instance and performing switchover .
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: r
+#  - debug: var=r.stdout_lines
+#  - name: Call Count after performing system switchover after rebuidling both instances 
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "expect /root/call.sh"
+#    register: s
+#  - debug: var=s.stdout_lines
+#  - name: Ansible date fact example
+#    debug:
+#      var=ansible_date_time.date
+#  - name: perform switchover on standby box
+#    shell: echo "request system admin vsbcSystem switchover"| /opt/sonus/sbx/tailf/bin/confd_cli -u admin --noninteractive --noaaa
+#    register: b
+#  - debug: var=b.stdout_lines
+#

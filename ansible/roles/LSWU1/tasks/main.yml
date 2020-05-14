@@ -1,0 +1,18 @@
+---
+# Main file which is calling all tasks .All tasks should be in the same directory .
+  - name: Authenticate to the cloud and retrieve the service catalog
+    os_auth:
+      cloud: elt-ext
+      validate_certs: no
+#    pre_tasks:
+#       - name: Install dependent packages before running playbook
+#         pip:
+#           name: shade
+#           state: latest
+
+#  - include: active.yml
+#  - include: standby.yml
+#  - include: license_configuration.yml
+#  - include: rebuild_standby.yml
+#  - include: rebuild_active.yml
+#  - include: switchover.yml

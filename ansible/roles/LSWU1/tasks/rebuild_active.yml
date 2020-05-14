@@ -1,0 +1,186 @@
+---
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_STANDBY"
+#  - name: remove  the invalid key
+#    shell: ssh-keygen -R "mgt0IPAddress_ACTIVE"
+#  - name: Upgrading Active Instance by  Rebuild Method
+#    os_stack:
+#       name: "{{ stack_name_active }}"
+#       tag: "{{ stack_name_active }}"
+#       state: "{{ present_or_absent }}"
+#       validate_certs: false
+#       template: "{{ TEMPLATE_ACTIVE }}"
+#       parameters:
+#           flavor: "{{ ISBC_ACTIVE_FLAVOR }}"
+#           image: "{{ ISBC_UPGRADED_BUILD }}"
+#           security_group: "{{ ISBC_ACTIVE_SG }}"
+#  - name: Wait until the rebuilded active instance pings
+#    wait_for:
+#       host: "{{ mgt0IPAddress_ACTIVE }}"
+#       port: 2024
+#       delay: 60
+#       state: started
+#       timeout: 180
+#       msg: Instance is not pinging
+#  - name: Checking the Mgmt IP is pingable or not for Active Node
+#    shell: ping -c2 {{ mgt0IPAddress_ACTIVE }}
+#    register: k
+#  - debug: var=k.stdout_lines
+#  - name: To wait until service starts running
+#    shell: sh $HOME/timeout.sh {{ mgt0IPAddress_ACTIVE }}
+   # wait_for: timeout=60
+#  - name: waiting for sync
+#    shell: sh /home/ansible/process.sh  {{ mgt0IPAddress_ACTIVE }}
+#  - name:
+#    wait_for: timeout=10
+#  - name: checking sync status after rebuilding active instance 
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: l
+#  - debug: var=l.stdout_lines
+#  - name: 
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: m
+#  - debug: var=m.stdout_lines
+#  - name: To push license in active node after rebuilding active instance
+#    shell: /home/ansible/license_push_cloud.sh {{ mgt0IPAddress_ACTIVE }} null
+   #delegate_to: bats14
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key -P 2024 $HOME/config.sh root@{{ mgt0IPAddress_ACTIVE }}:/root
+#  - name: To run configuration in active node after upgrade
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_ACTIVE }} "expect /root/config.sh"
+#  - name: 
+#    shell: scp -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key -P 2024 $HOME/call.sh root@{{ mgt0IPAddress_STANDBY }}:/root
+#  - name: Call Count after Upgrade
+#    shell: ssh -p 2024 -o  "stricthostkeychecking no" -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "expect /root/call.sh"
+#    register: n
+#  - debug: var=n.stdout_lines
+#  - name: Waiting for sync to be completed after active got rebuilded
+#    wait_for: timeout=120
+#  - name: checking sync status before final switchover
+#    shell: ssh -o  "stricthostkeychecking no" -p 2024 -i $HOME/cloud_ats.key root@{{ mgt0IPAddress_STANDBY }} "sh /opt/sonus/sbx/scripts/swinfo.sh"
+#    register: o
+#  - debug: var=o.stdout_lines
+
+  - name: name
+    command: "echo {{ item.name }}"
+    register: res
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.name }}"
+  - debug:
+      var: res
+    no_log: True
+
+
+  - name: Rebuilding the active instance
+    register: stack_create
+    os_stack:
+       name: "{{ item.name }}"
+       tag: "{{ item.name }}"
+       state: "{{ item.present_or_absent }}"
+       validate_certs: false
+       template: "{{ item.template }}"
+       parameters:
+           flavor: "{{ item.flavor }}"
+           image: "{{ item.upgraded_build }}"
+           security_group: "{{ item.security_group }}"
+           mgt0IPAddress: "{{ item.mgt0ipaddress }}"
+           sbc_ceRole: "{{ item.role }}"
+
+    loop: "{{ isbc_distributed_nodes }}"
+    when: item.role == 'ACTIVE'
+
+  - name: Wait until the  instance pings
+    wait_for:
+       host: "{{ item.mgt0ipaddress }}"
+       port: 2024
+       delay: 60
+       timeout: 120
+       state: started
+       msg: " Active Instance waiting to ping "
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+    when: item.role == 'ACTIVE'
+
+  - name: add instances to inventory
+    add_host:
+      name: "{{ item.name }}"
+      groups: "isbc"
+      ansible_host: "{{ item.mgt0ipaddress }}"
+    loop: "{{ isbc_distributed_nodes }}"
+    when: item.role == 'ACTIVE'
+
+
+  - name: Checking the Management node  is pingable or not
+    shell: ping -c2 {{ item.mgt0ipaddress }}
+    register: a
+    loop: "{{ isbc_distributed_nodes }}"
+    loop_control:
+       label: "{{ item.mgt0ipaddress }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ a.results }}"
+    loop_control:
+       label: "{{ item.stdout_lines }}"
+
+
+  - name: wait for 30 seconds
+    wait_for:
+      timeout: 30
+
+
+
+
+  - name: checking if any core file generated, fails task if generated .
+    shell:
+      "ls -alrt | grep -w core|wc -l"
+    args:
+     chdir: /var/log/sonus/sbx/coredump/
+    delegate_to: "{{ res.results[0].stdout }}"
+    register: b
+    failed_when: '"0" not in b.stdout'
+  - debug: var=b.stdout_lines
+  - block:
+      - name: Moving the files from localhost to both nodes
+
+        copy:
+          src: "{{ TimeOutScript_Path }}"
+          dest: /root/
+          mode: '0777'
+          force: yes
+        delegate_to: "{{ res.results[0].stdout }}"
+
+      - name: waiting for service to become available
+        shell: sh  timeout1.sh
+        args:
+         chdir: /root/
+
+        delegate_to: "{{ res.results[0].stdout }}"
+        register: command_result
+        failed_when: command_result.rc not in (0,255,1)
+        when: a is succeeded
+    rescue:
+      - name: Active Instance didnot come up.
+        debug: msg="There was an error in the block."
+
+
+
+
+
+  - name: checking sync status
+    shell: curl -kisu 'admin:admin' -X GET https://{{item.mgt0ipaddress}}/api/operational/system/syncStatus/ | grep status
+    register: b
+    loop: "{{ isbc_distributed_nodes }}"
+  - debug:
+      msg: "{{ item.stdout_lines }}"
+    loop: "{{ b.results }}"
+    loop_control:
+      label: "{{ item.stdout_lines }}"
+
+
+
+
+
+
+

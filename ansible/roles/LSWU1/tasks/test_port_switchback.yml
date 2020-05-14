@@ -1,0 +1,7 @@
+---
+  - name: To check port switchover time
+    shell:
+          "sh /home/ansible/test_port_switchback.sh" 
+    register: b
+  - debug: var=b.stdout_lines
+
